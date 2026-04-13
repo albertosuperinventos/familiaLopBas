@@ -480,26 +480,24 @@
 </div>
 
 
-<!-- Firebase SDK compat -->
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
-<script type="module">
-// Firebase modular v11 - funciona en GitHub Pages con HTTPS
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-const firebaseConfig = {
+<script>
+firebase.initializeApp({
   apiKey: "AIzaSyBpw-IXMNsthOUfwNzugMeiNNLT-TndaAM",
   authDomain: "familialopbas.firebaseapp.com",
+  databaseURL: "https://familialopbas-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "familialopbas",
   storageBucket: "familialopbas.firebasestorage.app",
   messagingSenderId: "152258815775",
   appId: "1:152258815775:web:f3d530d07d43113647b22a"
-};
+});
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const auth = firebase.auth();
+const db = firebase.database();
 
 let currentUser = null;
 let familiaData = null;
@@ -538,26 +536,16 @@ function generarCodigo() { return Math.random().toString(36).substring(2,8).toUp
 const COLORS = ['#6c63ff','#ff6584','#43e97b','#ffa500','#00d4ff','#a855f7','#f59e0b'];
 function avatarColor(uid) { let h=0; for(let c of uid) h=(h+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
 function initials(name) { return name ? name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '??'; }
-function ts() { return new Date().toISOString(); }
 
-// Wrapper Firestore con retry
-async function fsGet(ref) {
-  for (let i=0; i<3; i++) {
-    try { return await getDoc(ref); }
-    catch(e) { if(i===2) throw e; await new Promise(r=>setTimeout(r,1000)); }
-  }
+// DB helpers - Realtime Database usa REST-like paths
+function dbGet(path) {
+  return db.ref(path).once('value').then(s => s.val());
 }
-async function fsSet(ref, data) {
-  for (let i=0; i<3; i++) {
-    try { return await setDoc(ref, {...data, _ts: ts()}); }
-    catch(e) { if(i===2) throw e; await new Promise(r=>setTimeout(r,1000)); }
-  }
+function dbSet(path, data) {
+  return db.ref(path).set(data);
 }
-async function fsUpdate(ref, data) {
-  for (let i=0; i<3; i++) {
-    try { return await updateDoc(ref, data); }
-    catch(e) { if(i===2) throw e; await new Promise(r=>setTimeout(r,1000)); }
-  }
+function dbUpdate(path, data) {
+  return db.ref(path).update(data);
 }
 
 // --- Auth tabs ---
@@ -574,7 +562,7 @@ window.doLogin = async () => {
   if (!email || !pass) return showError('login-error','Rellena todos los campos');
   showLoading();
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
+    await auth.signInWithEmailAndPassword(email, pass);
   } catch(e) {
     hideLoading();
     const msgs = {'auth/user-not-found':'Usuario no encontrado','auth/wrong-password':'Contraseña incorrecta','auth/invalid-credential':'Email o contraseña incorrectos'};
@@ -591,9 +579,9 @@ window.doRegister = async () => {
   if (pass.length < 6) return showError('register-error','Mínimo 6 caracteres');
   showLoading();
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    await fsSet(doc(db,'users',cred.user.uid), { name, email, role:'padre', familiaId:null });
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: name });
+    await dbSet('users/' + cred.user.uid, { name, email, role:'padre', familiaId: null });
   } catch(e) {
     hideLoading();
     const msgs = {'auth/email-already-in-use':'Email ya registrado','auth/weak-password':'Contraseña muy débil'};
@@ -605,11 +593,10 @@ window.doRegister = async () => {
 window.doGoogleLogin = async () => {
   showLoading();
   try {
-    const cred = await signInWithPopup(auth, new GoogleAuthProvider());
-    const ref = doc(db,'users',cred.user.uid);
-    const snap = await fsGet(ref);
-    if (!snap.exists()) {
-      await fsSet(ref, { name: cred.user.displayName||'Usuario', email: cred.user.email, role:'padre', familiaId:null });
+    const cred = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    const snap = await dbGet('users/' + cred.user.uid);
+    if (!snap) {
+      await dbSet('users/' + cred.user.uid, { name: cred.user.displayName||'Usuario', email: cred.user.email, role:'padre', familiaId: null });
     }
   } catch(e) {
     hideLoading();
@@ -619,7 +606,7 @@ window.doGoogleLogin = async () => {
 
 // --- Logout ---
 window.doLogout = async () => {
-  await signOut(auth);
+  await auth.signOut();
   familiaData = null;
   document.getElementById('profile-menu').classList.remove('open');
 };
@@ -630,15 +617,14 @@ window.crearFamilia = async () => {
   showLoading();
   try {
     const codigo = generarCodigo();
-    const famRef = doc(collection(db,'familias'));
-    await fsSet(famRef, { nombre:'Familia LopBas', codigo, creadoPor:currentUser.uid, miembros:[currentUser.uid] });
-    const userRef = doc(db,'users',currentUser.uid);
-    const userSnap = await fsGet(userRef);
-    if (userSnap.exists()) {
-      await fsUpdate(userRef, { familiaId: famRef.id });
-    } else {
-      await fsSet(userRef, { name: currentUser.displayName||currentUser.email.split('@')[0], email:currentUser.email, role:'padre', familiaId:famRef.id });
-    }
+    const famId = 'fam_' + Date.now();
+    await dbSet('familias/' + famId, {
+      nombre: 'Familia LopBas',
+      codigo,
+      creadoPor: currentUser.uid,
+      miembros: { [currentUser.uid]: true }
+    });
+    await dbUpdate('users/' + currentUser.uid, { familiaId: famId, role: 'padre' });
     await cargarHome();
   } catch(e) {
     hideLoading();
@@ -647,7 +633,7 @@ window.crearFamilia = async () => {
   }
 };
 
-// --- Unirse ---
+// --- Unirse a familia ---
 window.toggleJoinForm = () => document.getElementById('join-form').classList.toggle('visible');
 
 window.unirseAFamilia = async () => {
@@ -655,20 +641,20 @@ window.unirseAFamilia = async () => {
   if (code.length !== 6) return showError('join-error','Código de 6 caracteres');
   showLoading();
   try {
-    const q = query(collection(db,'familias'), where('codigo','==',code));
-    const snap = await getDocs(q);
-    if (snap.empty) { hideLoading(); return showError('join-error','Código no encontrado'); }
-    const famDoc = snap.docs[0];
-    const miembros = famDoc.data().miembros || [];
-    if (!miembros.includes(currentUser.uid)) {
-      await fsUpdate(famDoc.ref, { miembros:[...miembros, currentUser.uid] });
-    }
-    const userRef = doc(db,'users',currentUser.uid);
-    const userSnap = await fsGet(userRef);
-    if (userSnap.exists()) {
-      await fsUpdate(userRef, { familiaId:famDoc.id, role:'hijo' });
+    const familias = await dbGet('familias');
+    if (!familias) { hideLoading(); return showError('join-error','Código no encontrado'); }
+    const famEntry = Object.entries(familias).find(([,f]) => f.codigo === code);
+    if (!famEntry) { hideLoading(); return showError('join-error','Código no encontrado'); }
+    const [famId, famData] = famEntry;
+    await dbUpdate('familias/' + famId + '/miembros', { [currentUser.uid]: true });
+    const userData = await dbGet('users/' + currentUser.uid);
+    if (userData) {
+      await dbUpdate('users/' + currentUser.uid, { familiaId: famId, role: 'hijo' });
     } else {
-      await fsSet(userRef, { name:currentUser.displayName||currentUser.email.split('@')[0], email:currentUser.email, role:'hijo', familiaId:famDoc.id });
+      await dbSet('users/' + currentUser.uid, {
+        name: currentUser.displayName || currentUser.email.split('@')[0],
+        email: currentUser.email, role: 'hijo', familiaId: famId
+      });
     }
     await cargarHome();
   } catch(e) {
@@ -680,46 +666,48 @@ window.unirseAFamilia = async () => {
 // --- Cargar home ---
 async function cargarHome() {
   try {
-    const userSnap = await fsGet(doc(db,'users',currentUser.uid));
-    if (!userSnap.exists() || !userSnap.data().familiaId) {
+    const userData = await dbGet('users/' + currentUser.uid);
+    if (!userData || !userData.familiaId) {
       hideLoading(); showScreen('familia'); return;
     }
-    const userData = userSnap.data();
-    const famSnap = await fsGet(doc(db,'familias',userData.familiaId));
-    if (!famSnap.exists()) { hideLoading(); showScreen('familia'); return; }
+    const famData = await dbGet('familias/' + userData.familiaId);
+    if (!famData) { hideLoading(); showScreen('familia'); return; }
 
-    familiaData = { id:famSnap.id, ...famSnap.data(), userRole:userData.role };
+    familiaData = { id: userData.familiaId, ...famData, userRole: userData.role };
     const nombre = currentUser.displayName || userData.name || 'Usuario';
+
     document.getElementById('home-username').innerHTML = nombre.split(' ')[0] + ' <span>👋</span>';
-    document.getElementById('home-familia-name').textContent = familiaData.nombre || 'FamiliaLopBas';
-    document.getElementById('home-codigo').textContent = familiaData.codigo;
-    document.getElementById('modal-codigo-value').textContent = familiaData.codigo;
-    document.getElementById('mi-rol-label').textContent = userData.role==='padre' ? '👨‍💼 Padre/Madre' : '👶 Hijo/a';
+    document.getElementById('home-familia-name').textContent = famData.nombre || 'FamiliaLopBas';
+    document.getElementById('home-codigo').textContent = famData.codigo;
+    document.getElementById('modal-codigo-value').textContent = famData.codigo;
+    document.getElementById('mi-rol-label').textContent = userData.role === 'padre' ? '👨‍💼 Padre/Madre' : '👶 Hijo/a';
+
     const color = avatarColor(currentUser.uid);
     document.getElementById('profile-btn').textContent = initials(nombre);
     document.getElementById('profile-btn').style.background = color;
-    await renderMiembros(familiaData.miembros || []);
+
+    await renderMiembros(famData.miembros || {});
     hideLoading(); showScreen('home');
-    if (userData.role==='hijo') {
+
+    if (userData.role === 'hijo') {
       document.querySelectorAll('.module-badge.padres').forEach(b => b.closest('.module-card').style.opacity='0.5');
     }
   } catch(e) {
     hideLoading();
-    showToast('Error al cargar: ' + e.message);
+    showToast('Error: ' + e.message);
     console.error('cargarHome:', e);
     showScreen('familia');
   }
 }
 
-async function renderMiembros(ids) {
+async function renderMiembros(miembrosObj) {
   const bar = document.getElementById('members-bar');
   bar.innerHTML = '';
-  for (const uid of ids) {
+  for (const uid of Object.keys(miembrosObj)) {
     try {
-      const snap = await fsGet(doc(db,'users',uid));
-      if (!snap.exists()) continue;
-      const u = snap.data();
-      const isSelf = uid===currentUser.uid;
+      const u = await dbGet('users/' + uid);
+      if (!u) continue;
+      const isSelf = uid === currentUser.uid;
       bar.innerHTML += `<div class="member-chip">
         <div class="member-avatar ${isSelf?'online':''}" style="background:${avatarColor(uid)}">${initials(u.name||'U')}</div>
         <div class="member-name">${isSelf?'Tú':(u.name||'').split(' ')[0]}</div>
@@ -731,42 +719,54 @@ async function renderMiembros(ids) {
 // --- Módulos ---
 window.openModule = (mod) => {
   document.getElementById('profile-menu').classList.remove('open');
-  const m = {geo:{icon:'📍',title:'Geolocalización',sub:'Fase 3'},cesta:{icon:'🛒',title:'Cesta de la compra',sub:'Fase 2'},gastos:{icon:'💶',title:'Gastos familia',sub:'Fase 3'},vehiculos:{icon:'🚗',title:'Vehículos',sub:'Fase 3'},medicos:{icon:'🏥',title:'Médicos y citas',sub:'Fase 4'},tareas:{icon:'✅',title:'Lista de tareas',sub:'Fase 2'}}[mod];
+  const m = {
+    geo:      {icon:'📍', title:'Geolocalización',    sub:'Módulo en desarrollo — Fase 3'},
+    cesta:    {icon:'🛒', title:'Cesta de la compra', sub:'Módulo en desarrollo — Fase 2'},
+    gastos:   {icon:'💶', title:'Gastos familia',     sub:'Módulo en desarrollo — Fase 3'},
+    vehiculos:{icon:'🚗', title:'Vehículos',          sub:'Módulo en desarrollo — Fase 3'},
+    medicos:  {icon:'🏥', title:'Médicos y citas',    sub:'Módulo en desarrollo — Fase 4'},
+    tareas:   {icon:'✅', title:'Lista de tareas',    sub:'Módulo en desarrollo — Fase 2'}
+  }[mod];
   if (!m) return;
   document.getElementById('cs-icon').textContent = m.icon;
   document.getElementById('cs-title').textContent = m.title;
-  document.getElementById('cs-sub').textContent = 'Módulo en desarrollo — ' + m.sub;
+  document.getElementById('cs-sub').textContent = m.sub;
   document.getElementById('coming-soon').classList.add('show');
 };
 
-window.mostrarCodigo = () => { document.getElementById('profile-menu').classList.remove('open'); document.getElementById('modal-codigo').style.display='flex'; };
+window.mostrarCodigo = () => {
+  document.getElementById('profile-menu').classList.remove('open');
+  document.getElementById('modal-codigo').style.display = 'flex';
+};
 window.copiarCodigo = () => { navigator.clipboard.writeText(familiaData?.codigo||''); showToast('✅ Código copiado'); };
 window.toggleProfile = () => document.getElementById('profile-menu').classList.toggle('open');
 window.gestionarRol = () => { document.getElementById('profile-menu').classList.remove('open'); showToast('Rol: '+(familiaData?.userRole==='padre'?'Padre/Madre':'Hijo/a')); };
 
 document.addEventListener('click', (e) => {
   if (!e.target.closest('#profile-btn') && !e.target.closest('#profile-menu')) document.getElementById('profile-menu').classList.remove('open');
-  if (e.target===document.getElementById('modal-codigo')) document.getElementById('modal-codigo').style.display='none';
+  if (e.target === document.getElementById('modal-codigo')) document.getElementById('modal-codigo').style.display = 'none';
 });
 document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 document.getElementById('join-code').addEventListener('keydown', e => { if(e.key==='Enter') unirseAFamilia(); });
 
 // --- Auth state ---
-onAuthStateChanged(auth, async (user) => {
+auth.onAuthStateChanged(async (user) => {
   currentUser = user;
   hideSplash();
   if (!user) { hideLoading(); showScreen('auth'); return; }
   showLoading();
   try {
-    const userRef = doc(db,'users',user.uid);
-    const snap = await fsGet(userRef);
-    if (!snap.exists()) {
-      await fsSet(userRef, { name:user.displayName||user.email.split('@')[0], email:user.email, role:'padre', familiaId:null });
+    const userData = await dbGet('users/' + user.uid);
+    if (!userData) {
+      await dbSet('users/' + user.uid, {
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email, role: 'padre', familiaId: null
+      });
     }
     await cargarHome();
   } catch(e) {
     hideLoading();
-    showToast('Error conexión: ' + e.message);
+    showToast('Error: ' + e.message);
     showScreen('auth');
   }
 });
