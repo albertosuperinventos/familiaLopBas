@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FamiliaLopBas">
+<meta name="theme-color" content="#1a1a2e">
+<title>FamiliaLopBas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --bg2: #16162a;
+    --bg3: #1e1e35;
+    --card: #1a1a2e;
+    --border: rgba(255,255,255,0.08);
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #f0f0ff;
+    --text2: #a0a0c0;
+    --text3: #6060a0;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+  /* ── SPLASH ── */
+  #splash {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    z-index: 1000; transition: opacity 0.5s;
+  }
+  #splash .logo-big { font-family: 'Nunito', sans-serif; font-size: 42px; font-weight: 900; letter-spacing: -1px; }
+  #splash .logo-big span { color: var(--accent); }
+  #splash .tagline { font-size: 14px; color: var(--text2); }
+  #splash .dots { display: flex; gap: 6px; margin-top: 20px; }
+  #splash .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.3; animation: pulse 1.2s ease-in-out infinite; }
+  #splash .dot:nth-child(2) { animation-delay: 0.2s; }
+  #splash .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; padding: 0; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── AUTH SCREEN ── */
+  #screen-auth {
+    background: var(--bg);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .auth-box { width: 100%; max-width: 380px; }
+  .auth-logo { font-family: 'Nunito', sans-serif; font-size: 32px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+  .auth-logo span { color: var(--accent); }
+  .auth-sub { text-align: center; color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+
+  .auth-tabs { display: flex; background: var(--bg2); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 24px; }
+  .auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text2); }
+  .auth-tab.active { background: var(--accent); color: white; }
+
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input {
+    width: 100%; padding: 13px 16px; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); font-size: 15px; font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s; outline: none;
+  }
+  .field input:focus { border-color: var(--accent); }
+
+  .btn-primary {
+    width: 100%; padding: 14px; background: var(--accent);
+    border: none; border-radius: var(--radius-sm); color: white;
+    font-size: 15px; font-weight: 700; font-family: 'Nunito', sans-serif;
+    cursor: pointer; transition: all 0.2s; margin-top: 4px;
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-google {
+    width: 100%; padding: 13px; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text);
+    font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 12px;
+  }
+  .btn-google:hover { background: var(--bg3); }
+  .google-icon { width: 18px; height: 18px; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background: var(--border); }
+  .divider span { font-size: 12px; color: var(--text3); }
+
+  .auth-error { background: rgba(255,101,132,0.15); border: 1px solid rgba(255,101,132,0.3); color: #ff6584; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; display: none; }
+
+  /* ── FAMILIA SETUP ── */
+  #screen-familia {
+    background: var(--bg);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .familia-box { width: 100%; max-width: 380px; }
+  .familia-title { font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .familia-sub { color: var(--text2); font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+
+  .option-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .option-card:hover { border-color: var(--accent); background: var(--bg3); }
+  .option-card .oc-icon { font-size: 28px; margin-bottom: 8px; }
+  .option-card .oc-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+  .option-card .oc-desc { font-size: 13px; color: var(--text2); }
+
+  .join-form { display: none; margin-top: 8px; }
+  .join-form.visible { display: block; }
+  .code-input {
+    width: 100%; padding: 14px 16px; background: var(--bg2);
+    border: 2px solid var(--accent); border-radius: var(--radius-sm);
+    color: var(--text); font-size: 20px; font-family: 'Nunito', sans-serif; font-weight: 800;
+    text-align: center; letter-spacing: 4px; text-transform: uppercase; outline: none; margin-bottom: 12px;
+  }
+
+  /* ── HOME SCREEN ── */
+  #screen-home { background: var(--bg); }
+
+  .home-header {
+    padding: 52px 20px 16px;
+    background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  }
+  .home-greeting { font-size: 13px; color: var(--text2); margin-bottom: 2px; }
+  .home-name { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; }
+  .home-name span { color: var(--accent); }
+  .familia-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--accent);
+    margin-top: 8px; font-weight: 600;
+  }
+
+  /* Miembros online */
+  .members-bar { padding: 12px 20px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+  .members-bar::-webkit-scrollbar { display: none; }
+  .member-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    flex-shrink: 0;
+  }
+  .member-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px;
+    border: 2px solid var(--bg);
+    position: relative;
+  }
+  .member-avatar.online::after {
+    content:''; position: absolute; bottom: 1px; right: 1px;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent3);
+    border: 2px solid var(--bg);
+  }
+  .member-name { font-size: 10px; color: var(--text2); max-width: 48px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Grid módulos */
+  .modules-title { padding: 8px 20px 12px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 100px; }
+
+  .module-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px 16px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+    min-height: 120px; display: flex; flex-direction: column; justify-content: space-between;
+    text-decoration: none;
+  }
+  .module-card::before {
+    content:''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--mc, var(--accent)); border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .module-card:active { transform: scale(0.97); }
+  .module-icon { font-size: 28px; margin-bottom: 8px; }
+  .module-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; }
+  .module-badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(255,255,255,0.08); color: var(--text2); margin-top: 4px;
+  }
+  .module-badge.padres { background: rgba(255,101,132,0.15); color: var(--accent2); }
+  .module-count {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--mc, var(--accent)); color: white;
+    font-size: 11px; font-weight: 700; font-family: 'Nunito', sans-serif;
+    padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg2); border-top: 1px solid var(--border);
+    display: flex; padding: 8px 0 20px; z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 10px; color: var(--text3); cursor: pointer; transition: color 0.2s; padding: 4px 0;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item svg { width: 22px; height: 22px; }
+
+  /* Código de familia */
+  .code-share-box {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-top: 16px;
+  }
+  .code-display {
+    font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900;
+    letter-spacing: 6px; color: var(--accent); text-align: center; margin: 8px 0;
+  }
+  .code-hint { font-size: 12px; color: var(--text2); text-align: center; }
+  .btn-copy {
+    width: 100%; padding: 11px; background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3); border-radius: var(--radius-sm);
+    color: var(--accent); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover { background: rgba(108,99,255,0.25); }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 30px;
+    padding: 10px 20px; font-size: 13px; font-weight: 600; color: var(--text);
+    opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 9999; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Loading overlay */
+  #loading {
+    position: fixed; inset: 0; background: rgba(15,15,26,0.85);
+    display: none; align-items: center; justify-content: center; z-index: 999;
+    backdrop-filter: blur(4px);
+  }
+  #loading.show { display: flex; }
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Próximamente */
+  .coming-soon-overlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(15,15,26,0.95); align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+    backdrop-filter: blur(8px);
+  }
+  .coming-soon-overlay.show { display: flex; }
+  .cs-icon { font-size: 56px; }
+  .cs-title { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; }
+  .cs-sub { color: var(--text2); font-size: 14px; }
+  .btn-back {
+    margin-top: 8px; padding: 12px 28px; background: var(--accent);
+    border: none; border-radius: var(--radius-sm); color: white;
+    font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif;
+  }
+
+  /* Perfil dropdown */
+  .profile-btn {
+    position: absolute; top: 52px; right: 20px;
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px;
+    cursor: pointer; border: 2px solid var(--border);
+  }
+  .profile-menu {
+    position: fixed; top: 96px; right: 16px; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 8px; z-index: 200; display: none; min-width: 200px;
+  }
+  .profile-menu.open { display: block; }
+  .pm-item { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 10px; }
+  .pm-item:hover { background: var(--bg3); }
+  .pm-divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .pm-logout { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="logo-big">Familia<span>LopBas</span></div>
+  <div class="tagline">Tu familia, siempre conectada</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<!-- LOADING -->
+<div id="loading"><div class="spinner"></div></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- COMING SOON -->
+<div class="coming-soon-overlay" id="coming-soon">
+  <div class="cs-icon" id="cs-icon">🚧</div>
+  <div class="cs-title" id="cs-title">Próximamente</div>
+  <div class="cs-sub" id="cs-sub">Este módulo está en desarrollo</div>
+  <button class="btn-back" onclick="document.getElementById('coming-soon').classList.remove('show')">Volver al inicio</button>
+</div>
+
+<!-- SCREEN: AUTH -->
+<div class="screen" id="screen-auth">
+  <div class="auth-box">
+    <div class="auth-logo">Familia<span>LopBas</span></div>
+    <div class="auth-sub">La app de tu familia</div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Entrar</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Registro</div>
+    </div>
+
+    <!-- Login -->
+    <div class="auth-panel active" id="panel-login">
+      <div class="auth-error" id="login-error"></div>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn-primary" onclick="doLogin()">Entrar</button>
+      <div class="divider"><span>o</span></div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+
+    <!-- Registro -->
+    <div class="auth-panel" id="panel-register">
+      <div class="auth-error" id="register-error"></div>
+      <div class="field"><label>Tu nombre</label><input type="text" id="reg-name" placeholder="Alberto" autocomplete="given-name"></div>
+      <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+      <button class="btn-primary" onclick="doRegister()">Crear cuenta</button>
+      <div class="divider"><span>o</span></div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: FAMILIA SETUP -->
+<div class="screen" id="screen-familia">
+  <div class="familia-box">
+    <div class="familia-title">👨‍👩‍👧‍👦 Tu familia</div>
+    <div class="familia-sub">Crea una familia nueva o únete a la de alguien con el código que te han compartido.</div>
+
+    <div class="option-card" onclick="crearFamilia()">
+      <div class="oc-icon">🏠</div>
+      <div class="oc-title">Crear familia nueva</div>
+      <div class="oc-desc">Soy el primero en registrarme. Obtendré un código para invitar al resto.</div>
+    </div>
+
+    <div class="option-card" onclick="toggleJoinForm()">
+      <div class="oc-icon">🔗</div>
+      <div class="oc-title">Unirme a una familia</div>
+      <div class="oc-desc">Tengo un código de invitación de un familiar.</div>
+    </div>
+
+    <div class="join-form" id="join-form">
+      <div class="auth-error" id="join-error"></div>
+      <input type="text" class="code-input" id="join-code" placeholder="XXXXXX" maxlength="6">
+      <button class="btn-primary" onclick="unirseAFamilia()">Unirme</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: HOME -->
+<div class="screen" id="screen-home">
+  <!-- Header -->
+  <div class="home-header" style="position:relative">
+    <div class="home-greeting">Hola de nuevo,</div>
+    <div class="home-name" id="home-username">Cargando...</div>
+    <div class="familia-badge">
+      🏠 <span id="home-familia-name">FamiliaLopBas</span>
+      &nbsp;·&nbsp; Código: <span id="home-codigo" style="font-weight:800;cursor:pointer" onclick="mostrarCodigo()"></span>
+    </div>
+    <div class="profile-btn" id="profile-btn" onclick="toggleProfile()" style="background: var(--accent)">?</div>
+    <div class="profile-menu" id="profile-menu">
+      <div class="pm-item" onclick="mostrarCodigo()">🔗 Código familia</div>
+      <div class="pm-item" onclick="gestionarRol()">👤 Mi rol: <span id="mi-rol-label" style="color:var(--accent);margin-left:4px">—</span></div>
+      <div class="pm-divider"></div>
+      <div class="pm-item pm-logout" onclick="doLogout()">🚪 Cerrar sesión</div>
+    </div>
+  </div>
+
+  <!-- Miembros -->
+  <div class="members-bar" id="members-bar">
+    <!-- generado dinámicamente -->
+  </div>
+
+  <!-- Módulos -->
+  <div class="modules-title">Módulos</div>
+  <div class="modules-grid">
+    <div class="module-card" style="--mc:#6c63ff" onclick="openModule('geo')">
+      <div>
+        <div class="module-icon">📍</div>
+        <div class="module-name">Localización</div>
+        <div class="module-badge">Familia</div>
+      </div>
+    </div>
+    <div class="module-card" style="--mc:#43e97b" onclick="openModule('cesta')">
+      <div>
+        <div class="module-icon">🛒</div>
+        <div class="module-name">Cesta</div>
+        <div class="module-badge">Familia</div>
+      </div>
+      <div class="module-count" id="badge-cesta" style="display:none">0</div>
+    </div>
+    <div class="module-card" style="--mc:#ff6584" onclick="openModule('gastos')">
+      <div>
+        <div class="module-icon">💶</div>
+        <div class="module-name">Gastos</div>
+        <div class="module-badge padres">Solo padres</div>
+      </div>
+    </div>
+    <div class="module-card" style="--mc:#ffa500" onclick="openModule('vehiculos')">
+      <div>
+        <div class="module-icon">🚗</div>
+        <div class="module-name">Vehículos</div>
+        <div class="module-badge padres">Solo padres</div>
+      </div>
+    </div>
+    <div class="module-card" style="--mc:#00d4ff" onclick="openModule('medicos')">
+      <div>
+        <div class="module-icon">🏥</div>
+        <div class="module-name">Médicos</div>
+        <div class="module-badge">Familia</div>
+      </div>
+      <div class="module-count" id="badge-medicos" style="display:none">0</div>
+    </div>
+    <div class="module-card" style="--mc:#a855f7" onclick="openModule('tareas')">
+      <div>
+        <div class="module-icon">✅</div>
+        <div class="module-name">Tareas</div>
+        <div class="module-badge">Familia</div>
+      </div>
+      <div class="module-count" id="badge-tareas" style="display:none">0</div>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Inicio
+    </div>
+    <div class="nav-item" onclick="openModule('cesta')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cesta
+    </div>
+    <div class="nav-item" onclick="openModule('tareas')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tareas
+    </div>
+    <div class="nav-item" onclick="openModule('geo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Mapa
+    </div>
+  </div>
+</div>
+
+<!-- Código modal -->
+<div id="modal-codigo" style="display:none; position:fixed; inset:0; z-index:600; background:rgba(15,15,26,0.9); align-items:center; justify-content:center; backdrop-filter:blur(6px);">
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:28px; max-width:320px; width:90%; text-align:center;">
+    <div style="font-size:14px; color:var(--text2); margin-bottom:4px;">Código de tu familia</div>
+    <div class="code-display" id="modal-codigo-value">——</div>
+    <div style="font-size:12px; color:var(--text2); margin-bottom:16px;">Comparte este código con tu familia para que puedan unirse</div>
+    <button class="btn-copy" onclick="copiarCodigo()">📋 Copiar código</button>
+    <button class="btn-primary" style="margin-top:10px" onclick="document.getElementById('modal-codigo').style.display='none'">Cerrar</button>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBpw-IXMNsthOUfwNzugMeiNNLT-TndaAM",
+  authDomain: "familialopbas.firebaseapp.com",
+  projectId: "familialopbas",
+  storageBucket: "familialopbas.firebasestorage.app",
+  messagingSenderId: "152258815775",
+  appId: "1:152258815775:web:f3d530d07d43113647b22a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+// --- Estado global ---
+let currentUser = null;
+let familiaData = null;
+let unsubMembers = null;
+
+// --- Utilidades UI ---
+window.showLoading = () => document.getElementById('loading').classList.add('show');
+window.hideLoading = () => document.getElementById('loading').classList.remove('show');
+window.showToast = (msg, ms=2500) => {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+};
+window.showScreen = (id) => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+};
+window.showError = (id, msg) => {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+};
+
+// --- Auth tabs ---
+window.switchAuthTab = (tab) => {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('panel-login').classList.toggle('active', tab==='login');
+  document.getElementById('panel-register').classList.toggle('active', tab==='register');
+};
+
+// --- Generar código familia (6 chars alfanumérico) ---
+function generarCodigo() {
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+// --- Colores avatar ---
+const COLORS = ['#6c63ff','#ff6584','#43e97b','#ffa500','#00d4ff','#a855f7','#f59e0b'];
+function avatarColor(uid) { let h=0; for(let c of uid) h=(h+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
+function initials(name) { return name ? name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '??'; }
+
+// --- Login ---
+window.doLogin = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) return showError('login-error','Rellena todos los campos');
+  showLoading();
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    hideLoading();
+    const msgs = { 'auth/user-not-found':'Usuario no encontrado', 'auth/wrong-password':'Contraseña incorrecta', 'auth/invalid-credential':'Email o contraseña incorrectos' };
+    showError('login-error', msgs[e.code] || 'Error al iniciar sesión');
+  }
+};
+
+// --- Register ---
+window.doRegister = async () => {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  if (!name || !email || !pass) return showError('register-error','Rellena todos los campos');
+  if (pass.length < 6) return showError('register-error','La contraseña debe tener al menos 6 caracteres');
+  showLoading();
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await setDoc(doc(db,'users',cred.user.uid), { name, email, role:'padre', familiaId:null, createdAt: serverTimestamp() });
+  } catch(e) {
+    hideLoading();
+    const msgs = { 'auth/email-already-in-use':'Este email ya está registrado', 'auth/weak-password':'Contraseña demasiado débil' };
+    showError('register-error', msgs[e.code] || 'Error al registrarse');
+  }
+};
+
+// --- Google Login ---
+window.doGoogleLogin = async () => {
+  showLoading();
+  try {
+    const cred = await signInWithPopup(auth, googleProvider);
+    const userRef = doc(db,'users',cred.user.uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      await setDoc(userRef, { name: cred.user.displayName || 'Usuario', email: cred.user.email, role:'padre', familiaId:null, createdAt: serverTimestamp() });
+    }
+  } catch(e) {
+    hideLoading();
+    if (e.code !== 'auth/popup-closed-by-user') showError('login-error','Error con Google: ' + e.message);
+  }
+};
+
+// --- Logout ---
+window.doLogout = async () => {
+  if (unsubMembers) unsubMembers();
+  await signOut(auth);
+  document.getElementById('profile-menu').classList.remove('open');
+};
+
+// --- Crear familia ---
+window.crearFamilia = async () => {
+  showLoading();
+  try {
+    const codigo = generarCodigo();
+    const nombre = (currentUser.displayName || 'Mi Familia').split(' ')[0] + 's';
+    const familiaRef = doc(collection(db,'familias'));
+    await setDoc(familiaRef, {
+      nombre: 'Familia LopBas', codigo, creadoPor: currentUser.uid,
+      miembros: [currentUser.uid], createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db,'users',currentUser.uid), { familiaId: familiaRef.id });
+    await cargarHome();
+  } catch(e) {
+    hideLoading();
+    showToast('Error al crear familia: ' + e.message);
+  }
+};
+
+// --- Unirse a familia ---
+window.toggleJoinForm = () => {
+  document.getElementById('join-form').classList.toggle('visible');
+};
+
+window.unirseAFamilia = async () => {
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (code.length !== 6) return showError('join-error','El código debe tener 6 caracteres');
+  showLoading();
+  try {
+    const q = query(collection(db,'familias'), where('codigo','==',code));
+    const snap = await getDocs(q);
+    if (snap.empty) { hideLoading(); return showError('join-error','Código no encontrado'); }
+    const familiaDoc = snap.docs[0];
+    const miembros = familiaDoc.data().miembros || [];
+    if (!miembros.includes(currentUser.uid)) {
+      await updateDoc(doc(db,'familias',familiaDoc.id), { miembros: [...miembros, currentUser.uid] });
+    }
+    await updateDoc(doc(db,'users',currentUser.uid), { familiaId: familiaDoc.id, role:'hijo' });
+    await cargarHome();
+  } catch(e) {
+    hideLoading();
+    showError('join-error', 'Error: ' + e.message);
+  }
+};
+
+// --- Cargar home ---
+async function cargarHome() {
+  const userSnap = await getDoc(doc(db,'users',currentUser.uid));
+  if (!userSnap.exists() || !userSnap.data().familiaId) {
+    hideLoading(); showScreen('familia'); return;
+  }
+  const userData = userSnap.data();
+  const famSnap = await getDoc(doc(db,'familias', userData.familiaId));
+  if (!famSnap.exists()) {
+    hideLoading(); showScreen('familia'); return;
+  }
+  familiaData = { id: famSnap.id, ...famSnap.data(), userRole: userData.role };
+
+  // Header
+  const nombre = currentUser.displayName || userData.name || 'Usuario';
+  document.getElementById('home-username').innerHTML = nombre.split(' ')[0] + ' <span>👋</span>';
+  document.getElementById('home-familia-name').textContent = familiaData.nombre || 'FamiliaLopBas';
+  document.getElementById('home-codigo').textContent = familiaData.codigo;
+  document.getElementById('modal-codigo-value').textContent = familiaData.codigo;
+  document.getElementById('mi-rol-label').textContent = userData.role === 'padre' ? '👨‍💼 Padre/Madre' : '👶 Hijo/a';
+
+  // Avatar
+  const color = avatarColor(currentUser.uid);
+  const ini = initials(nombre);
+  document.getElementById('profile-btn').textContent = ini;
+  document.getElementById('profile-btn').style.background = color;
+
+  // Cargar miembros en tiempo real
+  if (unsubMembers) unsubMembers();
+  const miembrosIds = familiaData.miembros || [];
+  renderMiembros(miembrosIds);
+
+  hideLoading();
+  showScreen('home');
+
+  // Ocultar módulos de padres si es hijo
+  if (userData.role === 'hijo') {
+    document.querySelectorAll('.module-badge.padres').forEach(b => {
+      b.closest('.module-card').style.opacity = '0.5';
+    });
+  }
+}
+
+// --- Render miembros ---
+async function renderMiembros(ids) {
+  const bar = document.getElementById('members-bar');
+  bar.innerHTML = '';
+  for (const uid of ids) {
+    try {
+      const snap = await getDoc(doc(db,'users',uid));
+      if (!snap.exists()) continue;
+      const u = snap.data();
+      const color = avatarColor(uid);
+      const ini = initials(u.name || 'U');
+      const isSelf = uid === currentUser.uid;
+      bar.innerHTML += `
+        <div class="member-chip">
+          <div class="member-avatar ${isSelf ? 'online' : ''}" style="background:${color}">${ini}</div>
+          <div class="member-name">${isSelf ? 'Tú' : (u.name||'').split(' ')[0]}</div>
+        </div>`;
+    } catch(e) {}
+  }
+}
+
+// --- Módulos ---
+window.openModule = (mod) => {
+  document.getElementById('profile-menu').classList.remove('open');
+  const modulos = {
+    geo:      { icon:'📍', title:'Geolocalización',  sub:'Módulo en desarrollo — Fase 3' },
+    cesta:    { icon:'🛒', title:'Cesta de la compra', sub:'Módulo en desarrollo — Fase 2' },
+    gastos:   { icon:'💶', title:'Gastos familia',    sub:'Módulo en desarrollo — Fase 3' },
+    vehiculos:{ icon:'🚗', title:'Vehículos',         sub:'Módulo en desarrollo — Fase 3' },
+    medicos:  { icon:'🏥', title:'Médicos y citas',   sub:'Módulo en desarrollo — Fase 4' },
+    tareas:   { icon:'✅', title:'Lista de tareas',   sub:'Módulo en desarrollo — Fase 2' },
+  };
+  const m = modulos[mod];
+  if (!m) return;
+  document.getElementById('cs-icon').textContent = m.icon;
+  document.getElementById('cs-title').textContent = m.title;
+  document.getElementById('cs-sub').textContent = m.sub;
+  document.getElementById('coming-soon').classList.add('show');
+};
+
+// --- Código ---
+window.mostrarCodigo = () => {
+  document.getElementById('profile-menu').classList.remove('open');
+  document.getElementById('modal-codigo').style.display = 'flex';
+};
+window.copiarCodigo = () => {
+  navigator.clipboard.writeText(familiaData?.codigo || '');
+  showToast('✅ Código copiado');
+};
+
+// --- Perfil menu ---
+window.toggleProfile = () => document.getElementById('profile-menu').classList.toggle('open');
+window.gestionarRol = () => { document.getElementById('profile-menu').classList.remove('open'); showToast('Rol: ' + (familiaData?.userRole === 'padre' ? 'Padre/Madre' : 'Hijo/a')); };
+
+// Cerrar menú al tocar fuera
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#profile-btn') && !e.target.closest('#profile-menu')) {
+    document.getElementById('profile-menu').classList.remove('open');
+  }
+  if (e.target === document.getElementById('modal-codigo')) {
+    document.getElementById('modal-codigo').style.display = 'none';
+  }
+});
+
+// Enter en inputs
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('join-code').addEventListener('keydown', e => { if(e.key==='Enter') unirseAFamilia(); });
+
+// --- Auth state ---
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (!user) {
+    hideSplash(); hideLoading(); showScreen('auth'); return;
+  }
+  showLoading();
+  await cargarHome();
+  hideSplash();
+});
+
+function hideSplash() {
+  const sp = document.getElementById('splash');
+  sp.style.opacity = '0';
+  setTimeout(() => sp.style.display = 'none', 500);
+}
+</script>
+</body>
+</html>
