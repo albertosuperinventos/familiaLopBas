@@ -609,20 +609,31 @@ window.doLogout = async () => {
 
 // --- Crear familia ---
 window.crearFamilia = async () => {
+  if (!currentUser) { showToast("Error: no hay sesión activa"); return; }
   showLoading();
   try {
     const codigo = generarCodigo();
-    const nombre = (currentUser.displayName || 'Mi Familia').split(' ')[0] + 's';
-    const familiaRef = doc(collection(db,'familias'));
+    const familiaRef = doc(collection(db,"familias"));
     await setDoc(familiaRef, {
-      nombre: 'Familia LopBas', codigo, creadoPor: currentUser.uid,
+      nombre: "Familia LopBas", codigo, creadoPor: currentUser.uid,
       miembros: [currentUser.uid], createdAt: serverTimestamp()
     });
-    await updateDoc(doc(db,'users',currentUser.uid), { familiaId: familiaRef.id });
+    const userRef = doc(db,"users",currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      await updateDoc(userRef, { familiaId: familiaRef.id });
+    } else {
+      await setDoc(userRef, {
+        name: currentUser.displayName || currentUser.email.split("@")[0],
+        email: currentUser.email, role:"padre",
+        familiaId: familiaRef.id, createdAt: serverTimestamp()
+      });
+    }
     await cargarHome();
   } catch(e) {
     hideLoading();
-    showToast('Error al crear familia: ' + e.message);
+    console.error("crearFamilia error:", e);
+    showToast("Error: " + e.code + " — " + e.message);
   }
 };
 
