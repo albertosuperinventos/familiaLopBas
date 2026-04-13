@@ -499,11 +499,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// Long polling forzado para GitHub Pages
-const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  useFetchStreams: false
-});
+const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 
 let currentUser = null;
 let familiaData = null;
