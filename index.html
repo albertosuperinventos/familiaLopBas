@@ -407,7 +407,7 @@
         <div class="module-badge">Familia</div>
       </div>
     </div>
-    <div class="module-card" style="--mc:#43e97b" onclick="openModule('cesta')">
+    <div class="module-card" style="--mc:#43e97b" onclick="abrirCesta()">
       <div>
         <div class="module-icon">🛒</div>
         <div class="module-name">Cesta</div>
@@ -453,7 +453,7 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       Inicio
     </div>
-    <div class="nav-item" onclick="openModule('cesta')">
+    <div class="nav-item" onclick="abrirCesta()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       Cesta
     </div>
@@ -480,10 +480,59 @@
 </div>
 
 
+<!-- SCREEN: CESTA -->
+<div class="screen" id="screen-cesta">
+  <div style="padding:52px 16px 16px; display:flex; align-items:center; gap:12px;">
+    <button onclick="showScreen('home')" style="background:var(--bg2);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><!-- Firebase SDK -->#8592;</button>
+    <h2 style="font-family:Nunito,sans-serif;font-size:22px;font-weight:800;">🛒 Cesta de la compra</h2>
+  </div>
+
+  <!-- Input añadir -->
+  <div style="padding:0 16px 16px;display:flex;gap:8px;">
+    <input id="cesta-input" type="text" placeholder="Añadir producto..." style="flex:1;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:15px;font-family:DM Sans,sans-serif;outline:none;" onkeydown="if(event.key==='Enter')addCestaItem()">
+    <input id="cesta-qty" type="text" placeholder="Cant." style="width:70px;padding:12px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:15px;font-family:DM Sans,sans-serif;outline:none;text-align:center;">
+    <button onclick="addCestaItem()" style="padding:12px 16px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:white;font-size:20px;cursor:pointer;">+</button>
+  </div>
+
+  <!-- Acciones -->
+  <div style="padding:0 16px 12px;display:flex;gap:8px;">
+    <button onclick="borrarTachados()" style="padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;color:var(--text2);font-size:12px;cursor:pointer;">🗑 Borrar tachados</button>
+    <button onclick="desmarcarTodos()" style="padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;color:var(--text2);font-size:12px;cursor:pointer;">↺ Desmarcar todos</button>
+  </div>
+
+  <!-- Lista -->
+  <div id="cesta-lista" style="padding:0 16px 100px;"></div>
+  <div id="cesta-empty" style="text-align:center;padding:60px 20px;color:var(--text3);display:none;">
+    <div style="font-size:48px;margin-bottom:12px;">🛒</div>
+    <div style="font-size:15px;">La cesta está vacía</div>
+    <div style="font-size:13px;margin-top:6px;">Añade productos arriba</div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Inicio
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cesta
+    </div>
+    <div class="nav-item" onclick="abrirTareas()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tareas
+    </div>
+    <div class="nav-item" onclick="openModule('geo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Mapa
+    </div>
+  </div>
+</div>
+
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
 firebase.initializeApp({
@@ -687,6 +736,7 @@ async function cargarHome() {
     document.getElementById('profile-btn').style.background = color;
 
     await renderMiembros(famData.miembros || {});
+    if (!cestaListener) suscribirCesta();
     hideLoading(); showScreen('home');
 
     if (userData.role === 'hijo') {
@@ -770,6 +820,123 @@ auth.onAuthStateChanged(async (user) => {
     showScreen('auth');
   }
 });
+
+// ============================================================
+// MÓDULO CESTA DE LA COMPRA
+// ============================================================
+let cestaListener = null;
+
+window.abrirCesta = () => {
+  showScreen('cesta');
+  if (familiaData && !cestaListener) suscribirCesta();
+};
+
+function suscribirCesta() {
+  const ref = db.ref('familias/' + familiaData.id + '/cesta');
+  cestaListener = ref.on('value', snap => {
+    const items = snap.val() || {};
+    renderCesta(items);
+    // Actualizar badge en home
+    const pendientes = Object.values(items).filter(i => !i.tachado).length;
+    const badge = document.getElementById('badge-cesta');
+    if (pendientes > 0) { badge.textContent = pendientes; badge.style.display = 'block'; }
+    else badge.style.display = 'none';
+  });
+}
+
+function renderCesta(items) {
+  const lista = document.getElementById('cesta-lista');
+  const empty = document.getElementById('cesta-empty');
+  const entries = Object.entries(items).sort((a,b) => (a[1].ts||0) - (b[1].ts||0));
+
+  if (entries.length === 0) {
+    lista.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Separar pendientes y tachados
+  const pendientes = entries.filter(([,i]) => !i.tachado);
+  const tachados = entries.filter(([,i]) => i.tachado);
+
+  let html = '';
+
+  pendientes.forEach(([id, item]) => {
+    html += `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+      <div onclick="tacharItem('${id}',true)" style="width:24px;height:24px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:500;">${item.nombre}${item.cantidad ? ' <span style="color:var(--text2);font-size:13px;">× '+item.cantidad+'</span>' : ''}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">por ${item.autor||'?'}</div>
+      </div>
+      <div onclick="borrarItem('${id}')" style="color:var(--text3);cursor:pointer;padding:4px;font-size:18px;">×</div>
+    </div>`;
+  });
+
+  if (tachados.length > 0) {
+    html += `<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;padding:12px 0 8px;">Ya cogidos (${tachados.length})</div>`;
+    tachados.forEach(([id, item]) => {
+      html += `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:0.5;">
+        <div onclick="tacharItem('${id}',false)" style="width:24px;height:24px;border-radius:50%;background:var(--accent3);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="flex:1;text-decoration:line-through;">
+          <div style="font-size:15px;">${item.nombre}${item.cantidad ? ' × '+item.cantidad : ''}</div>
+        </div>
+        <div onclick="borrarItem('${id}')" style="color:var(--text3);cursor:pointer;padding:4px;font-size:18px;">×</div>
+      </div>`;
+    });
+  }
+
+  lista.innerHTML = html;
+}
+
+window.addCestaItem = () => {
+  const input = document.getElementById('cesta-input');
+  const qtyInput = document.getElementById('cesta-qty');
+  const nombre = input.value.trim();
+  if (!nombre) return;
+  const cantidad = qtyInput.value.trim();
+  const id = 'item_' + Date.now();
+  const autor = currentUser.displayName || currentUser.email.split('@')[0];
+  db.ref('familias/' + familiaData.id + '/cesta/' + id).set({
+    nombre, cantidad, autor, tachado: false, ts: Date.now()
+  });
+  input.value = '';
+  qtyInput.value = '';
+  input.focus();
+};
+
+window.tacharItem = (id, tachado) => {
+  db.ref('familias/' + familiaData.id + '/cesta/' + id).update({ tachado });
+};
+
+window.borrarItem = (id) => {
+  db.ref('familias/' + familiaData.id + '/cesta/' + id).remove();
+};
+
+window.borrarTachados = () => {
+  db.ref('familias/' + familiaData.id + '/cesta').once('value').then(snap => {
+    const items = snap.val() || {};
+    const updates = {};
+    Object.entries(items).forEach(([id, item]) => { if (item.tachado) updates[id] = null; });
+    if (Object.keys(updates).length > 0) db.ref('familias/' + familiaData.id + '/cesta').update(updates);
+  });
+};
+
+window.desmarcarTodos = () => {
+  db.ref('familias/' + familiaData.id + '/cesta').once('value').then(snap => {
+    const items = snap.val() || {};
+    const updates = {};
+    Object.keys(items).forEach(id => { updates[id + '/tachado'] = false; });
+    if (Object.keys(updates).length > 0) db.ref('familias/' + familiaData.id + '/cesta').update(updates);
+  });
+};
+
+// Suscribir badge cesta al cargar home
+const _origCargarHome = cargarHome;
 </script>
 </body>
 </html>
