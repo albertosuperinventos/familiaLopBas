@@ -777,18 +777,37 @@ document.getElementById('join-code').addEventListener('keydown', e => { if(e.key
 // --- Auth state ---
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
+  hideSplash();
   if (!user) {
-    hideSplash(); hideLoading(); showScreen('auth'); return;
+    hideLoading(); showScreen("auth"); return;
   }
   showLoading();
-  await cargarHome();
-  hideSplash();
+  try {
+    // Asegurar que el documento de usuario existe
+    const userRef = doc(db,"users",user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        name: user.displayName || user.email.split("@")[0],
+        email: user.email,
+        role: "padre",
+        familiaId: null,
+        createdAt: serverTimestamp()
+      });
+    }
+    await cargarHome();
+  } catch(e) {
+    hideLoading();
+    console.error("onAuthStateChanged error:", e);
+    showToast("Error de conexión: " + e.code);
+    showScreen("auth");
+  }
 });
 
 function hideSplash() {
-  const sp = document.getElementById('splash');
-  sp.style.opacity = '0';
-  setTimeout(() => sp.style.display = 'none', 500);
+  const sp = document.getElementById("splash");
+  sp.style.opacity = "0";
+  setTimeout(() => sp.style.display = "none", 500);
 }
 </script>
 </body>
