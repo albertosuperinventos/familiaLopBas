@@ -592,10 +592,26 @@ window.doRegister=async()=>{
   try{const c=await auth.createUserWithEmailAndPassword(e,p);await c.user.updateProfile({displayName:name});await dbS('users/'+c.user.uid,{name,email:e,role:'padre',familiaId:null});}
   catch(err){hideLoading();const m={'auth/email-already-in-use':'Email ya registrado','auth/weak-password':'Contraseña débil'};showError('register-error',m[err.code]||err.message);}
 };
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)||
+  (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
+
 window.doGoogleLogin=async()=>{
   showLoading();
-  try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
-  catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
+  const provider=new firebase.auth.GoogleAuthProvider();
+  try{
+    if(isIOS()){
+      // En iOS usamos redirect — la página se recarga y onAuthStateChanged lo recoge
+      await auth.signInWithRedirect(provider);
+      // La ejecución no continúa aquí, el navegador redirige
+    } else {
+      const c=await auth.signInWithPopup(provider);
+      const s=await dbG('users/'+c.user.uid);
+      if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});
+    }
+  }catch(err){
+    hideLoading();
+    if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);
+  }
 };
 window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=null;};
 window.crearFamilia=async()=>{
@@ -754,69 +770,59 @@ window.enviarMensaje = async () => {
 // NOTIFICACIONES PUSH
 window.solicitarPermisoNotificaciones = async () => {
   if (!("Notification" in window)) {
-    // iOS Safari sin PWA instalada
-    showToast("⚠️ Añade la app a pantalla de inicio para notificaciones");
-    // Mostrar instrucciones
-    alert('Para recibir notificaciones en iPhone:\n1. Pulsa el botón Compartir (□↑)\n2. Selecciona "Añadir a pantalla de inicio"\n3. Abre la app desde el icono\n4. Vuelve a pulsar este botón');
+    showToast("Este navegador no soporta notificaciones");
     return;
   }
-
+  
   if (Notification.permission === "granted") {
     showToast("✅ Ya tienes notificaciones activadas");
     const btn = T('btn-notif');
-    if(btn) { btn.textContent = '🔔 Notificaciones activadas ✅'; btn.classList.add('activado'); }
+    if(btn) {
+      btn.textContent = '🔔 Notificaciones activadas ✅';
+      btn.classList.add('activado');
+    }
     return;
   }
-
-  if (Notification.permission === "denied") {
-    showToast("❌ Notificaciones bloqueadas — actívalas en ajustes del navegador");
-    return;
-  }
-
-  // permission === "default" — pedir permiso
-  const permiso = await Notification.requestPermission();
-  const btn = T('btn-notif');
-  if (permiso === "granted") {
-    showToast("✅ Notificaciones activadas");
-    if(btn) { btn.textContent = '🔔 Notificaciones activadas ✅'; btn.classList.add('activado'); }
-    new Notification("🎉 FamiliaLopBas", {
-      body: "Recibirás notificaciones cuando lleguen mensajes nuevos",
-      icon: "https://emojicdn.elk.sh/🏠"
-    });
-    // Re-iniciar listener ahora que hay permiso
-    iniciarListenerNotificaciones();
-  } else {
-    showToast("❌ Permiso denegado");
-    if(btn) btn.textContent = '🔕 Notificaciones desactivadas';
+  
+  if (Notification.permission !== "denied") {
+    const permiso = await Notification.requestPermission();
+    if (permiso === "granted") {
+      showToast("✅ Notificaciones activadas");
+      const btn = T('btn-notif');
+      if(btn) {
+        btn.textContent = '🔔 Notificaciones activadas ✅';
+        btn.classList.add('activado');
+      }
+      new Notification("🎉 FamiliaLopBas", {
+        body: "Recibirás notificaciones cuando lleguen mensajes nuevos",
+        icon: "https://emojicdn.elk.sh/🏠"
+      });
+    } else {
+      showToast("❌ Permiso denegado");
+    }
   }
 };
 
 // Escuchar mensajes nuevos para notificaciones
 function iniciarListenerNotificaciones() {
   if(!familiaData || !currentUser) return;
-
-  // Usamos el timestamp actual como referencia: solo notificamos mensajes
-  // que lleguen DESPUÉS de haber iniciado el listener, ignorando los históricos.
-  const tsInicio = Date.now();
-
-  db.ref(`familias/${familiaData.id}/chat/mensajes`)
-    .orderByChild('timestamp')
-    .startAt(tsInicio)
-    .on('child_added', (snap) => {
-      const msg = snap.val();
-      if(!msg || msg.uid === currentUser?.uid) return;
-      // Doble comprobación: solo mensajes posteriores al inicio de sesión
-      if(msg.timestamp <= tsInicio) return;
-
-      if(Notification.permission === "granted") {
-        new Notification(`💬 ${msg.autor || 'Alguien'}`, {
-          body: msg.texto,
-          icon: "https://emojicdn.elk.sh/💬",
-          tag: "chat-notification"
-        });
-      }
+  
+  db.ref(`familias/${familiaData.id}/chat/mensajes`).on('child_added', async (snap) => {
+    const msg = snap.val();
+    if(!msg || msg.uid === currentUser?.uid) return;
+    
+    const ultimoLeidoSnap = await db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).once('value');
+    const ultimoLeido = ultimoLeidoSnap.val() || 0;
+    
+    if(msg.timestamp > ultimoLeido && Notification.permission === "granted") {
+      new Notification(`💬 ${msg.autor || 'Alguien'}`, {
+        body: msg.texto,
+        icon: "https://emojicdn.elk.sh/💬",
+        tag: "chat-notification"
+      });
       actualizarBadgeChat();
-    });
+    }
+  });
 }
 
 // ===== CESTA (código original) =====
@@ -1064,8 +1070,26 @@ window.guardarGastoVehiculo=async()=>{
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
 
+// ── REDIRECT RESULT (iOS Google login) ──
+auth.getRedirectResult().then(async result=>{
+  if(result&&result.user){
+    const u=result.user;
+    const s=await dbG('users/'+u.uid);
+    if(!s)await dbS('users/'+u.uid,{name:u.displayName||'Usuario',email:u.email,role:'padre',familiaId:null});
+  }
+}).catch(err=>{
+  if(err.code!=='auth/no-auth-event')console.error('Redirect error:',err.message);
+});
+
 // ===== AUTH STATE =====
+// Timeout de seguridad — si Firebase no responde en 10s en iOS, mostramos login
+const authTimeout=setTimeout(()=>{
+  hideSplash();hideLoading();
+  if(!currentUser)showScreen('auth');
+},10000);
+
 auth.onAuthStateChanged(async user=>{
+  clearTimeout(authTimeout);
   currentUser=user;hideSplash();
   if(!user){hideLoading();showScreen('auth');return;}
   showLoading();
@@ -1073,9 +1097,8 @@ auth.onAuthStateChanged(async user=>{
     const u=await dbG('users/'+user.uid);
     if(!u)await dbS('users/'+user.uid,{name:user.displayName||user.email.split('@')[0],email:user.email,role:'padre',familiaId:null});
     await cargarHome();
-    // cargarHome() ya habrá establecido familiaData, ahora es seguro iniciar el listener
     iniciarListenerNotificaciones();
-    // Actualizar botón según permiso actual
+    // Verificar estado de notificaciones para el botón
     const btnNotif = T('btn-notif');
     if(btnNotif && Notification.permission === "granted") {
       btnNotif.textContent = '🔔 Notificaciones activadas ✅';
