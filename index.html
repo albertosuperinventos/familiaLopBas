@@ -778,15 +778,16 @@ window.solicitarPermisoNotificaciones = async () => {
         btn.classList.add('activado');
       }
       new Notification("🎉 FamiliaLopBas", {
-        body: "Recibirás notificaciones cuando lleguen mensajes nuevos",
+        body: "Recibirás notificaciones del chat",
         icon: "https://emojicdn.elk.sh/🏠"
       });
     } else {
-      showToast("❌ Permiso denegado");
+      showToast("❌ Permiso denegado. Actívalo desde ajustes del navegador");
     }
+  } else {
+    showToast("❌ Permiso bloqueado. Actívalo en ajustes del navegador");
   }
 };
-
 // Escuchar mensajes nuevos para notificaciones
 function iniciarListenerNotificaciones() {
   if(!familiaData || !currentUser) return;
