@@ -6,6 +6,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>FamiliaLopBas</title>
+<meta name="theme-color" content="#6c63ff">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="FamiliaLopBas">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -592,26 +597,10 @@ window.doRegister=async()=>{
   try{const c=await auth.createUserWithEmailAndPassword(e,p);await c.user.updateProfile({displayName:name});await dbS('users/'+c.user.uid,{name,email:e,role:'padre',familiaId:null});}
   catch(err){hideLoading();const m={'auth/email-already-in-use':'Email ya registrado','auth/weak-password':'Contraseña débil'};showError('register-error',m[err.code]||err.message);}
 };
-function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)||
-  (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
-
 window.doGoogleLogin=async()=>{
   showLoading();
-  const provider=new firebase.auth.GoogleAuthProvider();
-  try{
-    if(isIOS()){
-      // En iOS usamos redirect — la página se recarga y onAuthStateChanged lo recoge
-      await auth.signInWithRedirect(provider);
-      // La ejecución no continúa aquí, el navegador redirige
-    } else {
-      const c=await auth.signInWithPopup(provider);
-      const s=await dbG('users/'+c.user.uid);
-      if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});
-    }
-  }catch(err){
-    hideLoading();
-    if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);
-  }
+  try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
+  catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
 };
 window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=null;};
 window.crearFamilia=async()=>{
@@ -1070,26 +1059,8 @@ window.guardarGastoVehiculo=async()=>{
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
 
-// ── REDIRECT RESULT (iOS Google login) ──
-auth.getRedirectResult().then(async result=>{
-  if(result&&result.user){
-    const u=result.user;
-    const s=await dbG('users/'+u.uid);
-    if(!s)await dbS('users/'+u.uid,{name:u.displayName||'Usuario',email:u.email,role:'padre',familiaId:null});
-  }
-}).catch(err=>{
-  if(err.code!=='auth/no-auth-event')console.error('Redirect error:',err.message);
-});
-
 // ===== AUTH STATE =====
-// Timeout de seguridad — si Firebase no responde en 10s en iOS, mostramos login
-const authTimeout=setTimeout(()=>{
-  hideSplash();hideLoading();
-  if(!currentUser)showScreen('auth');
-},10000);
-
 auth.onAuthStateChanged(async user=>{
-  clearTimeout(authTimeout);
   currentUser=user;hideSplash();
   if(!user){hideLoading();showScreen('auth');return;}
   showLoading();
@@ -1106,6 +1077,15 @@ auth.onAuthStateChanged(async user=>{
     }
   }catch(err){hideLoading();showToast('Error: '+err.message);showScreen('auth');}
 });
+
+// ── SERVICE WORKER (PWA) ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(r=>console.log('SW OK:',r.scope))
+      .catch(e=>console.log('SW error:',e));
+  });
+}
 </script>
 </body>
 </html>
