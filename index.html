@@ -17,11 +17,30 @@
   --shadow:0 2px 12px rgba(0,0,0,0.07); --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
 }
 [data-theme="dark"] {
-  --bg:#0f0f1a; --bg2:#1a1a2e; --bg3:#252540; --card:#1a1a2e;
-  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14);
-  --text:#f0f0ff; --text2:#9ca3af; --text3:#6b7280;
-  --shadow:0 2px 12px rgba(0,0,0,0.3); --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+  --bg:#1a1f2e; --bg2:#242938; --bg3:#2e3347; --card:#242938;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --text:#e8eaf6; --text2:#9ca3af; --text3:#6b7280;
+  --shadow:0 2px 12px rgba(0,0,0,0.25); --shadow-lg:0 8px 32px rgba(0,0,0,0.4);
 }
+[data-theme="dark"] .bottom-nav{background:var(--bg2);border-color:var(--border)}
+[data-theme="dark"] .screen-header{background:var(--bg2);border-color:var(--border)}
+[data-theme="dark"] .input-bar{background:var(--bg2);border-color:var(--border)}
+[data-theme="dark"] .filter-bar{background:var(--bg2);border-color:var(--border)}
+[data-theme="dark"] .modal-sheet{background:var(--bg2)}
+[data-theme="dark"] .vh-card{background:var(--bg2)}
+[data-theme="dark"] .cita-card{background:var(--bg2)}
+[data-theme="dark"] .field input{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+[data-theme="dark"] .fg input,[data-theme="dark"] .fg select,[data-theme="dark"] .fg textarea{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+[data-theme="dark"] .chat-input-bar{background:var(--bg2)}
+[data-theme="dark"] .emoji-picker{background:var(--bg2)}
+[data-theme="dark"] .listas-bar{background:var(--bg2)}
+[data-theme="dark"] .profile-menu{background:var(--bg2);border-color:var(--border)}
+[data-theme="dark"] .gasto-total{box-shadow:none}
+[data-theme="dark"] .option-card{background:var(--bg2);border-color:var(--border)}
+[data-theme="dark"] .code-input{background:var(--bg3);color:var(--text)}
+[data-theme="dark"] #screen-auth,[data-theme="dark"] #screen-familia{background:var(--bg)}
+[data-theme="dark"] .auth-tab.active{background:var(--bg3)}
+[data-theme="dark"] .btn-google{background:var(--bg3);border-color:var(--border2);color:var(--text)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
 #splash{position:fixed;inset:0;background:linear-gradient(135deg,#6c63ff 0%,#a78bfa 50%,#f472b6 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:1000;transition:opacity .5s}
@@ -255,10 +274,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="home-name" id="home-username">Cargando...</div>
     <div class="familia-badge">🏠 <span id="home-familia-name">FamiliaLopBas</span> · Código: <span id="home-codigo" style="font-weight:900;cursor:pointer" onclick="mostrarCodigo()"></span></div>
     <div class="profile-btn" id="profile-btn" onclick="toggleProfile()">A</div>
-    <div class="dark-toggle" onclick="toggleDarkMode()" id="dark-toggle-btn">🌙</div>
     <div class="profile-menu" id="profile-menu">
       <div class="pm-item" onclick="mostrarCodigo()">🔗 Código familia</div>
       <div class="pm-item">👤 Rol: <span id="mi-rol-label" style="color:var(--accent);margin-left:4px">—</span></div>
+      <div class="pm-item" onclick="toggleDarkMode()" id="dark-toggle-btn">🌙 Modo oscuro</div>
       <div class="pm-divider"></div>
       <div class="pm-item pm-logout" onclick="doLogout()">🚪 Cerrar sesión</div>
     </div>
@@ -298,6 +317,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="module-card" style="--mc:#ffa500" onclick="abrirVehiculos()">
         <div class="mc-grad"></div>
         <div><div class="module-icon">🚗</div><div class="module-name">Vehículos</div><div class="module-badge padres">Solo padres</div></div>
+      </div>
+      <div class="module-card" style="--mc:#f97316" onclick="abrirOtto()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🐾</div><div class="module-name">Otto</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-otto" style="display:none;background:#f97316">0</div>
       </div>
     </div>
     <button class="btn-notificaciones" id="btn-notif" onclick="solicitarPermisoNotificaciones()">
@@ -580,6 +604,64 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 </div>
 
 <!-- MODAL CÓDIGO -->
+<!-- OTTO -->
+<div class="screen" id="screen-otto">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🐾 Otto</span>
+    <button onclick="T('modal-otto').classList.add('show')" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#f97316,#fb923c);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
+  </div>
+  <div class="filter-bar">
+    <button class="chip active" id="fo-todas" onclick="filtrarOtto('todas')">Todo</button>
+    <button class="chip" id="fo-vacuna" onclick="filtrarOtto('vacuna')">💉 Vacunas</button>
+    <button class="chip" id="fo-revision" onclick="filtrarOtto('revision')">🩺 Revisiones</button>
+    <button class="chip" id="fo-compra" onclick="filtrarOtto('compra')">🛍️ Compras</button>
+  </div>
+  <div class="screen-body">
+    <div id="otto-proximo" style="margin:12px 16px 0;display:none">
+      <div style="background:linear-gradient(135deg,#f97316,#fb923c);border-radius:var(--radius);padding:16px;color:white;box-shadow:0 4px 16px rgba(249,115,22,.3)">
+        <div style="font-size:11px;opacity:.8;margin-bottom:2px">Próximo evento</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:18px;font-weight:800" id="otto-proximo-txt">—</div>
+        <div style="font-size:12px;opacity:.8;margin-top:2px" id="otto-proximo-fecha">—</div>
+      </div>
+    </div>
+    <div id="otto-lista" style="padding:12px 0 0"></div>
+    <div id="otto-empty" class="empty-state" style="display:none"><div class="ei">🐾</div><p>Sin registros de Otto</p><small>Pulsa + Añadir para empezar</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- MODAL OTTO -->
+<div class="modal-overlay" id="modal-otto">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Añadir registro de Otto</div>
+    <div class="fg"><label>Tipo</label>
+      <select id="otto-tipo">
+        <option value="vacuna">💉 Vacuna</option>
+        <option value="revision">🩺 Revisión veterinaria</option>
+        <option value="compra">🛍️ Compra</option>
+        <option value="medicacion">💊 Medicación</option>
+        <option value="otro">📝 Otro</option>
+      </select>
+    </div>
+    <div class="fg"><label>Descripción</label><input type="text" id="otto-desc" placeholder="Ej: Vacuna rabia, Pienso..."></div>
+    <div class="fr">
+      <div class="fg"><label>Fecha</label><input type="date" id="otto-fecha"></div>
+      <div class="fg"><label>Próxima fecha</label><input type="date" id="otto-proxima"></div>
+    </div>
+    <div class="fg"><label>Importe € (opcional)</label><input type="number" id="otto-importe" placeholder="0,00" step="0.01"></div>
+    <div class="fg"><label>Notas</label><textarea id="otto-notas" placeholder="Veterinario, dosis, marca..."></textarea></div>
+    <button class="btn-primary" onclick="guardarOtto()">Guardar</button>
+    <button class="btn-sec" onclick="T('modal-otto').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-codigo">
   <div class="modal-sheet" style="text-align:center">
     <div class="modal-handle"></div>
@@ -605,8 +687,8 @@ firebase.initializeApp({
 const auth=firebase.auth(), db=firebase.database();
 const CL_CLOUD='drsy461un', CL_PRESET='familialopbas';
 let currentUser=null,familiaData=null;
-let lCesta=null,lTareas=null,lGastos=null,lMedicos=null,lVehiculos=null;
-let tareasData={},filtroT='todas',filtroC='todas',vhSel=null,fotoB64=null;
+let lCesta=null,lTareas=null,lGastos=null,lMedicos=null,lVehiculos=null,lOtto=null;
+let tareasData={},filtroT='todas',filtroC='todas',filtroOtto='todas',vhSel=null,fotoB64=null,mesOffset=0;
 let chatListener=null;
 
 const T=id=>document.getElementById(id);
@@ -653,7 +735,7 @@ window.doGoogleLogin=async()=>{
   try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
   catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
 };
-window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=null;};
+window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=null;};
 window.crearFamilia=async()=>{
   if(!currentUser)return showToast('Sin sesión');showLoading();
   try{
@@ -698,9 +780,12 @@ async function cargarHome(){
     await renderMiembros(fd.miembros||{});
     hideLoading();showScreen('home');
     if(!lCesta)suscribirCesta();if(!lTareas)suscribirTareas();if(!lMedicos)suscribirMedicos();
+    if(!lOtto)suscribirOtto();
     suscribirListasGuardadas();
     if(ud.role==='hijo')document.querySelectorAll('.module-badge.padres').forEach(b=>b.closest('.module-card').style.opacity='.5');
-    
+    // Actualizar botón dark mode
+    const t=localStorage.getItem('flb-theme')||'light';
+    const dbtn=T('dark-toggle-btn');if(dbtn)dbtn.textContent=t==='dark'?'☀️ Modo claro':'🌙 Modo oscuro';
     // Actualizar badge de chat
     actualizarBadgeChat();
   }catch(err){hideLoading();showToast('Error: '+err.message);showScreen('auth');}
@@ -736,11 +821,18 @@ async function actualizarBadgeChat() {
 // ── DARK MODE ──
 function toggleDarkMode(){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
-  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
-  T('dark-toggle-btn').textContent=dark?'🌙':'☀️';
-  localStorage.setItem('flb-theme',dark?'light':'dark');
+  const newTheme=dark?'light':'dark';
+  document.documentElement.setAttribute('data-theme',newTheme);
+  const btn=T('dark-toggle-btn');
+  if(btn)btn.textContent=newTheme==='dark'?'☀️ Modo claro':'🌙 Modo oscuro';
+  localStorage.setItem('flb-theme',newTheme);
+  T('profile-menu').classList.remove('open');
 }
-(()=>{const t=localStorage.getItem('flb-theme')||'light';document.documentElement.setAttribute('data-theme',t);if(T('dark-toggle-btn'))T('dark-toggle-btn').textContent=t==='dark'?'☀️':'🌙';})();
+(()=>{
+  const t=localStorage.getItem('flb-theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  // El botón se actualiza cuando carga el home
+})();
 
 // ── CHAT MEJORADO ──
 window.abrirChat=()=>{
@@ -1234,6 +1326,78 @@ window.guardarGastoVehiculo=async()=>{
     await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/gastos/vhg_'+Date.now()).set({tipo:T('vhg-tipo').value,importe:parseFloat(imp),fecha:T('vhg-fecha').value,litros:T('vhg-litros').value||null,nota:T('vhg-nota').value,ts:Date.now()});
     T('modal-gasto-vh').classList.remove('show');hideLoading();showToast('✅ Gasto guardado');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+
+// ── OTTO ──
+window.abrirOtto=()=>{showScreen('otto');if(familiaData&&!lOtto)suscribirOtto();};
+function suscribirOtto(){
+  lOtto=db.ref('familias/'+familiaData.id+'/otto').on('value',snap=>{
+    const data=snap.val()||{};renderOtto(data);
+    const h=hoy();const en30=new Date();en30.setDate(en30.getDate()+30);const en30Str=en30.toISOString().split('T')[0];
+    const n=Object.values(data).filter(o=>o.proxima&&o.proxima>=h&&o.proxima<=en30Str).length;
+    const b=T('badge-otto');if(b){b.textContent=n;b.style.display=n>0?'block':'none';}
+  });
+}
+const OTTO_IC={vacuna:'💉',revision:'🩺',compra:'🛍️',medicacion:'💊',otro:'📝'};
+function renderOtto(data){
+  const lista=T('otto-lista'),empty=T('otto-empty');if(!lista)return;
+  let entries=Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+  if(filtroOtto!=='todas')entries=entries.filter(([,o])=>o.tipo===filtroOtto);
+  const h=hoy();
+  const proximos=Object.values(data).filter(o=>o.proxima&&o.proxima>=h).sort((a,b)=>a.proxima.localeCompare(b.proxima));
+  const prox=proximos[0];
+  const proxCard=T('otto-proximo');
+  if(prox&&proxCard){
+    proxCard.style.display='block';
+    T('otto-proximo-txt').textContent=(OTTO_IC[prox.tipo]||'📝')+' '+prox.descripcion;
+    T('otto-proximo-fecha').textContent='📅 '+prox.proxima.split('-').reverse().join('/');
+  }else if(proxCard){proxCard.style.display='none';}
+  if(!entries.length){lista.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+  lista.innerHTML=entries.map(([id,o])=>`
+    <div class="item-card">
+      <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#f97316,#fb923c);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${OTTO_IC[o.tipo]||'📝'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600">${o.descripcion||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">
+          ${o.fecha?'📅 '+o.fecha.split('-').reverse().join('/'):''}
+          ${o.proxima?' · Próxima: '+o.proxima.split('-').reverse().join('/'):''}
+          ${o.importe?' · '+fmtE(o.importe):''}
+        </div>
+        ${o.notas?`<div style="font-size:11px;color:var(--text2);margin-top:2px">${o.notas}</div>`:''}
+      </div>
+      <div onclick="borrarOtto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div>
+    </div>`).join('');
+}
+window.guardarOtto=async()=>{
+  const desc=T('otto-desc').value.trim();if(!desc)return showToast('Añade una descripción');
+  showLoading();
+  try{
+    const imp=T('otto-importe').value;const ts=Date.now();
+    await db.ref('familias/'+familiaData.id+'/otto/o_'+ts).set({
+      tipo:T('otto-tipo').value,descripcion:desc,
+      fecha:T('otto-fecha').value,proxima:T('otto-proxima').value||null,
+      importe:imp?parseFloat(imp):null,notas:T('otto-notas').value,
+      autor:currentUser.displayName||'',ts
+    });
+    if(imp){
+      await db.ref('familias/'+familiaData.id+'/gastos/g_otto_'+ts).set({
+        importe:parseFloat(imp),categoria:'otto',fecha:T('otto-fecha').value,
+        nota:'🐾 Otto — '+desc,autor:currentUser.displayName||'',ts
+      });
+    }
+    T('modal-otto').classList.remove('show');
+    T('otto-desc').value='';T('otto-importe').value='';T('otto-notas').value='';T('otto-proxima').value='';
+    hideLoading();showToast('✅ Registro guardado');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+window.borrarOtto=id=>db.ref('familias/'+familiaData.id+'/otto/'+id).remove();
+window.filtrarOtto=f=>{
+  filtroOtto=f;
+  ['fo-todas','fo-vacuna','fo-revision','fo-compra'].forEach(bid=>{
+    const b=T(bid);if(b)b.classList.toggle('active',bid==='fo-'+f||(bid==='fo-todas'&&f==='todas'));
+  });
+  db.ref('familias/'+familiaData.id+'/otto').once('value').then(s=>renderOtto(s.val()||{}));
 };
 
 // ===== AUTH STATE =====
