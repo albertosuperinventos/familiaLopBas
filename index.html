@@ -1132,7 +1132,6 @@ window.abrirLocalizacion = () => {
 };
 
 // ===== GASTOS (código original) =====
-let mesOffset=0; // 0=mes actual, -1=mes anterior, etc.
 window.abrirGastos=()=>{
   if(familiaData?.userRole==='hijo'){showToast('Solo los padres pueden ver los gastos');return;}
   mesOffset=0;showScreen('gastos');
