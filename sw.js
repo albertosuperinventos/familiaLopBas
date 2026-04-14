@@ -1,10 +1,10 @@
 const CACHE = 'familialopbas-v1';
 const ASSETS = [
-  '/familiaLopBas/',
-  '/familiaLopBas/index.html',
-  '/familiaLopBas/manifest.json',
-  '/familiaLopBas/icon-192.png',
-  '/familiaLopBas/icon-512.png'
+  '.',
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 self.addEventListener('install', e => {
