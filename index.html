@@ -697,8 +697,39 @@ window.filtrarTareas=f=>{
   renderTareas(tareasData);
 };
 
-// ── LOCALIZACIÓN ──
-window.abrirLocalizacion=()=>{window.open('https://maps.google.com/?q=compartir+ubicacion','_blank');showToast('📍 Abriendo Google Maps...');};
+// ── LOCALIZACIÓN ── ✅ FUNCIÓN CORREGIDA CON GPS REAL
+window.abrirLocalizacion = () => {
+  if (!navigator.geolocation) {
+    showToast('❌ Tu navegador no soporta geolocalización');
+    return;
+  }
+  showToast('📍 Obteniendo tu ubicación...');
+  showLoading();
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+      hideLoading();
+      showToast('✅ Mostrando tu ubicación real');
+    },
+    (error) => {
+      hideLoading();
+      let mensaje = '';
+      switch(error.code) {
+        case 1: mensaje = '❌ Permiso denegado. Activa ubicación en ajustes del navegador'; break;
+        case 2: mensaje = '❌ Ubicación no disponible'; break;
+        case 3: mensaje = '❌ Tiempo de espera agotado'; break;
+        default: mensaje = '❌ Error: ' + error.message;
+      }
+      showToast(mensaje);
+      if (confirm('¿No se pudo obtener tu ubicación. ¿Abrir Maps manualmente?')) {
+        window.open('https://www.google.com/maps', '_blank');
+      }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+};
 
 // ── GASTOS ──
 window.abrirGastos=()=>{
@@ -765,7 +796,7 @@ function renderCitas(citas){
   lista.innerHTML=entries.map(([id,c])=>{
     const d=new Date(c.fecha+'T12:00:00'),day=d.getDate(),mon=d.toLocaleString('es-ES',{month:'short'});
     const esHoy=c.fecha===h,esPas=c.fecha<h;
-    const bCls=esHoy?'hoy':esPas?'pasada':'proxima',bTxt=esHoy?'Hoy':esPas?'Pasada':'Próxima';
+    const bTxt=esHoy?'Hoy':esPas?'Pasada':'Próxima';
     const bSty=esHoy?'background:#dcfce7;color:#15803d':esPas?'background:var(--bg3);color:var(--text3)':'background:#dbeafe;color:#1d4ed8';
     return `<div class="cita-card"><div style="padding:12px 16px;display:flex;align-items:center;gap:12px"><div class="cita-date-box"><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;line-height:1">${day}</div><div style="font-size:10px;text-transform:uppercase;opacity:.9">${mon}</div></div><div style="flex:1"><div style="font-weight:600;font-size:15px">${c.especialidad||'Médico'}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${c.hora||''} ${c.centro?'· '+c.centro:''} ${c.miembroNombre?'· '+c.miembroNombre:''}</div>${c.notas?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${c.notas}</div>`:''}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span style="font-size:11px;padding:3px 8px;border-radius:10px;font-weight:600;${bSty}">${bTxt}</span><span onclick="borrarCita('${id}')" style="color:var(--text3);cursor:pointer;font-size:18px">×</span></div></div></div>`;
   }).join('');
