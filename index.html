@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>FamiliaLopBas + Chat</title>
+<title>FamiliaLopBas</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ===== ESTILOS (mismos que antes + añadidos para chat) ===== */
 :root {
   --bg:#f2f4f8; --bg2:#ffffff; --bg3:#e8ecf4; --card:#ffffff;
   --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
@@ -18,11 +17,130 @@
   --shadow:0 2px 12px rgba(0,0,0,0.07); --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+#splash{position:fixed;inset:0;background:linear-gradient(135deg,#6c63ff 0%,#a78bfa 50%,#f472b6 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:1000;transition:opacity .5s}
+#splash .logo{font-family:'Nunito',sans-serif;font-size:38px;font-weight:900;color:white;letter-spacing:-1px}
+#splash .sub{font-size:14px;color:rgba(255,255,255,.8)}
+#splash .dots{display:flex;gap:6px;margin-top:16px}
+#splash .dot{width:8px;height:8px;border-radius:50%;background:white;opacity:.4;animation:pulse 1.2s ease-in-out infinite}
+#splash .dot:nth-child(2){animation-delay:.2s}#splash .dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 .screen{display:none;min-height:100vh;flex-direction:column}
 .screen.active{display:flex}
-/* Copia aquí todos los estilos de la versión anterior (son muy largos) */
-/* Por brevedad, incluyo solo los nuevos estilos para chat */
+#screen-auth{background:var(--bg);align-items:center;justify-content:center;padding:24px}
+.auth-box{width:100%;max-width:380px}
+.auth-hero{text-align:center;margin-bottom:28px}
+.auth-hero .icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#6c63ff,#a78bfa);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:32px;box-shadow:0 8px 24px rgba(108,99,255,.35)}
+.auth-hero h1{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900}
+.auth-hero p{font-size:14px;color:var(--text2);margin-top:4px}
+.auth-tabs{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:4px;margin-bottom:20px}
+.auth-tab{flex:1;padding:10px;text-align:center;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2)}
+.auth-tab.active{background:white;color:var(--accent);box-shadow:var(--shadow)}
+.auth-panel{display:none}.auth-panel.active{display:block}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:13px 16px;background:white;border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;box-shadow:var(--shadow)}
+.field input:focus{border-color:var(--accent)}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:var(--radius-sm);color:white;font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(108,99,255,.35);margin-top:4px}
+.btn-primary:active{transform:scale(.98)}
+.btn-google{width:100%;padding:13px;background:white;border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;box-shadow:var(--shadow)}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+.divider span{font-size:12px;color:var(--text3)}
+.auth-error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px;display:none}
+#screen-familia{background:var(--bg);align-items:center;justify-content:center;padding:24px}
+.familia-box{width:100%;max-width:380px}
+.option-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.option-card:hover{border-color:var(--accent)}
+.option-card .oc-icon{font-size:28px;margin-bottom:8px}
+.option-card .oc-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;margin-bottom:4px}
+.option-card .oc-desc{font-size:13px;color:var(--text2)}
+.join-form{display:none;margin-top:8px}.join-form.visible{display:block}
+.code-input{width:100%;padding:14px 16px;background:white;border:2px solid var(--accent);border-radius:var(--radius-sm);color:var(--text);font-size:22px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center;letter-spacing:6px;text-transform:uppercase;outline:none;margin-bottom:12px;box-shadow:var(--shadow)}
+.err-msg{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px;display:none}
+#screen-home{background:var(--bg)}
+.home-header{padding:52px 20px 20px;background:linear-gradient(135deg,#6c63ff 0%,#a78bfa 60%,#f472b6 100%);position:relative;border-radius:0 0 28px 28px}
+.home-greeting{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:2px}
+.home-name{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:white}
+.familia-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:12px;color:white;margin-top:8px;font-weight:600}
+.profile-btn{position:absolute;top:52px;right:20px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;border:2px solid rgba(255,255,255,.5);color:white}
+.profile-menu{position:fixed;top:100px;right:16px;background:white;border:1px solid var(--border);border-radius:var(--radius);padding:8px;z-index:200;display:none;min-width:200px;box-shadow:var(--shadow-lg)}
+.profile-menu.open{display:block}
+.pm-item{padding:10px 14px;border-radius:var(--radius-sm);font-size:14px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:10px}
+.pm-item:hover{background:var(--bg3)}
+.pm-divider{height:1px;background:var(--border);margin:4px 0}
+.pm-logout{color:#dc2626}
+.members-bar{padding:16px 20px 8px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
+.members-bar::-webkit-scrollbar{display:none}
+.member-chip{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.member-avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:white;position:relative;box-shadow:var(--shadow)}
+.member-avatar.online::after{content:'';position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:var(--accent3);border:2px solid white}
+.member-name{font-size:10px;color:var(--text2);max-width:50px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modules-section{padding:8px 16px 100px}
+.modules-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding:0 4px}
+.modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.module-card{background:white;border-radius:var(--radius);padding:18px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow);border:1px solid var(--border)}
+.module-card:active{transform:scale(.97)}
+.mc-grad{position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 var(--radius) 0 80px;opacity:.1;background:var(--mc,#6c63ff)}
+.module-icon{font-size:26px;margin-bottom:6px}
+.module-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:15px}
+.module-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg3);color:var(--text2);margin-top:4px;font-weight:600}
+.module-badge.padres{background:#fef3c7;color:#92400e}
+.module-count{position:absolute;top:12px;right:12px;color:white;font-size:11px;font-weight:700;font-family:'Nunito',sans-serif;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);display:flex;padding:8px 0 20px;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--text3);cursor:pointer;transition:color .2s;padding:4px 0;font-weight:600}
+.nav-item.active{color:var(--accent)}
+.nav-item svg{width:22px;height:22px}
+.screen-header{padding:52px 16px 16px;display:flex;align-items:center;gap:12px;background:white;border-bottom:1px solid var(--border)}
+.back-btn{background:var(--bg3);border:none;border-radius:50%;width:38px;height:38px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.screen-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800}
+.screen-body{flex:1;background:var(--bg);overflow-y:auto;padding-bottom:100px}
+.item-card{background:white;border-radius:var(--radius-sm);padding:14px 16px;margin:0 16px 10px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state .ei{font-size:52px;margin-bottom:12px}
+.empty-state p{font-size:15px;color:var(--text2)}
+.empty-state small{font-size:13px;display:block;margin-top:4px}
+.input-bar{padding:12px 16px;background:white;border-bottom:1px solid var(--border);display:flex;gap:8px}
+.input-bar input,.input-bar select{padding:11px 14px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
+.input-bar input:focus,.input-bar select:focus{border-color:var(--accent)}
+.add-btn{padding:11px 16px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:var(--radius-sm);color:white;font-size:20px;cursor:pointer;flex-shrink:0}
+.filter-bar{padding:10px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;background:white;border-bottom:1px solid var(--border)}
+.filter-bar::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.chip.active{background:var(--accent);border-color:var(--accent);color:white}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;border-radius:30px;padding:10px 20px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:none;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(4px)}
+#loading.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cs-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(255,255,255,.96);align-items:center;justify-content:center;flex-direction:column;gap:12px;backdrop-filter:blur(8px)}
+.cs-overlay.show{display:flex}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-sheet{background:white;border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;margin-bottom:16px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);background:white}
+.fg textarea{min-height:80px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-sec{width:100%;padding:12px;background:var(--bg3);border:none;border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.foto-prev{width:100%;height:160px;background:var(--bg3);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;cursor:pointer;border:2px dashed var(--border2)}
+.foto-prev img{width:100%;height:100%;object-fit:cover}
+.gasto-total{margin:16px 16px 0;background:linear-gradient(135deg,#6c63ff,#a78bfa);border-radius:var(--radius);padding:20px;color:white;box-shadow:0 4px 16px rgba(108,99,255,.3)}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 0}
+.cat-card{background:white;border-radius:var(--radius-sm);padding:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.cita-card{background:white;border-radius:var(--radius-sm);margin:0 16px 10px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.cita-date-box{background:linear-gradient(135deg,#00d4ff,#0ea5e9);border-radius:10px;padding:8px 10px;text-align:center;color:white;min-width:46px;flex-shrink:0}
+.vh-card{background:white;border-radius:var(--radius);margin:0 16px 12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden}
+.vh-head{padding:16px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#ffa500,#f59e0b)}
+.vh-row{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border)}
+.vh-row:last-child{border-bottom:none}
+
+/* ESTILOS NUEVOS PARA CHAT (sin afectar nada más) */
 .chat-container{display:flex;flex-direction:column;height:100%;background:var(--bg)}
 .chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
 .chat-message{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;word-wrap:break-word}
@@ -33,10 +151,9 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
 .chat-input-bar{display:flex;gap:8px;padding:12px;background:white;border-top:1px solid var(--border)}
 .chat-input-bar input{flex:1;padding:12px;border:1.5px solid var(--border2);border-radius:25px;outline:none;font-size:14px}
 .chat-input-bar button{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;color:white;font-size:20px;cursor:pointer}
-.btn-notificaciones{background:var(--bg3);border:none;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:8px 16px}
+.btn-notificaciones{background:var(--bg3);border:none;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:8px 16px;width:calc(100% - 32px)}
 .btn-notificaciones.activado{background:#43e97b;color:white}
-.nav-chat{display:flex;gap:8px;padding:8px 16px;background:white;border-bottom:1px solid var(--border)}
-.nav-chat .chip{flex:1;text-align:center}
+.notif-badge{background:#ff6584;color:white;border-radius:10px;padding:2px 6px;font-size:10px;margin-left:4px}
 </style>
 </head>
 <body>
@@ -49,7 +166,14 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
 <div id="loading"><div class="spinner"></div></div>
 <div id="toast"></div>
 
-<!-- AUTH (mismo código que antes) -->
+<div class="cs-overlay" id="coming-soon">
+  <div style="font-size:56px" id="cs-icon">🚧</div>
+  <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800" id="cs-title">Próximamente</div>
+  <div style="color:var(--text2);font-size:14px" id="cs-sub">Módulo en desarrollo</div>
+  <button class="btn-primary" style="width:auto;padding:12px 28px;margin-top:8px" onclick="document.getElementById('coming-soon').classList.remove('show')">Volver</button>
+</div>
+
+<!-- AUTH -->
 <div class="screen" id="screen-auth">
   <div class="auth-box">
     <div class="auth-hero"><div class="icon">🏠</div><h1>FamiliaLopBas</h1><p>La app de tu familia</p></div>
@@ -59,7 +183,7 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
     </div>
     <div class="auth-panel active" id="panel-login">
       <div class="auth-error" id="login-error"></div>
-      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="tu@email.com"></div>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email"></div>
       <div class="field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••"></div>
       <button class="btn-primary" onclick="doLogin()">Entrar</button>
       <div class="divider"><span>o</span></div>
@@ -67,9 +191,9 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
     </div>
     <div class="auth-panel" id="panel-register">
       <div class="auth-error" id="register-error"></div>
-      <div class="field"><label>Tu nombre</label><input type="text" id="reg-name"></div>
-      <div class="field"><label>Email</label><input type="email" id="reg-email"></div>
-      <div class="field"><label>Contraseña</label><input type="password" id="reg-pass"></div>
+      <div class="field"><label>Tu nombre</label><input type="text" id="reg-name" placeholder="Alberto"></div>
+      <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="tu@email.com"></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"></div>
       <button class="btn-primary" onclick="doRegister()">Crear cuenta</button>
       <div class="divider"><span>o</span></div>
       <button class="btn-google" onclick="doGoogleLogin()">Continuar con Google</button>
@@ -80,40 +204,216 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
 <!-- FAMILIA SETUP -->
 <div class="screen" id="screen-familia">
   <div class="familia-box">
-    <div style="font-size:26px;font-weight:800">👨‍👩‍👧‍👦 Tu familia</div>
-    <div class="option-card" onclick="crearFamilia()">🏠 Crear familia nueva</div>
-    <div class="option-card" onclick="toggleJoinForm()">🔗 Unirme a una familia</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px">👨‍👩‍👧‍👦 Tu familia</div>
+    <div style="color:var(--text2);font-size:14px;margin-bottom:28px;line-height:1.5">Crea una familia nueva o únete con el código que te han compartido.</div>
+    <div class="option-card" onclick="crearFamilia()">
+      <div class="oc-icon">🏠</div><div class="oc-title">Crear familia nueva</div><div class="oc-desc">Obtendré un código para invitar al resto.</div>
+    </div>
+    <div class="option-card" onclick="toggleJoinForm()">
+      <div class="oc-icon">🔗</div><div class="oc-title">Unirme a una familia</div><div class="oc-desc">Tengo un código de invitación.</div>
+    </div>
     <div class="join-form" id="join-form">
+      <div class="err-msg" id="join-error"></div>
       <input type="text" class="code-input" id="join-code" placeholder="XXXXXX" maxlength="6">
       <button class="btn-primary" onclick="unirseAFamilia()">Unirme</button>
     </div>
   </div>
 </div>
 
-<!-- HOME (versión simplificada con acceso al chat) -->
+<!-- HOME -->
 <div class="screen" id="screen-home">
-  <div class="home-header">
-    <div class="home-greeting">Hola,</div>
+  <div class="home-header" style="position:relative">
+    <div class="home-greeting">Hola de nuevo,</div>
     <div class="home-name" id="home-username">Cargando...</div>
+    <div class="familia-badge">🏠 <span id="home-familia-name">FamiliaLopBas</span> · Código: <span id="home-codigo" style="font-weight:900;cursor:pointer" onclick="mostrarCodigo()"></span></div>
     <div class="profile-btn" id="profile-btn" onclick="toggleProfile()">A</div>
+    <div class="profile-menu" id="profile-menu">
+      <div class="pm-item" onclick="mostrarCodigo()">🔗 Código familia</div>
+      <div class="pm-item">👤 Rol: <span id="mi-rol-label" style="color:var(--accent);margin-left:4px">—</span></div>
+      <div class="pm-divider"></div>
+      <div class="pm-item pm-logout" onclick="doLogout()">🚪 Cerrar sesión</div>
+    </div>
   </div>
+  <div class="members-bar" id="members-bar"></div>
   <div class="modules-section">
     <div class="modules-title">Módulos</div>
     <div class="modules-grid">
-      <div class="module-card" onclick="abrirChat()">💬 Chat familiar</div>
-      <div class="module-card" onclick="abrirCesta()">🛒 Cesta</div>
-      <div class="module-card" onclick="abrirTareas()">✅ Tareas</div>
-      <div class="module-card" onclick="abrirLocalizacion()">📍 Localización</div>
+      <div class="module-card" style="--mc:#6c63ff" onclick="abrirChat()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">💬</div><div class="module-name">Chat</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-chat" style="display:none;background:#6c63ff">0</div>
+      </div>
+      <div class="module-card" style="--mc:#43e97b" onclick="abrirCesta()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🛒</div><div class="module-name">Cesta</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-cesta" style="display:none;background:#43e97b">0</div>
+      </div>
+      <div class="module-card" style="--mc:#a855f7" onclick="abrirTareas()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">✅</div><div class="module-name">Tareas</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-tareas" style="display:none;background:#a855f7">0</div>
+      </div>
+      <div class="module-card" style="--mc:#6c63ff" onclick="abrirLocalizacion()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">📍</div><div class="module-name">Localización</div><div class="module-badge">Familia</div></div>
+      </div>
+      <div class="module-card" style="--mc:#ff6584" onclick="abrirGastos()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">💶</div><div class="module-name">Gastos</div><div class="module-badge padres">Solo padres</div></div>
+      </div>
+      <div class="module-card" style="--mc:#00d4ff" onclick="abrirMedicos()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🏥</div><div class="module-name">Médicos</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-medicos" style="display:none;background:#0ea5e9">0</div>
+      </div>
+      <div class="module-card" style="--mc:#ffa500" onclick="abrirVehiculos()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🚗</div><div class="module-name">Vehículos</div><div class="module-badge padres">Solo padres</div></div>
+      </div>
     </div>
+    <button class="btn-notificaciones" id="btn-notif" onclick="solicitarPermisoNotificaciones()">
+      🔔 Activar notificaciones
+    </button>
   </div>
-  <button class="btn-notificaciones" id="btn-notif" onclick="solicitarPermisoNotificaciones()">🔔 Activar notificaciones</button>
   <div class="bottom-nav">
-    <div class="nav-item active" onclick="showScreen('home')">🏠 Inicio</div>
-    <div class="nav-item" onclick="abrirChat()">💬 Chat</div>
+    <div class="nav-item active" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
   </div>
 </div>
 
-<!-- CHAT -->
+<!-- CESTA -->
+<div class="screen" id="screen-cesta">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🛒 Cesta de la compra</span>
+  </div>
+  <div class="input-bar">
+    <input id="cesta-input" type="text" placeholder="Añadir producto..." style="flex:1" onkeydown="if(event.key==='Enter')addCestaItem()">
+    <input id="cesta-qty" type="text" placeholder="Cant." style="width:64px;text-align:center">
+    <button class="add-btn" onclick="addCestaItem()">+</button>
+  </div>
+  <div style="padding:8px 16px;display:flex;gap:8px;background:white;border-bottom:1px solid var(--border)">
+    <button onclick="borrarTachados()" style="padding:7px 12px;background:var(--bg3);border:none;border-radius:20px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">🗑 Borrar tachados</button>
+    <button onclick="desmarcarTodos()" style="padding:7px 12px;background:var(--bg3);border:none;border-radius:20px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">↺ Desmarcar</button>
+  </div>
+  <div class="screen-body">
+    <div id="cesta-lista" style="padding:12px 0 0"></div>
+    <div id="cesta-empty" class="empty-state" style="display:none"><div class="ei">🛒</div><p>La cesta está vacía</p><small>Añade productos arriba</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- TAREAS -->
+<div class="screen" id="screen-tareas">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">✅ Tareas</span>
+  </div>
+  <div class="input-bar" style="flex-direction:column;gap:8px">
+    <div style="display:flex;gap:8px">
+      <input id="tarea-input" type="text" placeholder="Nueva tarea..." style="flex:1" onkeydown="if(event.key==='Enter')addTarea()">
+      <button class="add-btn" onclick="addTarea()">+</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <select id="tarea-asignado" style="flex:1"><option value="">👥 Todos</option></select>
+      <select id="tarea-prioridad"><option value="normal">Normal</option><option value="alta">🔴 Alta</option><option value="baja">🔵 Baja</option></select>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <button class="chip active" id="ft-todas" onclick="filtrarTareas('todas')">Todas</button>
+    <button class="chip" id="ft-pendientes" onclick="filtrarTareas('pendientes')">Pendientes</button>
+    <button class="chip" id="ft-mias" onclick="filtrarTareas('mias')">Mis tareas</button>
+    <button class="chip" id="ft-completadas" onclick="filtrarTareas('completadas')">Completadas</button>
+  </div>
+  <div class="screen-body">
+    <div id="tareas-lista" style="padding:12px 0 0"></div>
+    <div id="tareas-empty" class="empty-state" style="display:none"><div class="ei">✅</div><p>No hay tareas</p><small>Añade una tarea arriba</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- GASTOS -->
+<div class="screen" id="screen-gastos">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">💶 Gastos familia</span>
+    <button onclick="abrirModalGasto()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
+  </div>
+  <div class="screen-body">
+    <div class="gasto-total" id="gasto-total-card">
+      <div style="font-size:12px;opacity:.8;margin-bottom:4px">Total este mes</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:36px;font-weight:900" id="gastos-total-amt">0,00 €</div>
+      <div style="font-size:12px;opacity:.7;margin-top:2px" id="gastos-period"></div>
+    </div>
+    <div class="cat-grid" id="gastos-cats"></div>
+    <div style="padding:16px 16px 0;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Movimientos</div>
+    <div id="gastos-lista" style="padding:8px 0 0"></div>
+    <div id="gastos-empty" class="empty-state" style="display:none"><div class="ei">💶</div><p>Sin gastos este mes</p><small>Pulsa + Añadir para registrar uno</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- MÉDICOS -->
+<div class="screen" id="screen-medicos">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🏥 Médicos</span>
+    <button onclick="abrirModalCita()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#00d4ff,#0ea5e9);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Cita</button>
+  </div>
+  <div class="filter-bar">
+    <button class="chip active" id="fc-todas" onclick="filtrarCitas('todas')">Todas</button>
+    <button class="chip" id="fc-proximas" onclick="filtrarCitas('proximas')">Próximas</button>
+    <button class="chip" id="fc-pasadas" onclick="filtrarCitas('pasadas')">Pasadas</button>
+  </div>
+  <div class="screen-body">
+    <div id="medicos-lista" style="padding:12px 0 0"></div>
+    <div id="medicos-empty" class="empty-state" style="display:none"><div class="ei">🏥</div><p>Sin citas registradas</p><small>Pulsa + Cita para añadir</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- VEHÍCULOS -->
+<div class="screen" id="screen-vehiculos">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🚗 Vehículos</span>
+    <button onclick="abrirModalVehiculo()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#ffa500,#f59e0b);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Vehículo</button>
+  </div>
+  <div class="screen-body">
+    <div id="vehiculos-lista" style="padding:12px 0 0"></div>
+    <div id="vehiculos-empty" class="empty-state" style="display:none"><div class="ei">🚗</div><p>Sin vehículos</p><small>Pulsa + Vehículo para añadir</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- CHAT (NUEVO) -->
 <div class="screen" id="screen-chat">
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('home')">←</button>
@@ -128,202 +428,265 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif}
   </div>
 </div>
 
+<!-- MODAL GASTO -->
+<div class="modal-overlay" id="modal-gasto">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nuevo gasto</div>
+    <div class="foto-prev" id="gasto-foto-preview" onclick="document.getElementById('gasto-foto-input').click()">
+      <div style="text-align:center;color:var(--text3)"><div style="font-size:32px;margin-bottom:6px">📷</div><div style="font-size:13px">Toca para añadir foto</div></div>
+    </div>
+    <input type="file" id="gasto-foto-input" accept="image/*" capture="environment" style="display:none" onchange="previsualizarFoto(this)">
+    <div class="fr">
+      <div class="fg"><label>Importe (€)</label><input type="number" id="gasto-importe" placeholder="0,00" step="0.01" min="0"></div>
+      <div class="fg"><label>Fecha</label><input type="date" id="gasto-fecha"></div>
+    </div>
+    <div class="fg">
+      <label>Categoría</label>
+      <select id="gasto-categoria">
+        <option value="supermercado">🛒 Supermercado</option><option value="restaurante">🍽️ Restaurante</option>
+        <option value="luz">💡 Luz</option><option value="agua">💧 Agua</option><option value="gas">🔥 Gas</option>
+        <option value="telefono">📱 Teléfono/Internet</option><option value="ropa">👕 Ropa</option>
+        <option value="colegio">🎒 Colegio</option><option value="medico">🏥 Médico/Farmacia</option>
+        <option value="ocio">🎭 Ocio</option><option value="transporte">🚌 Transporte</option><option value="otro">📦 Otro</option>
+      </select>
+    </div>
+    <div class="fg"><label>Nota (opcional)</label><input type="text" id="gasto-nota" placeholder="Descripción..."></div>
+    <button class="btn-primary" onclick="guardarGasto()">Guardar gasto</button>
+    <button class="btn-sec" onclick="cerrarModalGasto()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL CITA -->
+<div class="modal-overlay" id="modal-cita">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nueva cita médica</div>
+    <div class="fg"><label>Especialidad / Médico</label><input type="text" id="cita-especialidad" placeholder="Ej: Pediatra, Dentista..."></div>
+    <div class="fr">
+      <div class="fg"><label>Fecha</label><input type="date" id="cita-fecha"></div>
+      <div class="fg"><label>Hora</label><input type="time" id="cita-hora"></div>
+    </div>
+    <div class="fg"><label>Miembro</label><select id="cita-miembro"><option value="">Selecciona...</option></select></div>
+    <div class="fg"><label>Centro / Hospital</label><input type="text" id="cita-centro" placeholder="Nombre del centro..."></div>
+    <div class="fg"><label>Notas</label><textarea id="cita-notas" placeholder="Motivo, preparación..."></textarea></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <input type="checkbox" id="cita-recordatorio" style="width:18px;height:18px;accent-color:var(--accent)">
+      <label for="cita-recordatorio" style="font-size:14px">Activar recordatorio (notificación)</label>
+    </div>
+    <button class="btn-primary" onclick="guardarCita()">Guardar cita</button>
+    <button class="btn-sec" onclick="document.getElementById('modal-cita').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL VEHÍCULO -->
+<div class="modal-overlay" id="modal-vehiculo">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nuevo vehículo</div>
+    <div class="fr">
+      <div class="fg"><label>Marca</label><input type="text" id="vh-marca" placeholder="Ej: Seat"></div>
+      <div class="fg"><label>Modelo</label><input type="text" id="vh-modelo" placeholder="Ej: León"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Matrícula</label><input type="text" id="vh-matricula" placeholder="1234 ABC" style="text-transform:uppercase"></div>
+      <div class="fg"><label>Año</label><input type="number" id="vh-año" placeholder="2020"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Venc. seguro</label><input type="date" id="vh-seguro"></div>
+      <div class="fg"><label>Próxima ITV</label><input type="date" id="vh-itv"></div>
+    </div>
+    <button class="btn-primary" onclick="guardarVehiculo()">Guardar vehículo</button>
+    <button class="btn-sec" onclick="document.getElementById('modal-vehiculo').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL GASTO VEHÍCULO -->
+<div class="modal-overlay" id="modal-gasto-vh">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-gasto-vh-title">Añadir gasto</div>
+    <div class="fg"><label>Tipo</label>
+      <select id="vhg-tipo" onchange="document.getElementById('vhg-litros-group').style.display=this.value==='gasolina'?'block':'none'">
+        <option value="gasolina">⛽ Gasolina</option><option value="averia">🔧 Avería</option>
+        <option value="seguro">🛡️ Seguro</option><option value="itv">🔍 ITV</option><option value="otro">📦 Otro</option>
+      </select>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Importe (€)</label><input type="number" id="vhg-importe" placeholder="0,00" step="0.01"></div>
+      <div class="fg"><label>Fecha</label><input type="date" id="vhg-fecha"></div>
+    </div>
+    <div class="fg" id="vhg-litros-group"><label>Litros</label><input type="number" id="vhg-litros" placeholder="0,00" step="0.01"></div>
+    <div class="fg"><label>Nota</label><input type="text" id="vhg-nota" placeholder="Descripción..."></div>
+    <button class="btn-primary" onclick="guardarGastoVehiculo()">Guardar</button>
+    <button class="btn-sec" onclick="document.getElementById('modal-gasto-vh').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL CÓDIGO -->
+<div class="modal-overlay" id="modal-codigo">
+  <div class="modal-sheet" style="text-align:center">
+    <div class="modal-handle"></div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:4px">Código de tu familia</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:36px;font-weight:900;color:var(--accent);letter-spacing:6px;margin:8px 0" id="modal-codigo-value">——</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Comparte con tu familia para unirse</div>
+    <button class="btn-primary" onclick="copiarCodigo()">📋 Copiar código</button>
+    <button class="btn-sec" onclick="document.getElementById('modal-codigo').classList.remove('show')">Cerrar</button>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-// ===== CONFIGURACIÓN FIREBASE =====
 firebase.initializeApp({
   apiKey:"AIzaSyBpw-IXMNsthOUfwNzugMeiNNLT-TndaAM",
   authDomain:"familialopbas.firebaseapp.com",
   databaseURL:"https://familialopbas-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"familialopbas",
-  storageBucket:"familialopbas.firebasestorage.app",
-  messagingSenderId:"152258815775",
-  appId:"1:152258815775:web:f3d530d07d43113647b22a"
+  projectId:"familialopbas",storageBucket:"familialopbas.firebasestorage.app",
+  messagingSenderId:"152258815775",appId:"1:152258815775:web:f3d530d07d43113647b22a"
 });
+const auth=firebase.auth(), db=firebase.database();
+const CL_CLOUD='drsy461un', CL_PRESET='familialopbas';
+let currentUser=null,familiaData=null;
+let lCesta=null,lTareas=null,lGastos=null,lMedicos=null,lVehiculos=null;
+let tareasData={},filtroT='todas',filtroC='todas',vhSel=null,fotoB64=null;
+let chatListener=null;
 
-const auth = firebase.auth();
-const db = firebase.database();
-let currentUser = null;
-let familiaData = null;
-let chatListener = null;
+const T=id=>document.getElementById(id);
+window.showLoading=()=>T('loading').classList.add('show');
+window.hideLoading=()=>T('loading').classList.remove('show');
+window.showToast=(msg,ms=2500)=>{const t=T('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);};
+window.showScreen=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));T('screen-'+id).classList.add('active');};
+window.showError=(id,msg)=>{const el=T(id);el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',4000);};
+function hideSplash(){const sp=T('splash');sp.style.opacity='0';setTimeout(()=>sp.style.display='none',500);}
+setTimeout(()=>{const sp=T('splash');if(sp&&sp.style.display!=='none'){hideSplash();hideLoading();showScreen('auth');}},8000);
+function genCod(){return Math.random().toString(36).substring(2,8).toUpperCase();}
+const COLS=['#6c63ff','#ff6584','#43e97b','#ffa500','#00d4ff','#a855f7','#f59e0b'];
+function aCol(uid){let h=0;for(let c of uid)h=(h+c.charCodeAt(0))%COLS.length;return COLS[h];}
+function ini(name){return name?name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2):'??';}
+function dbG(p){return db.ref(p).once('value').then(s=>s.val());}
+function dbS(p,d){return db.ref(p).set(d);}
+function dbU(p,d){return db.ref(p).update(d);}
+function fmtE(n){return parseFloat(n||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function mesAct(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function hoy(){return new Date().toISOString().split('T')[0];}
 
-// ===== FUNCIONES AUXILIARES =====
-const T = id => document.getElementById(id);
-const showToast = (msg) => { const t = T('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); };
-const showLoading = () => T('loading').classList.add('show');
-const hideLoading = () => T('loading').classList.remove('show');
-const showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); T('screen-'+id).classList.add('active'); };
-const hideSplash = () => { const sp = T('splash'); sp.style.opacity = '0'; setTimeout(() => sp.style.display = 'none', 500); };
-setTimeout(() => { if(T('splash') && T('splash').style.display !== 'none') hideSplash(); }, 5000);
-
-// ===== AUTENTICACIÓN =====
-window.switchAuthTab = (tab) => {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0 && tab==='login') || (i===1 && tab==='register')));
-  T('panel-login').classList.toggle('active', tab==='login');
-  T('panel-register').classList.toggle('active', tab==='register');
+window.switchAuthTab=tab=>{
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
+  T('panel-login').classList.toggle('active',tab==='login');
+  T('panel-register').classList.toggle('active',tab==='register');
 };
-
-window.doLogin = async () => {
-  const email = T('login-email').value.trim();
-  const pass = T('login-pass').value;
-  if(!email || !pass) return;
+window.doLogin=async()=>{
+  const e=T('login-email').value.trim(),p=T('login-pass').value;
+  if(!e||!p)return showError('login-error','Rellena todos los campos');
   showLoading();
-  try { await auth.signInWithEmailAndPassword(email, pass); }
-  catch(err) { hideLoading(); showToast('Error: '+err.message); }
+  try{await auth.signInWithEmailAndPassword(e,p);}
+  catch(err){hideLoading();const m={'auth/user-not-found':'Usuario no encontrado','auth/wrong-password':'Contraseña incorrecta','auth/invalid-credential':'Email o contraseña incorrectos'};showError('login-error',m[err.code]||err.message);}
 };
-
-window.doRegister = async () => {
-  const name = T('reg-name').value.trim();
-  const email = T('reg-email').value.trim();
-  const pass = T('reg-pass').value;
-  if(!name || !email || pass.length<6) return showToast('Completa todos los campos');
+window.doRegister=async()=>{
+  const name=T('reg-name').value.trim(),e=T('reg-email').value.trim(),p=T('reg-pass').value;
+  if(!name||!e||!p)return showError('register-error','Rellena todos los campos');
+  if(p.length<6)return showError('register-error','Mínimo 6 caracteres');
   showLoading();
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await cred.user.updateProfile({displayName: name});
-    await db.ref('users/'+cred.user.uid).set({name, email, role:'padre', familiaId: null});
-  } catch(err) { hideLoading(); showToast('Error: '+err.message); }
+  try{const c=await auth.createUserWithEmailAndPassword(e,p);await c.user.updateProfile({displayName:name});await dbS('users/'+c.user.uid,{name,email:e,role:'padre',familiaId:null});}
+  catch(err){hideLoading();const m={'auth/email-already-in-use':'Email ya registrado','auth/weak-password':'Contraseña débil'};showError('register-error',m[err.code]||err.message);}
 };
-
-window.doGoogleLogin = async () => {
+window.doGoogleLogin=async()=>{
   showLoading();
-  try {
-    const cred = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    const userData = await db.ref('users/'+cred.user.uid).once('value');
-    if(!userData.exists()) {
-      await db.ref('users/'+cred.user.uid).set({
-        name: cred.user.displayName || 'Usuario',
-        email: cred.user.email,
-        role: 'padre',
-        familiaId: null
-      });
-    }
-  } catch(err) { hideLoading(); showToast('Error: '+err.message); }
+  try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
+  catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
 };
-
-window.doLogout = async () => {
-  if(chatListener) chatListener.off();
-  await auth.signOut();
-  showScreen('auth');
-};
-
-// ===== FAMILIA =====
-function genCodigo() { return Math.random().toString(36).substring(2,8).toUpperCase(); }
-
-window.crearFamilia = async () => {
-  if(!currentUser) return;
-  showLoading();
-  const codigo = genCodigo();
-  const familiaId = 'fam_'+Date.now();
-  try {
-    await db.ref('familias/'+familiaId).set({
-      nombre: 'Mi Familia',
-      codigo: codigo,
-      creadoPor: currentUser.uid,
-      miembros: { [currentUser.uid]: true }
-    });
-    await db.ref('users/'+currentUser.uid).update({ familiaId: familiaId, role: 'padre' });
+window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=null;};
+window.crearFamilia=async()=>{
+  if(!currentUser)return showToast('Sin sesión');showLoading();
+  try{
+    const cod=genCod(),fid='fam_'+Date.now();
+    await dbS('familias/'+fid,{nombre:'Familia LopBas',codigo:cod,creadoPor:currentUser.uid,miembros:{[currentUser.uid]:true}});
+    const u=await dbG('users/'+currentUser.uid);
+    if(u)await dbU('users/'+currentUser.uid,{familiaId:fid,role:'padre'});
+    else await dbS('users/'+currentUser.uid,{name:currentUser.displayName||currentUser.email.split('@')[0],email:currentUser.email,role:'padre',familiaId:fid});
     await cargarHome();
-  } catch(err) { hideLoading(); showToast('Error: '+err.message); }
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
-
-window.toggleJoinForm = () => T('join-form').classList.toggle('visible');
-
-window.unirseAFamilia = async () => {
-  const codigo = T('join-code').value.trim().toUpperCase();
-  if(codigo.length !== 6) return showToast('Código inválido');
+window.toggleJoinForm=()=>T('join-form').classList.toggle('visible');
+window.unirseAFamilia=async()=>{
+  const code=T('join-code').value.trim().toUpperCase();
+  if(code.length!==6)return showError('join-error','Código de 6 caracteres');
   showLoading();
-  try {
-    const familias = await db.ref('familias').once('value');
-    let encontrada = null;
-    familias.forEach(f => { if(f.val().codigo === codigo) encontrada = { id: f.key, ...f.val() }; });
-    if(!encontrada) throw new Error('Código no encontrado');
-    await db.ref('familias/'+encontrada.id+'/miembros/'+currentUser.uid).set(true);
-    await db.ref('users/'+currentUser.uid).update({ familiaId: encontrada.id, role: 'hijo' });
+  try{
+    const fams=await dbG('familias');if(!fams){hideLoading();return showError('join-error','Código no encontrado');}
+    const entry=Object.entries(fams).find(([,f])=>f.codigo===code);if(!entry){hideLoading();return showError('join-error','Código no encontrado');}
+    const [fid]=entry;
+    await dbU('familias/'+fid+'/miembros',{[currentUser.uid]:true});
+    const u=await dbG('users/'+currentUser.uid);
+    if(u)await dbU('users/'+currentUser.uid,{familiaId:fid,role:'hijo'});
+    else await dbS('users/'+currentUser.uid,{name:currentUser.displayName||currentUser.email.split('@')[0],email:currentUser.email,role:'hijo',familiaId:fid});
     await cargarHome();
-  } catch(err) { hideLoading(); showToast(err.message); }
+  }catch(err){hideLoading();showError('join-error',err.message);}
 };
+async function cargarHome(){
+  try{
+    const ud=await dbG('users/'+currentUser.uid);
+    if(!ud||!ud.familiaId){hideLoading();showScreen('familia');return;}
+    const fd=await dbG('familias/'+ud.familiaId);
+    if(!fd){hideLoading();showScreen('familia');return;}
+    familiaData={id:ud.familiaId,...fd,userRole:ud.role};
+    const nombre=currentUser.displayName||ud.name||'Usuario';
+    T('home-username').innerHTML=nombre.split(' ')[0]+' <span>👋</span>';
+    T('home-familia-name').textContent=fd.nombre||'FamiliaLopBas';
+    T('home-codigo').textContent=fd.codigo;
+    T('modal-codigo-value').textContent=fd.codigo;
+    T('mi-rol-label').textContent=ud.role==='padre'?'👨‍💼 Padre/Madre':'👶 Hijo/a';
+    T('profile-btn').textContent=ini(nombre);T('profile-btn').style.background=aCol(currentUser.uid);
+    await renderMiembros(fd.miembros||{});
+    hideLoading();showScreen('home');
+    if(!lCesta)suscribirCesta();if(!lTareas)suscribirTareas();if(!lMedicos)suscribirMedicos();
+    if(ud.role==='hijo')document.querySelectorAll('.module-badge.padres').forEach(b=>b.closest('.module-card').style.opacity='.5');
+    
+    // Actualizar badge de chat
+    actualizarBadgeChat();
+  }catch(err){hideLoading();showToast('Error: '+err.message);showScreen('auth');}
+}
+async function renderMiembros(mObj){
+  const bar=T('members-bar');bar.innerHTML='';
+  for(const uid of Object.keys(mObj)){
+    try{const u=await dbG('users/'+uid);if(!u)continue;const isSelf=uid===currentUser.uid;bar.innerHTML+=`<div class="member-chip"><div class="member-avatar ${isSelf?'online':''}" style="background:${aCol(uid)}">${ini(u.name||'U')}</div><div class="member-name">${isSelf?'Tú':(u.name||'').split(' ')[0]}</div></div>`;}catch(e){}
+  }
+}
+window.toggleProfile=()=>T('profile-menu').classList.toggle('open');
+window.mostrarCodigo=()=>{T('profile-menu').classList.remove('open');T('modal-codigo').classList.add('show');};
+window.copiarCodigo=()=>{navigator.clipboard.writeText(familiaData?.codigo||'');showToast('✅ Código copiado');};
+document.addEventListener('click',e=>{if(!e.target.closest('#profile-btn')&&!e.target.closest('#profile-menu'))T('profile-menu').classList.remove('open');});
+T('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+T('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')unirseAFamilia();});
 
-async function cargarHome() {
-  try {
-    const userData = await db.ref('users/'+currentUser.uid).once('value');
-    const familiaId = userData.val().familiaId;
-    if(!familiaId) { hideLoading(); showScreen('familia'); return; }
-    const famData = await db.ref('familias/'+familiaId).once('value');
-    familiaData = { id: familiaId, ...famData.val(), userRole: userData.val().role };
-    const nombre = currentUser.displayName || userData.val().name || 'Usuario';
-    T('home-username').innerHTML = nombre.split(' ')[0];
-    T('profile-btn').textContent = nombre.substring(0,2).toUpperCase();
-    hideLoading();
-    showScreen('home');
-    // Mostrar estado de notificaciones
-    const notifPerm = Notification.permission === 'granted';
-    const btn = T('btn-notif');
-    if(btn) {
-      btn.textContent = notifPerm ? '🔔 Notificaciones activadas ✅' : '🔔 Activar notificaciones';
-      btn.classList.toggle('activado', notifPerm);
-    }
-  } catch(err) { hideLoading(); showToast('Error al cargar'); }
+// ===== CHAT Y NOTIFICACIONES =====
+async function actualizarBadgeChat() {
+  if(!familiaData || !currentUser) return;
+  const ultimoLeidoSnap = await db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).once('value');
+  const ultimoLeido = ultimoLeidoSnap.val() || 0;
+  const mensajesSnap = await db.ref(`familias/${familiaData.id}/chat/mensajes`).once('value');
+  const mensajes = mensajesSnap.val() || {};
+  const noLeidos = Object.values(mensajes).filter(m => m.timestamp > ultimoLeido && m.uid !== currentUser.uid).length;
+  const badge = T('badge-chat');
+  if(badge) {
+    badge.textContent = noLeidos;
+    badge.style.display = noLeidos > 0 ? 'block' : 'none';
+  }
 }
 
-// ===== NOTIFICACIONES PUSH =====
-window.solicitarPermisoNotificaciones = async () => {
-  if (!("Notification" in window)) {
-    showToast("Este navegador no soporta notificaciones");
-    return;
-  }
-  
-  if (Notification.permission === "granted") {
-    showToast("✅ Ya tienes notificaciones activadas");
-    return;
-  }
-  
-  if (Notification.permission !== "denied") {
-    const permiso = await Notification.requestPermission();
-    if (permiso === "granted") {
-      showToast("✅ Notificaciones activadas. Recibirás alertas del chat!");
-      const btn = T('btn-notif');
-      if(btn) {
-        btn.textContent = '🔔 Notificaciones activadas ✅';
-        btn.classList.add('activado');
-      }
-      // Notificación de prueba
-      new Notification("🎉 Notificaciones activadas", {
-        body: "Recibirás alertas cuando te mencionen o lleguen mensajes nuevos",
-        icon: "https://emojicdn.elk.sh/🏠"
-      });
-    } else {
-      showToast("❌ Permiso denegado. Actívalo desde ajustes del navegador");
-    }
-  }
-};
-
-function enviarNotificacion(mensaje, emisor, tipo = 'mensaje') {
-  if (Notification.permission !== "granted") return;
-  
-  // Solo notificar si NO es el propio usuario quien envió el mensaje
-  if (emisor === currentUser?.uid) return;
-  
-  new Notification(`💬 ${mensaje.autor || 'Alguien'} te ha escrito`, {
-    body: mensaje.texto,
-    icon: "https://emojicdn.elk.sh/💬",
-    tag: "chat-notification",
-    renotify: true
-  });
-}
-
-// ===== CHAT =====
 window.abrirChat = () => {
   showScreen('chat');
   if(!familiaData) return;
   
-  // Limpiar listener anterior
   if(chatListener) chatListener.off();
   
-  // Escuchar mensajes en tiempo real
-  const chatRef = db.ref(`familias/${familiaData.id}/chat`);
+  // Marcar como leídos al abrir
+  db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).set(Date.now());
+  actualizarBadgeChat();
+  
+  const chatRef = db.ref(`familias/${familiaData.id}/chat/mensajes`);
   chatListener = chatRef.on('value', (snap) => {
     const mensajes = snap.val() || {};
     renderChat(mensajes);
@@ -346,18 +709,18 @@ function renderChat(mensajes) {
     const hora = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
     return `
       <div class="chat-message ${esMio ? 'mio' : 'otro'}">
-        <div class="autor">${esMio ? 'Tú' : (msg.autor || 'Usuario')}</div>
+        <div class="autor">${esMio ? 'Tú' : escapeHtml(msg.autor || 'Usuario')}</div>
         <div>${escapeHtml(msg.texto)}</div>
         <div class="fecha">${hora}</div>
       </div>
     `;
   }).join('');
   
-  // Auto-scroll al final
   container.scrollTop = container.scrollHeight;
 }
 
 function escapeHtml(text) {
+  if(!text) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
@@ -380,69 +743,335 @@ window.enviarMensaje = async () => {
     timestamp: Date.now()
   };
   
-  const chatRef = db.ref(`familias/${familiaData.id}/chat`);
-  const newMsgRef = chatRef.push();
-  await newMsgRef.set(nuevoMensaje);
+  const chatRef = db.ref(`familias/${familiaData.id}/chat/mensajes`);
+  await chatRef.push().set(nuevoMensaje);
   
-  // Enviar notificación a otros miembros (esto se hace desde el receptor, pero podemos guardar una notificación en la DB)
-  // La notificación se dispara en el evento 'value' de cada cliente
+  // Marcar como leído el mensaje propio
+  db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).set(Date.now());
+  actualizarBadgeChat();
 };
 
-// ===== FUNCIONES BÁSICAS DE MÓDULOS (simplificadas) =====
-window.abrirCesta = () => { showToast('🛒 Cesta - En desarrollo con chat'); };
-window.abrirTareas = () => { showToast('✅ Tareas - En desarrollo con chat'); };
-window.abrirLocalizacion = () => {
-  if(navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => window.open(`https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`, '_blank'),
-      () => showToast('Activa ubicación en ajustes')
-    );
-  } else showToast('GPS no soportado');
-};
-
-// ===== INICIALIZACIÓN =====
-auth.onAuthStateChanged(async (user) => {
-  currentUser = user;
-  hideSplash();
-  if(!user) { showScreen('auth'); hideLoading(); return; }
-  showLoading();
-  try {
-    const userData = await db.ref('users/'+user.uid).once('value');
-    if(!userData.exists()) {
-      await db.ref('users/'+user.uid).set({
-        name: user.displayName || user.email.split('@')[0],
-        email: user.email,
-        role: 'padre',
-        familiaId: null
-      });
+// NOTIFICACIONES PUSH
+window.solicitarPermisoNotificaciones = async () => {
+  if (!("Notification" in window)) {
+    showToast("Este navegador no soporta notificaciones");
+    return;
+  }
+  
+  if (Notification.permission === "granted") {
+    showToast("✅ Ya tienes notificaciones activadas");
+    const btn = T('btn-notif');
+    if(btn) {
+      btn.textContent = '🔔 Notificaciones activadas ✅';
+      btn.classList.add('activado');
     }
-    await cargarHome();
-  } catch(err) { hideLoading(); showToast('Error: '+err.message); }
-});
-
-// Cerrar sesión con botón
-window.toggleProfile = () => {
-  const menu = document.getElementById('profile-menu');
-  if(menu) menu.classList.toggle('open');
-  else {
-    // Crear menú rápido si no existe
-    const btn = T('profile-btn');
-    const div = document.createElement('div');
-    div.id = 'profile-menu';
-    div.className = 'profile-menu';
-    div.innerHTML = '<div class="pm-item" onclick="doLogout()">🚪 Cerrar sesión</div>';
-    btn.parentNode.appendChild(div);
-    div.classList.add('open');
-    setTimeout(() => {
-      document.addEventListener('click', function cerrar(e) {
-        if(!div.contains(e.target) && e.target !== btn) {
-          div.remove();
-          document.removeEventListener('click', cerrar);
-        }
+    return;
+  }
+  
+  if (Notification.permission !== "denied") {
+    const permiso = await Notification.requestPermission();
+    if (permiso === "granted") {
+      showToast("✅ Notificaciones activadas");
+      const btn = T('btn-notif');
+      if(btn) {
+        btn.textContent = '🔔 Notificaciones activadas ✅';
+        btn.classList.add('activado');
+      }
+      new Notification("🎉 FamiliaLopBas", {
+        body: "Recibirás notificaciones cuando lleguen mensajes nuevos",
+        icon: "https://emojicdn.elk.sh/🏠"
       });
-    }, 100);
+    } else {
+      showToast("❌ Permiso denegado");
+    }
   }
 };
+
+// Escuchar mensajes nuevos para notificaciones
+function iniciarListenerNotificaciones() {
+  if(!familiaData || !currentUser) return;
+  
+  db.ref(`familias/${familiaData.id}/chat/mensajes`).on('child_added', async (snap) => {
+    const msg = snap.val();
+    if(!msg || msg.uid === currentUser?.uid) return;
+    
+    const ultimoLeidoSnap = await db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).once('value');
+    const ultimoLeido = ultimoLeidoSnap.val() || 0;
+    
+    if(msg.timestamp > ultimoLeido && Notification.permission === "granted") {
+      new Notification(`💬 ${msg.autor || 'Alguien'}`, {
+        body: msg.texto,
+        icon: "https://emojicdn.elk.sh/💬",
+        tag: "chat-notification"
+      });
+      actualizarBadgeChat();
+    }
+  });
+}
+
+// ===== CESTA (código original) =====
+window.abrirCesta=()=>{showScreen('cesta');if(familiaData&&!lCesta)suscribirCesta();};
+function suscribirCesta(){
+  lCesta=db.ref('familias/'+familiaData.id+'/cesta').on('value',snap=>{
+    const items=snap.val()||{};renderCesta(items);
+    const n=Object.values(items).filter(i=>!i.tachado).length;
+    const b=T('badge-cesta');b.textContent=n;b.style.display=n>0?'block':'none';
+  });
+}
+function renderCesta(items){
+  const lista=T('cesta-lista'),empty=T('cesta-empty');
+  const entries=Object.entries(items).sort((a,b)=>(a[1].ts||0)-(b[1].ts||0));
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const pend=entries.filter(([,i])=>!i.tachado),tach=entries.filter(([,i])=>i.tachado);
+  let html='';
+  pend.forEach(([id,it])=>{html+=`<div class="item-card"><div onclick="tacharItem('${id}',true)" style="width:26px;height:26px;border-radius:50%;border:2px solid var(--border2);cursor:pointer;flex-shrink:0"></div><div style="flex:1"><div style="font-weight:500">${it.nombre}${it.cantidad?' <span style="color:var(--text2);font-size:13px">×'+it.cantidad+'</span>':''}</div><div style="font-size:11px;color:var(--text3)">${it.autor||''}</div></div><div onclick="borrarItem('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`;});
+  if(tach.length)html+=`<div style="padding:8px 16px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Cogidos (${tach.length})</div>`;
+  tach.forEach(([id,it])=>{html+=`<div class="item-card" style="opacity:.5"><div onclick="tacharItem('${id}',false)" style="width:26px;height:26px;border-radius:50%;background:var(--accent3);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div style="flex:1;text-decoration:line-through">${it.nombre}${it.cantidad?' ×'+it.cantidad:''}</div><div onclick="borrarItem('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`;});
+  lista.innerHTML=html;
+}
+window.addCestaItem=()=>{const inp=T('cesta-input'),qty=T('cesta-qty'),nombre=inp.value.trim();if(!nombre)return;db.ref('familias/'+familiaData.id+'/cesta/item_'+Date.now()).set({nombre,cantidad:qty.value.trim(),autor:currentUser.displayName||currentUser.email.split('@')[0],tachado:false,ts:Date.now()});inp.value='';qty.value='';inp.focus();};
+window.tacharItem=(id,v)=>db.ref('familias/'+familiaData.id+'/cesta/'+id).update({tachado:v});
+window.borrarItem=id=>db.ref('familias/'+familiaData.id+'/cesta/'+id).remove();
+window.borrarTachados=()=>db.ref('familias/'+familiaData.id+'/cesta').once('value').then(s=>{const u={};Object.entries(s.val()||{}).forEach(([id,it])=>{if(it.tachado)u[id]=null;});db.ref('familias/'+familiaData.id+'/cesta').update(u);});
+window.desmarcarTodos=()=>db.ref('familias/'+familiaData.id+'/cesta').once('value').then(s=>{const u={};Object.keys(s.val()||{}).forEach(id=>{u[id+'/tachado']=false;});db.ref('familias/'+familiaData.id+'/cesta').update(u);});
+
+// ===== TAREAS (código original) =====
+window.abrirTareas=()=>{showScreen('tareas');cargarSelAsignados();if(familiaData&&!lTareas)suscribirTareas();};
+function cargarSelAsignados(){
+  const sel=T('tarea-asignado');if(!sel||!familiaData)return;
+  sel.innerHTML='<option value="">👥 Todos</option>';
+  Object.keys(familiaData.miembros||{}).forEach(uid=>{dbG('users/'+uid).then(u=>{if(!u)return;const o=document.createElement('option');o.value=uid;o.textContent=uid===currentUser.uid?'Yo':(u.name||u.email).split(' ')[0];sel.appendChild(o);});});
+}
+function suscribirTareas(){
+  lTareas=db.ref('familias/'+familiaData.id+'/tareas').on('value',snap=>{
+    tareasData=snap.val()||{};renderTareas(tareasData);
+    const n=Object.values(tareasData).filter(t=>!t.completada).length;
+    const b=T('badge-tareas');b.textContent=n;b.style.display=n>0?'block':'none';
+  });
+}
+function renderTareas(items){
+  const lista=T('tareas-lista'),empty=T('tareas-empty');if(!lista)return;
+  const prioOrd={alta:0,normal:1,baja:2};
+  let entries=Object.entries(items).sort((a,b)=>{if(a[1].completada!==b[1].completada)return a[1].completada?1:-1;return(prioOrd[a[1].prioridad||'normal']||1)-(prioOrd[b[1].prioridad||'normal']||1);});
+  if(filtroT==='pendientes')entries=entries.filter(([,t])=>!t.completada);
+  else if(filtroT==='completadas')entries=entries.filter(([,t])=>t.completada);
+  else if(filtroT==='mias')entries=entries.filter(([,t])=>!t.completada&&(!t.asignadoA||t.asignadoA===currentUser.uid));
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const pb={alta:'#fecaca',normal:'var(--border)',baja:'#dbeafe'};
+  lista.innerHTML=entries.map(([id,t])=>`<div class="item-card" style="border-color:${t.completada?'var(--border)':pb[t.prioridad||'normal']};opacity:${t.completada?.5:1}"><div onclick="completarTarea('${id}',${!t.completada})" style="width:24px;height:24px;border-radius:6px;border:2px solid ${t.completada?'var(--accent3)':'var(--border2)'};background:${t.completada?'var(--accent3)':'transparent'};cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">${t.completada?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}</div><div style="flex:1;min-width:0"><div style="font-weight:500;${t.completada?'text-decoration:line-through':''}">${t.prioridad==='alta'?'🔴 ':t.prioridad==='baja'?'🔵 ':''}${t.nombre}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${t.asignadoNombre?'👤 '+t.asignadoNombre:'👥 Todos'} · por ${t.autor||'?'}</div></div><div onclick="borrarTarea('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`).join('');
+}
+window.addTarea=async()=>{
+  const inp=T('tarea-input'),nombre=inp.value.trim();if(!nombre)return;
+  const asignadoA=T('tarea-asignado').value||null,prio=T('tarea-prioridad').value||'normal';
+  let asignadoNombre='';
+  if(asignadoA){const u=await dbG('users/'+asignadoA);asignadoNombre=asignadoA===currentUser.uid?'Yo':(u?(u.name||u.email).split(' ')[0]:'');}
+  await db.ref('familias/'+familiaData.id+'/tareas/t_'+Date.now()).set({nombre,autor:currentUser.displayName||currentUser.email.split('@')[0],asignadoA,asignadoNombre,prioridad:prio,completada:false,ts:Date.now()});
+  inp.value='';inp.focus();
+};
+window.completarTarea=(id,v)=>db.ref('familias/'+familiaData.id+'/tareas/'+id).update({completada:v});
+window.borrarTarea=id=>db.ref('familias/'+familiaData.id+'/tareas/'+id).remove();
+window.filtrarTareas=f=>{
+  filtroT=f;
+  ['ft-todas','ft-pendientes','ft-mias','ft-completadas'].forEach(bid=>{const b=T(bid);if(b)b.classList.toggle('active',bid==='ft-'+f);});
+  renderTareas(tareasData);
+};
+
+// ===== LOCALIZACIÓN CON GPS REAL =====
+window.abrirLocalizacion = () => {
+  if (!navigator.geolocation) {
+    showToast('❌ Tu navegador no soporta geolocalización');
+    return;
+  }
+  showToast('📍 Obteniendo tu ubicación...');
+  showLoading();
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+      hideLoading();
+      showToast('✅ Mostrando tu ubicación real');
+    },
+    (error) => {
+      hideLoading();
+      let mensaje = '';
+      switch(error.code) {
+        case 1: mensaje = '❌ Permiso denegado. Activa ubicación en ajustes'; break;
+        case 2: mensaje = '❌ Ubicación no disponible'; break;
+        case 3: mensaje = '❌ Tiempo de espera agotado'; break;
+        default: mensaje = '❌ Error: ' + error.message;
+      }
+      showToast(mensaje);
+      if (confirm('¿Abrir Maps manualmente?')) window.open('https://www.google.com/maps', '_blank');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+};
+
+// ===== GASTOS (código original) =====
+window.abrirGastos=()=>{
+  if(familiaData?.userRole==='hijo'){showToast('Solo los padres pueden ver los gastos');return;}
+  showScreen('gastos');
+  T('gastos-period').textContent=new Date().toLocaleString('es-ES',{month:'long',year:'numeric'});
+  if(familiaData&&!lGastos)suscribirGastos();
+};
+const CAT_IC={supermercado:'🛒',restaurante:'🍽️',luz:'💡',agua:'💧',gas:'🔥',telefono:'📱',ropa:'👕',colegio:'🎒',medico:'🏥',ocio:'🎭',transporte:'🚌',otro:'📦'};
+function suscribirGastos(){
+  const mes=mesAct();
+  lGastos=db.ref('familias/'+familiaData.id+'/gastos').on('value',snap=>{
+    const todos=snap.val()||{};
+    const delMes=Object.entries(todos).filter(([,g])=>(g.fecha||'').startsWith(mes));
+    renderGastos(delMes);
+  });
+}
+function renderGastos(entries){
+  const lista=T('gastos-lista'),empty=T('gastos-empty');
+  const total=entries.reduce((s,[,g])=>s+parseFloat(g.importe||0),0);
+  T('gastos-total-amt').textContent=fmtE(total);
+  const cats={};entries.forEach(([,g])=>{const c=g.categoria||'otro';cats[c]=(cats[c]||0)+parseFloat(g.importe||0);});
+  T('gastos-cats').innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([c,v])=>`<div class="cat-card"><div style="font-size:20px;margin-bottom:4px">${CAT_IC[c]||'📦'}</div><div style="font-size:11px;color:var(--text2)">${c}</div><div style="font-family:'Nunito',sans-serif;font-size:16px;font-weight:800">${fmtE(v)}</div></div>`).join('');
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  lista.innerHTML=entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([id,g])=>`<div class="item-card"><div style="width:40px;height:40px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${CAT_IC[g.categoria]||'📦'}</div><div style="flex:1;min-width:0"><div style="font-weight:500">${g.nota||g.categoria||'Gasto'}</div><div style="font-size:11px;color:var(--text3)">${g.fecha||''} · ${g.autor||''}</div></div>${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0" onclick="window.open('${g.fotoUrl}','_blank')">`:''}  <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-left:8px;flex-shrink:0">${fmtE(g.importe)}</div><div onclick="borrarGasto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`).join('');
+}
+window.abrirModalGasto=()=>{T('gasto-fecha').value=hoy();fotoB64=null;T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:32px;margin-bottom:6px">📷</div><div style="font-size:13px">Toca para añadir foto</div></div>';T('modal-gasto').classList.add('show');};
+window.cerrarModalGasto=()=>T('modal-gasto').classList.remove('show');
+window.previsualizarFoto=input=>{const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{fotoB64=e.target.result;T('gasto-foto-preview').innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;};r.readAsDataURL(file);};
+window.guardarGasto=async()=>{
+  const imp=T('gasto-importe').value;if(!imp)return showToast('Introduce el importe');
+  showLoading();
+  try{
+    let fotoUrl=null;
+    if(fotoB64){
+      const fd=new FormData();fd.append('file',fotoB64);fd.append('upload_preset',CL_PRESET);
+      const res=await fetch(`https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`,{method:'POST',body:fd});
+      const data=await res.json();fotoUrl=data.secure_url;
+    }
+    await db.ref('familias/'+familiaData.id+'/gastos/g_'+Date.now()).set({importe:parseFloat(imp),categoria:T('gasto-categoria').value,fecha:T('gasto-fecha').value,nota:T('gasto-nota').value,fotoUrl,autor:currentUser.displayName||currentUser.email.split('@')[0],ts:Date.now()});
+    cerrarModalGasto();hideLoading();showToast('✅ Gasto guardado');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+window.borrarGasto=id=>db.ref('familias/'+familiaData.id+'/gastos/'+id).remove();
+
+// ===== MÉDICOS (código original) =====
+window.abrirMedicos=()=>{showScreen('medicos');if(familiaData&&!lMedicos)suscribirMedicos();};
+function suscribirMedicos(){
+  lMedicos=db.ref('familias/'+familiaData.id+'/citas').on('value',snap=>{
+    const citas=snap.val()||{};renderCitas(citas);
+    const n=Object.values(citas).filter(c=>c.fecha>=hoy()).length;
+    const b=T('badge-medicos');b.textContent=n;b.style.display=n>0?'block':'none';
+  });
+}
+function renderCitas(citas){
+  const lista=T('medicos-lista'),empty=T('medicos-empty');
+  let entries=Object.entries(citas).sort((a,b)=>a[1].fecha?.localeCompare(b[1].fecha||'')||0);
+  const h=hoy();
+  if(filtroC==='proximas')entries=entries.filter(([,c])=>c.fecha>=h);
+  else if(filtroC==='pasadas')entries=entries.filter(([,c])=>c.fecha<h);
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  lista.innerHTML=entries.map(([id,c])=>{
+    const d=new Date(c.fecha+'T12:00:00'),day=d.getDate(),mon=d.toLocaleString('es-ES',{month:'short'});
+    const esHoy=c.fecha===h,esPas=c.fecha<h;
+    const bTxt=esHoy?'Hoy':esPas?'Pasada':'Próxima';
+    const bSty=esHoy?'background:#dcfce7;color:#15803d':esPas?'background:var(--bg3);color:var(--text3)':'background:#dbeafe;color:#1d4ed8';
+    return `<div class="cita-card"><div style="padding:12px 16px;display:flex;align-items:center;gap:12px"><div class="cita-date-box"><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;line-height:1">${day}</div><div style="font-size:10px;text-transform:uppercase;opacity:.9">${mon}</div></div><div style="flex:1"><div style="font-weight:600;font-size:15px">${c.especialidad||'Médico'}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${c.hora||''} ${c.centro?'· '+c.centro:''} ${c.miembroNombre?'· '+c.miembroNombre:''}</div>${c.notas?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${c.notas}</div>`:''}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span style="font-size:11px;padding:3px 8px;border-radius:10px;font-weight:600;${bSty}">${bTxt}</span><span onclick="borrarCita('${id}')" style="color:var(--text3);cursor:pointer;font-size:18px">×</span></div></div></div>`;
+  }).join('');
+}
+window.abrirModalCita=async()=>{
+  T('cita-fecha').value=hoy();T('cita-hora').value='09:00';
+  const sel=T('cita-miembro');sel.innerHTML='<option value="">Selecciona...</option>';
+  for(const uid of Object.keys(familiaData.miembros||{})){const u=await dbG('users/'+uid);if(!u)continue;const o=document.createElement('option');o.value=uid;o.textContent=uid===currentUser.uid?'Yo':(u.name||u.email).split(' ')[0];sel.appendChild(o);}
+  T('modal-cita').classList.add('show');
+};
+window.guardarCita=async()=>{
+  const esp=T('cita-especialidad').value.trim(),fecha=T('cita-fecha').value;
+  if(!esp||!fecha)return showToast('Rellena especialidad y fecha');
+  showLoading();
+  try{
+    const mid=T('cita-miembro').value;let mnom='';
+    if(mid){const u=await dbG('users/'+mid);mnom=mid===currentUser.uid?'Yo':(u?(u.name||u.email).split(' ')[0]:'');}
+    const id='cita_'+Date.now();
+    await db.ref('familias/'+familiaData.id+'/citas/'+id).set({especialidad:esp,fecha,hora:T('cita-hora').value,centro:T('cita-centro').value,notas:T('cita-notas').value,miembroId:mid,miembroNombre:mnom,autor:currentUser.displayName||'',ts:Date.now()});
+    if(T('cita-recordatorio').checked){
+      if(Notification.permission==='default')await Notification.requestPermission();
+      if(Notification.permission==='granted'){
+        const fh=new Date(fecha+'T'+T('cita-hora').value);const diff=fh-new Date()-86400000;
+        if(diff>0){setTimeout(()=>new Notification('📅 Cita mañana',{body:esp+' a las '+T('cita-hora').value}),diff);showToast('🔔 Recordatorio activado');}
+      }
+    }
+    T('modal-cita').classList.remove('show');hideLoading();showToast('✅ Cita guardada');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+window.borrarCita=id=>db.ref('familias/'+familiaData.id+'/citas/'+id).remove();
+window.filtrarCitas=f=>{filtroC=f;['fc-todas','fc-proximas','fc-pasadas'].forEach(bid=>{const b=T(bid);if(b)b.classList.toggle('active',bid==='fc-'+f);});db.ref('familias/'+familiaData.id+'/citas').once('value').then(s=>renderCitas(s.val()||{}));};
+
+// ===== VEHÍCULOS (código original) =====
+window.abrirVehiculos=()=>{
+  if(familiaData?.userRole==='hijo'){showToast('Solo los padres pueden ver los vehículos');return;}
+  showScreen('vehiculos');if(familiaData&&!lVehiculos)suscribirVehiculos();
+};
+function suscribirVehiculos(){
+  lVehiculos=db.ref('familias/'+familiaData.id+'/vehiculos').on('value',snap=>renderVehiculos(snap.val()||{}));
+}
+function renderVehiculos(vhs){
+  const lista=T('vehiculos-lista'),empty=T('vehiculos-empty');
+  const entries=Object.entries(vhs);
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const h=hoy();
+  lista.innerHTML=entries.map(([id,v])=>{
+    const gastos=Object.values(v.gastos||{});
+    const tot=gastos.reduce((s,g)=>s+parseFloat(g.importe||0),0);
+    const segAlert=v.seguro&&v.seguro<h,itvAlert=v.itv&&v.itv<h;
+    const ultGas=gastos.filter(g=>g.tipo==='gasolina').sort((a,b)=>b.ts-a.ts)[0];
+    return `<div class="vh-card"><div class="vh-head"><div style="font-size:28px">🚗</div><div style="flex:1"><div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:white">${v.marca||''} ${v.modelo||''}</div><div style="font-size:12px;color:rgba(255,255,255,.8)">${v.matricula||''} ${v.año?'· '+v.año:''}</div></div><div style="text-align:right"><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:white">${fmtE(tot)}</div><div style="font-size:10px;color:rgba(255,255,255,.7)">total gastos</div></div></div>
+    <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🛡️ Seguro</span><span style="font-size:13px;font-weight:600;${segAlert?'color:#dc2626':''}">${v.seguro||'—'} ${segAlert?'⚠️':''}</span></div>
+    <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🔍 ITV</span><span style="font-size:13px;font-weight:600;${itvAlert?'color:#dc2626':''}">${v.itv||'—'} ${itvAlert?'⚠️':''}</span></div>
+    ${ultGas?`<div class="vh-row"><span style="font-size:13px;color:var(--text2)">⛽ Último repostaje</span><span style="font-size:13px;font-weight:600">${fmtE(ultGas.importe)}${ultGas.litros?' · '+ultGas.litros+'L':''}</span></div>`:''}
+    <div class="vh-row" style="border:none;padding:12px 16px;gap:8px"><button onclick="abrirModalGastoVh('${id}','${(v.marca||'')+' '+(v.modelo||'')}')" style="padding:8px 14px;background:linear-gradient(135deg,#ffa500,#f59e0b);border:none;border-radius:20px;color:white;font-size:12px;font-weight:700;cursor:pointer">+ Gasto</button><button onclick="borrarVehiculo('${id}')" style="padding:8px 14px;background:var(--bg3);border:none;border-radius:20px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">Eliminar</button></div></div>`;
+  }).join('');
+}
+window.abrirModalVehiculo=()=>T('modal-vehiculo').classList.add('show');
+window.guardarVehiculo=async()=>{
+  const marca=T('vh-marca').value.trim();if(!marca)return showToast('Introduce la marca');
+  showLoading();
+  try{
+    await db.ref('familias/'+familiaData.id+'/vehiculos/vh_'+Date.now()).set({marca,modelo:T('vh-modelo').value,matricula:T('vh-matricula').value.toUpperCase(),año:T('vh-año').value,seguro:T('vh-seguro').value,itv:T('vh-itv').value});
+    T('modal-vehiculo').classList.remove('show');hideLoading();showToast('✅ Vehículo añadido');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+window.borrarVehiculo=id=>{if(confirm('¿Eliminar vehículo y todos sus gastos?'))db.ref('familias/'+familiaData.id+'/vehiculos/'+id).remove();};
+window.abrirModalGastoVh=(id,nombre)=>{vhSel=id;T('modal-gasto-vh-title').textContent='Gasto — '+nombre;T('vhg-fecha').value=hoy();T('vhg-litros-group').style.display='block';T('modal-gasto-vh').classList.add('show');};
+window.guardarGastoVehiculo=async()=>{
+  const imp=T('vhg-importe').value;if(!imp)return showToast('Introduce el importe');
+  showLoading();
+  try{
+    await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/gastos/vhg_'+Date.now()).set({tipo:T('vhg-tipo').value,importe:parseFloat(imp),fecha:T('vhg-fecha').value,litros:T('vhg-litros').value||null,nota:T('vhg-nota').value,ts:Date.now()});
+    T('modal-gasto-vh').classList.remove('show');hideLoading();showToast('✅ Gasto guardado');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+
+// ===== AUTH STATE =====
+auth.onAuthStateChanged(async user=>{
+  currentUser=user;hideSplash();
+  if(!user){hideLoading();showScreen('auth');return;}
+  showLoading();
+  try{
+    const u=await dbG('users/'+user.uid);
+    if(!u)await dbS('users/'+user.uid,{name:user.displayName||user.email.split('@')[0],email:user.email,role:'padre',familiaId:null});
+    await cargarHome();
+    iniciarListenerNotificaciones();
+    // Verificar estado de notificaciones para el botón
+    const btnNotif = T('btn-notif');
+    if(btnNotif && Notification.permission === "granted") {
+      btnNotif.textContent = '🔔 Notificaciones activadas ✅';
+      btnNotif.classList.add('activado');
+    }
+  }catch(err){hideLoading();showToast('Error: '+err.message);showScreen('auth');}
+});
 </script>
 </body>
 </html>
