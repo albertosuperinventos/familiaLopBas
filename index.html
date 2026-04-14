@@ -754,60 +754,69 @@ window.enviarMensaje = async () => {
 // NOTIFICACIONES PUSH
 window.solicitarPermisoNotificaciones = async () => {
   if (!("Notification" in window)) {
-    showToast("Este navegador no soporta notificaciones");
+    // iOS Safari sin PWA instalada
+    showToast("⚠️ Añade la app a pantalla de inicio para notificaciones");
+    // Mostrar instrucciones
+    alert('Para recibir notificaciones en iPhone:\n1. Pulsa el botón Compartir (□↑)\n2. Selecciona "Añadir a pantalla de inicio"\n3. Abre la app desde el icono\n4. Vuelve a pulsar este botón');
     return;
   }
-  
+
   if (Notification.permission === "granted") {
     showToast("✅ Ya tienes notificaciones activadas");
     const btn = T('btn-notif');
-    if(btn) {
-      btn.textContent = '🔔 Notificaciones activadas ✅';
-      btn.classList.add('activado');
-    }
+    if(btn) { btn.textContent = '🔔 Notificaciones activadas ✅'; btn.classList.add('activado'); }
     return;
   }
-  
-  if (Notification.permission !== "denied") {
-    const permiso = await Notification.requestPermission();
-    if (permiso === "granted") {
-      showToast("✅ Notificaciones activadas");
-      const btn = T('btn-notif');
-      if(btn) {
-        btn.textContent = '🔔 Notificaciones activadas ✅';
-        btn.classList.add('activado');
-      }
-      new Notification("🎉 FamiliaLopBas", {
-        body: "Recibirás notificaciones del chat",
-        icon: "https://emojicdn.elk.sh/🏠"
-      });
-    } else {
-      showToast("❌ Permiso denegado. Actívalo desde ajustes del navegador");
-    }
+
+  if (Notification.permission === "denied") {
+    showToast("❌ Notificaciones bloqueadas — actívalas en ajustes del navegador");
+    return;
+  }
+
+  // permission === "default" — pedir permiso
+  const permiso = await Notification.requestPermission();
+  const btn = T('btn-notif');
+  if (permiso === "granted") {
+    showToast("✅ Notificaciones activadas");
+    if(btn) { btn.textContent = '🔔 Notificaciones activadas ✅'; btn.classList.add('activado'); }
+    new Notification("🎉 FamiliaLopBas", {
+      body: "Recibirás notificaciones cuando lleguen mensajes nuevos",
+      icon: "https://emojicdn.elk.sh/🏠"
+    });
+    // Re-iniciar listener ahora que hay permiso
+    iniciarListenerNotificaciones();
   } else {
-    showToast("❌ Permiso bloqueado. Actívalo en ajustes del navegador");
+    showToast("❌ Permiso denegado");
+    if(btn) btn.textContent = '🔕 Notificaciones desactivadas';
   }
 };
+
 // Escuchar mensajes nuevos para notificaciones
 function iniciarListenerNotificaciones() {
   if(!familiaData || !currentUser) return;
-  
-  db.ref(`familias/${familiaData.id}/chat/mensajes`).on('child_added', async (snap) => {
-    const msg = snap.val();
-    if(!msg || msg.uid === currentUser?.uid) return;
-    
-    const ultimoLeidoSnap = await db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).once('value');
-    const ultimoLeido = ultimoLeidoSnap.val() || 0;
-    
-    if(msg.timestamp > ultimoLeido && Notification.permission === "granted") {
-      new Notification(`💬 ${msg.autor || 'Alguien'}`, {
-        body: msg.texto,
-        icon: "https://emojicdn.elk.sh/💬",
-        tag: "chat-notification"
-      });
+
+  // Usamos el timestamp actual como referencia: solo notificamos mensajes
+  // que lleguen DESPUÉS de haber iniciado el listener, ignorando los históricos.
+  const tsInicio = Date.now();
+
+  db.ref(`familias/${familiaData.id}/chat/mensajes`)
+    .orderByChild('timestamp')
+    .startAt(tsInicio)
+    .on('child_added', (snap) => {
+      const msg = snap.val();
+      if(!msg || msg.uid === currentUser?.uid) return;
+      // Doble comprobación: solo mensajes posteriores al inicio de sesión
+      if(msg.timestamp <= tsInicio) return;
+
+      if(Notification.permission === "granted") {
+        new Notification(`💬 ${msg.autor || 'Alguien'}`, {
+          body: msg.texto,
+          icon: "https://emojicdn.elk.sh/💬",
+          tag: "chat-notification"
+        });
+      }
       actualizarBadgeChat();
-    }
-  });
+    });
 }
 
 // ===== CESTA (código original) =====
@@ -1064,8 +1073,9 @@ auth.onAuthStateChanged(async user=>{
     const u=await dbG('users/'+user.uid);
     if(!u)await dbS('users/'+user.uid,{name:user.displayName||user.email.split('@')[0],email:user.email,role:'padre',familiaId:null});
     await cargarHome();
+    // cargarHome() ya habrá establecido familiaData, ahora es seguro iniciar el listener
     iniciarListenerNotificaciones();
-    // Verificar estado de notificaciones para el botón
+    // Actualizar botón según permiso actual
     const btnNotif = T('btn-notif');
     if(btnNotif && Notification.permission === "granted") {
       btnNotif.textContent = '🔔 Notificaciones activadas ✅';
