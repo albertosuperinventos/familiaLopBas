@@ -971,60 +971,108 @@ window.cargarListaCesta=async id=>{
 };
 window.borrarListaGuardada=id=>db.ref('familias/'+familiaData.id+'/listasGuardadas/'+id).remove();
 
-// NOTIFICACIONES PUSH
-window.solicitarPermisoNotificaciones = async () => {
-  if (!("Notification" in window)) {
-    showToast("Este navegador no soporta notificaciones");
-    return;
-  }
-  
-  if (Notification.permission === "granted") {
-    showToast("✅ Ya tienes notificaciones activadas");
-    const btn = T('btn-notif');
-    if(btn) {
-      btn.textContent = '🔔 Notificaciones activadas ✅';
-      btn.classList.add('activado');
-    }
-    return;
-  }
-  
-  if (Notification.permission !== "denied") {
-    const permiso = await Notification.requestPermission();
-    if (permiso === "granted") {
-      showToast("✅ Notificaciones activadas");
-      const btn = T('btn-notif');
-      if(btn) {
-        btn.textContent = '🔔 Notificaciones activadas ✅';
-        btn.classList.add('activado');
-      }
-      new Notification("🎉 FamiliaLopBas", {
-        body: "Recibirás notificaciones cuando lleguen mensajes nuevos",
-        icon: "https://emojicdn.elk.sh/🏠"
+// ── FCM PUSH NOTIFICATIONS ──
+const VAPID_KEY = 'BFDoT-wMlI6j-o_Kym4GYeCQ9_p4XLjR1UA65Qpa0jjvctOvaZ-VtVsK7IBM8rhGOXtqxPwRO3CiyvpmOfsMwOY';
+let fcmMessaging = null;
+let fcmToken = null;
+
+function notifDisponible(){ return typeof Notification !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator; }
+function notifConcedida(){ return notifDisponible() && Notification.permission === 'granted'; }
+
+async function iniciarFCM(){
+  if(!notifDisponible()||!currentUser||!familiaData) return;
+  try{
+    // Inicializar Firebase Messaging (diferente instancia del SW)
+    if(!fcmMessaging) fcmMessaging = firebase.messaging();
+    const swReg = await navigator.serviceWorker.ready;
+    fcmToken = await fcmMessaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+    if(fcmToken){
+      // Guardar token en Firebase bajo el uid del usuario
+      await db.ref('users/'+currentUser.uid+'/fcmTokens/'+btoa(fcmToken).slice(0,20)).set({
+        token: fcmToken, ts: Date.now(), activo: true
       });
-    } else {
-      showToast("❌ Permiso denegado");
+      console.log('FCM token guardado');
     }
+    // Mensajes en primer plano
+    fcmMessaging.onMessage(payload => {
+      const { title, body } = payload.notification || {};
+      showToast((title||'FamiliaLopBas')+': '+(body||''));
+      actualizarBadgeChat();
+    });
+  }catch(e){ console.log('FCM error:', e.message); }
+}
+
+async function desactivarFCM(){
+  if(!currentUser) return;
+  try{
+    if(fcmMessaging && fcmToken){
+      await fcmMessaging.deleteToken();
+      // Marcar todos los tokens del usuario como inactivos
+      await db.ref('users/'+currentUser.uid+'/fcmTokens').remove();
+      fcmToken = null;
+      console.log('FCM desactivado');
+    }
+  }catch(e){ console.log('FCM desactivar error:', e.message); }
+}
+
+window.solicitarPermisoNotificaciones = async () => {
+  if(!notifDisponible()){
+    if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
+      alert('Para notificaciones en iPhone:\n1. Pulsa Compartir ↑\n2. "Añadir a pantalla de inicio"\n3. Abre desde el icono\n4. Vuelve a pulsar aquí');
+    } else {
+      showToast('Este navegador no soporta notificaciones');
+    }
+    return;
+  }
+  const btn = T('btn-notif');
+  // Comprobar si hay token activo en Firebase (no solo en memoria)
+  const tokenSnap = await dbG('users/'+currentUser.uid+'/fcmTokens');
+  const tieneToken = tokenSnap && Object.keys(tokenSnap).length > 0;
+
+  // Toggle — si ya está activado, desactivar
+  if(notifConcedida() && tieneToken){
+    showLoading();
+    await desactivarFCM();
+    hideLoading();
+    if(btn){ btn.textContent='🔔 Activar notificaciones'; btn.classList.remove('activado'); }
+    showToast('🔕 Notificaciones desactivadas');
+    localStorage.removeItem('flb-notif');
+    return;
+  }
+  if(Notification.permission === 'denied'){
+    showToast('❌ Bloqueadas — actívalas en ajustes del navegador');
+    return;
+  }
+  const permiso = await Notification.requestPermission();
+  if(permiso === 'granted'){
+    showLoading();
+    await iniciarFCM();
+    hideLoading();
+    if(fcmToken){
+      if(btn){ btn.textContent='🔔 Notificaciones activadas ✅'; btn.classList.add('activado'); }
+      showToast('✅ Notificaciones push activadas');
+      localStorage.setItem('flb-notif','1');
+    } else {
+      showToast('⚠️ Error al obtener token push');
+    }
+  } else {
+    showToast('❌ Permiso denegado');
+    if(btn) btn.textContent='🔕 Permiso denegado';
   }
 };
 
-// Escuchar mensajes nuevos para notificaciones
-function iniciarListenerNotificaciones() {
-  if(!familiaData || !currentUser) return;
-  
-  db.ref(`familias/${familiaData.id}/chat/mensajes`).on('child_added', async (snap) => {
-    const msg = snap.val();
-    if(!msg || msg.uid === currentUser?.uid) return;
-    
-    const ultimoLeidoSnap = await db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).once('value');
-    const ultimoLeido = ultimoLeidoSnap.val() || 0;
-    
-    if(msg.timestamp > ultimoLeido && Notification.permission === "granted") {
-      new Notification(`💬 ${msg.autor || 'Alguien'}`, {
-        body: msg.texto,
-        icon: "https://emojicdn.elk.sh/💬",
-        tag: "chat-notification"
-      });
-      actualizarBadgeChat();
+function iniciarListenerNotificaciones(){
+  if(!currentUser) return;
+  // Comprobar estado real en Firebase para actualizar el botón
+  dbG('users/'+currentUser.uid+'/fcmTokens').then(tokenSnap=>{
+    const tieneToken = tokenSnap && Object.keys(tokenSnap).length > 0;
+    const btn = T('btn-notif');
+    if(notifConcedida() && tieneToken){
+      if(btn){ btn.textContent='🔔 Notificaciones activadas ✅'; btn.classList.add('activado'); }
+      // Reconectar FCM en primer plano
+      iniciarFCM();
+    } else {
+      if(btn){ btn.textContent='🔔 Activar notificaciones'; btn.classList.remove('activado'); }
     }
   });
 }
@@ -1555,12 +1603,6 @@ auth.onAuthStateChanged(async user=>{
     if(!u)await dbS('users/'+user.uid,{name:user.displayName||user.email.split('@')[0],email:user.email,role:'padre',familiaId:null});
     await cargarHome();
     iniciarListenerNotificaciones();
-    // Verificar estado de notificaciones para el botón
-    const btnNotif = T('btn-notif');
-    if(btnNotif && Notification.permission === "granted") {
-      btnNotif.textContent = '🔔 Notificaciones activadas ✅';
-      btnNotif.classList.add('activado');
-    }
   }catch(err){hideLoading();showToast('Error: '+err.message);showScreen('auth');}
 });
 </script>
