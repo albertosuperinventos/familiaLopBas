@@ -412,7 +412,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('home')">←</button>
     <span class="screen-title">💶 Gastos familia</span>
-    <button onclick="abrirModalGasto()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
+    <button onclick="exportarGastosExcel()" style="margin-left:auto;padding:8px 12px;background:var(--bg3);border:none;border-radius:20px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">📊 Excel</button>
+    <button onclick="abrirModalGasto()" style="padding:8px 14px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer;margin-left:6px">+ Añadir</button>
   </div>
   <div class="screen-body">
     <div class="gasto-total" id="gasto-total-card">
@@ -501,7 +502,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="chat-input-bar">
       <button class="btn-icon" onclick="toggleEmojiPicker()">😊</button>
       <input type="text" id="chat-input" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')enviarMensaje()">
-      <input type="file" id="chat-foto-input" accept="image/*" capture="environment" style="display:none" onchange="enviarFotoChat(this)">
+      <input type="file" id="chat-foto-input" accept="image/*" style="display:none" onchange="enviarFotoChat(this)">
       <button class="btn-icon" onclick="document.getElementById('chat-foto-input').click()">📷</button>
       <button class="btn-send" onclick="enviarMensaje()">➤</button>
     </div>
@@ -513,10 +514,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">Nuevo gasto</div>
-    <div class="foto-prev" id="gasto-foto-preview" onclick="document.getElementById('gasto-foto-input').click()">
-      <div style="text-align:center;color:var(--text3)"><div style="font-size:32px;margin-bottom:6px">📷</div><div style="font-size:13px">Toca para añadir foto</div></div>
+    <div id="gasto-foto-preview" style="width:100%;height:120px;background:var(--bg3);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:8px;border:2px dashed var(--border2)">
+      <div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>
     </div>
-    <input type="file" id="gasto-foto-input" accept="image/*" capture="environment" style="display:none" onchange="previsualizarFoto(this)">
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button type="button" onclick="document.getElementById('gasto-foto-camara').click()" style="flex:1;padding:10px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">📷 Cámara</button>
+      <button type="button" onclick="document.getElementById('gasto-foto-galeria').click()" style="flex:1;padding:10px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">🖼️ Galería</button>
+    </div>
+    <input type="file" id="gasto-foto-camara" accept="image/*" capture="environment" style="display:none" onchange="previsualizarFoto(this)">
+    <input type="file" id="gasto-foto-galeria" accept="image/*" style="display:none" onchange="previsualizarFoto(this)">
     <div class="fr">
       <div class="fg"><label>Importe (€)</label><input type="number" id="gasto-importe" placeholder="0,00" step="0.01" min="0"></div>
       <div class="fg"><label>Fecha</label><input type="date" id="gasto-fecha"></div>
@@ -572,10 +578,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="fg"><label>Matrícula</label><input type="text" id="vh-matricula" placeholder="1234 ABC" style="text-transform:uppercase"></div>
       <div class="fg"><label>Año</label><input type="number" id="vh-año" placeholder="2020"></div>
     </div>
+    <div class="fg"><label>Kilometraje actual</label><input type="number" id="vh-km" placeholder="Ej: 45000"></div>
     <div class="fr">
       <div class="fg"><label>Venc. seguro</label><input type="date" id="vh-seguro"></div>
       <div class="fg"><label>Próxima ITV</label><input type="date" id="vh-itv"></div>
     </div>
+    <div class="fg"><label>Próxima revisión (km)</label><input type="number" id="vh-revision-km" placeholder="Ej: 50000"></div>
     <button class="btn-primary" onclick="guardarVehiculo()">Guardar vehículo</button>
     <button class="btn-sec" onclick="document.getElementById('modal-vehiculo').classList.remove('show')">Cancelar</button>
   </div>
@@ -597,6 +605,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="fg"><label>Fecha</label><input type="date" id="vhg-fecha"></div>
     </div>
     <div class="fg" id="vhg-litros-group"><label>Litros</label><input type="number" id="vhg-litros" placeholder="0,00" step="0.01"></div>
+    <div class="fg"><label>Kilometraje actual (opcional)</label><input type="number" id="vhg-km" placeholder="Ej: 47500"></div>
     <div class="fg"><label>Nota</label><input type="text" id="vhg-nota" placeholder="Descripción..."></div>
     <button class="btn-primary" onclick="guardarGastoVehiculo()">Guardar</button>
     <button class="btn-sec" onclick="document.getElementById('modal-gasto-vh').classList.remove('show')">Cancelar</button>
@@ -659,6 +668,34 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="fg"><label>Notas</label><textarea id="otto-notas" placeholder="Veterinario, dosis, marca..."></textarea></div>
     <button class="btn-primary" onclick="guardarOtto()">Guardar</button>
     <button class="btn-sec" onclick="T('modal-otto').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL EDITAR TAREA -->
+<div class="modal-overlay" id="modal-editar-tarea">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Editar tarea</div>
+    <input type="hidden" id="edit-tarea-id">
+    <div class="fg"><label>Nombre</label><input type="text" id="edit-tarea-nombre" placeholder="Nombre de la tarea..."></div>
+    <div class="fr">
+      <div class="fg"><label>Prioridad</label>
+        <select id="edit-tarea-prioridad">
+          <option value="normal">⚪ Normal</option>
+          <option value="alta">🔴 Alta</option>
+          <option value="baja">🔵 Baja</option>
+        </select>
+      </div>
+      <div class="fg"><label>Asignado</label><select id="edit-tarea-asignado"><option value="">👥 Todos</option></select></div>
+    </div>
+    <div class="fg"><label>Fecha límite (opcional)</label>
+      <div style="display:flex;gap:8px">
+        <input type="date" id="edit-tarea-fecha" style="flex:1">
+        <button type="button" onclick="T('edit-tarea-fecha').value=''" style="padding:8px 12px;background:var(--bg3);border:none;border-radius:var(--radius-sm);color:var(--text2);cursor:pointer">✕</button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="guardarEdicionTarea()">Guardar cambios</button>
+    <button class="btn-sec" onclick="T('modal-editar-tarea').classList.remove('show')">Cancelar</button>
   </div>
 </div>
 
@@ -1067,7 +1104,7 @@ function renderTareas(items){
       <div onclick="completarTarea('${id}',${!t.completada})" style="width:24px;height:24px;border-radius:6px;border:2px solid ${t.completada?'var(--accent3)':'var(--border2)'};background:${t.completada?'var(--accent3)':'transparent'};cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
         ${t.completada?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}
       </div>
-      <div style="flex:1;min-width:0">
+      <div style="flex:1;min-width:0" onclick="abrirEditarTarea('${id}')" style="cursor:pointer">
         <div style="font-weight:500;${t.completada?'text-decoration:line-through':''}display:flex;align-items:center;flex-wrap:wrap;gap:4px">
           ${t.prioridad==='alta'?'🔴 ':t.prioridad==='baja'?'🔵 ':''}${t.nombre}${fechaBadge}
         </div>
@@ -1209,7 +1246,7 @@ function renderGastos(entries,todos){
   empty.style.display='none';
   lista.innerHTML=entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([id,g])=>`<div class="item-card"><div style="width:40px;height:40px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${CAT_IC[g.categoria]||'📦'}</div><div style="flex:1;min-width:0"><div style="font-weight:500">${g.nota||g.categoria||'Gasto'}</div><div style="font-size:11px;color:var(--text3)">${g.fecha||''} · ${g.autor||''}</div></div>${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0" onclick="window.open('${g.fotoUrl}','_blank')">`:''}  <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-left:8px;flex-shrink:0">${fmtE(g.importe)}</div><div onclick="borrarGasto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`).join('');
 }
-window.abrirModalGasto=()=>{T('gasto-fecha').value=hoy();fotoB64=null;T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:32px;margin-bottom:6px">📷</div><div style="font-size:13px">Toca para añadir foto</div></div>';T('modal-gasto').classList.add('show');};
+window.abrirModalGasto=()=>{T('gasto-fecha').value=hoy();fotoB64=null;T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>';T('modal-gasto').classList.add('show');};
 window.cerrarModalGasto=()=>T('modal-gasto').classList.remove('show');
 window.previsualizarFoto=input=>{const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{fotoB64=e.target.result;T('gasto-foto-preview').innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;};r.readAsDataURL(file);};
 window.guardarGasto=async()=>{
@@ -1299,12 +1336,28 @@ function renderVehiculos(vhs){
     const gastos=Object.values(v.gastos||{});
     const tot=gastos.reduce((s,g)=>s+parseFloat(g.importe||0),0);
     const segAlert=v.seguro&&v.seguro<h,itvAlert=v.itv&&v.itv<h;
+    // Último km registrado
+    const gastosCKm=gastos.filter(g=>g.km).sort((a,b)=>b.ts-a.ts);
+    const ultKm=gastosCKm[0]?.km||v.km||null;
+    // Alerta revisión por km
+    const revAlert=v.revisionKm&&ultKm&&parseInt(ultKm)>=parseInt(v.revisionKm);
     const ultGas=gastos.filter(g=>g.tipo==='gasolina').sort((a,b)=>b.ts-a.ts)[0];
-    return `<div class="vh-card"><div class="vh-head"><div style="font-size:28px">🚗</div><div style="flex:1"><div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:white">${v.marca||''} ${v.modelo||''}</div><div style="font-size:12px;color:rgba(255,255,255,.8)">${v.matricula||''} ${v.año?'· '+v.año:''}</div></div><div style="text-align:right"><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:white">${fmtE(tot)}</div><div style="font-size:10px;color:rgba(255,255,255,.7)">total gastos</div></div></div>
-    <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🛡️ Seguro</span><span style="font-size:13px;font-weight:600;${segAlert?'color:#dc2626':''}">${v.seguro||'—'} ${segAlert?'⚠️':''}</span></div>
-    <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🔍 ITV</span><span style="font-size:13px;font-weight:600;${itvAlert?'color:#dc2626':''}">${v.itv||'—'} ${itvAlert?'⚠️':''}</span></div>
-    ${ultGas?`<div class="vh-row"><span style="font-size:13px;color:var(--text2)">⛽ Último repostaje</span><span style="font-size:13px;font-weight:600">${fmtE(ultGas.importe)}${ultGas.litros?' · '+ultGas.litros+'L':''}</span></div>`:''}
-    <div class="vh-row" style="border:none;padding:12px 16px;gap:8px"><button onclick="abrirModalGastoVh('${id}','${(v.marca||'')+' '+(v.modelo||'')}')" style="padding:8px 14px;background:linear-gradient(135deg,#ffa500,#f59e0b);border:none;border-radius:20px;color:white;font-size:12px;font-weight:700;cursor:pointer">+ Gasto</button><button onclick="borrarVehiculo('${id}')" style="padding:8px 14px;background:var(--bg3);border:none;border-radius:20px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">Eliminar</button></div></div>`;
+    // Precio por litro del último repostaje
+    const pxl=ultGas&&ultGas.litros?( parseFloat(ultGas.importe)/parseFloat(ultGas.litros)).toFixed(3):null;
+    return `<div class="vh-card">
+    <div class="vh-head"><div style="font-size:28px">🚗</div>
+    <div style="flex:1"><div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:white">${v.marca||''} ${v.modelo||''}</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.8)">${v.matricula||''} ${v.año?'· '+v.año:''} ${ultKm?'· '+parseInt(ultKm).toLocaleString('es-ES')+' km':''}</div></div>
+    <div style="text-align:right"><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:white">${fmtE(tot)}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.7)">total gastos</div></div></div>
+    <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🛡️ Seguro</span><span style="font-size:13px;font-weight:600;${segAlert?'color:#dc2626':''}">${v.seguro?v.seguro.split('-').reverse().join('/'):'—'} ${segAlert?'⚠️':''}</span></div>
+    <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🔍 ITV</span><span style="font-size:13px;font-weight:600;${itvAlert?'color:#dc2626':''}">${v.itv?v.itv.split('-').reverse().join('/'):'—'} ${itvAlert?'⚠️':''}</span></div>
+    ${v.revisionKm?`<div class="vh-row"><span style="font-size:13px;color:var(--text2)">🔧 Revisión</span><span style="font-size:13px;font-weight:600;${revAlert?'color:#dc2626':''}">${parseInt(v.revisionKm).toLocaleString('es-ES')} km ${revAlert?'⚠️ Pendiente':''}</span></div>`:''}
+    ${ultGas?`<div class="vh-row"><span style="font-size:13px;color:var(--text2)">⛽ Último repostaje</span><span style="font-size:13px;font-weight:600">${fmtE(ultGas.importe)}${ultGas.litros?' · '+ultGas.litros+'L':''}${pxl?' · '+pxl+'€/L':''}</span></div>`:''}
+    <div class="vh-row" style="border:none;padding:12px 16px;gap:8px">
+      <button onclick="abrirModalGastoVh('${id}','${(v.marca||'')+' '+(v.modelo||'')}','${id}')" style="padding:8px 14px;background:linear-gradient(135deg,#ffa500,#f59e0b);border:none;border-radius:20px;color:white;font-size:12px;font-weight:700;cursor:pointer">+ Gasto</button>
+      <button onclick="borrarVehiculo('${id}')" style="padding:8px 14px;background:var(--bg3);border:none;border-radius:20px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">Eliminar</button>
+    </div></div>`;
   }).join('');
 }
 window.abrirModalVehiculo=()=>T('modal-vehiculo').classList.add('show');
@@ -1312,17 +1365,43 @@ window.guardarVehiculo=async()=>{
   const marca=T('vh-marca').value.trim();if(!marca)return showToast('Introduce la marca');
   showLoading();
   try{
-    await db.ref('familias/'+familiaData.id+'/vehiculos/vh_'+Date.now()).set({marca,modelo:T('vh-modelo').value,matricula:T('vh-matricula').value.toUpperCase(),año:T('vh-año').value,seguro:T('vh-seguro').value,itv:T('vh-itv').value});
+    await db.ref('familias/'+familiaData.id+'/vehiculos/vh_'+Date.now()).set({
+      marca,modelo:T('vh-modelo').value,matricula:T('vh-matricula').value.toUpperCase(),
+      año:T('vh-año').value,seguro:T('vh-seguro').value,itv:T('vh-itv').value,
+      km:T('vh-km').value||null,revisionKm:T('vh-revision-km').value||null
+    });
     T('modal-vehiculo').classList.remove('show');hideLoading();showToast('✅ Vehículo añadido');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
 window.borrarVehiculo=id=>{if(confirm('¿Eliminar vehículo y todos sus gastos?'))db.ref('familias/'+familiaData.id+'/vehiculos/'+id).remove();};
-window.abrirModalGastoVh=(id,nombre)=>{vhSel=id;T('modal-gasto-vh-title').textContent='Gasto — '+nombre;T('vhg-fecha').value=hoy();T('vhg-litros-group').style.display='block';T('modal-gasto-vh').classList.add('show');};
+window.abrirModalGastoVh=(id,nombre)=>{
+  vhSel=id;
+  T('modal-gasto-vh-title').textContent='Gasto — '+nombre;
+  T('vhg-fecha').value=hoy();
+  T('vhg-litros-group').style.display='block';
+  T('vhg-km').value='';
+  T('modal-gasto-vh').classList.add('show');
+};
 window.guardarGastoVehiculo=async()=>{
   const imp=T('vhg-importe').value;if(!imp)return showToast('Introduce el importe');
   showLoading();
   try{
-    await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/gastos/vhg_'+Date.now()).set({tipo:T('vhg-tipo').value,importe:parseFloat(imp),fecha:T('vhg-fecha').value,litros:T('vhg-litros').value||null,nota:T('vhg-nota').value,ts:Date.now()});
+    const tipo=T('vhg-tipo').value,fecha=T('vhg-fecha').value;
+    const litros=T('vhg-litros').value||null,nota=T('vhg-nota').value;
+    const km=T('vhg-km').value||null;
+    const ts=Date.now();
+    await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/gastos/vhg_'+ts).set({tipo,importe:parseFloat(imp),fecha,litros,km,nota,ts});
+    // Actualizar km del vehículo si se introdujo
+    if(km) await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/km').set(km);
+    // Sincronizar con gastos generales
+    const vhSnap=await dbG('familias/'+familiaData.id+'/vehiculos/'+vhSel);
+    const vhNombre=vhSnap?(vhSnap.marca||'')+(vhSnap.modelo?' '+vhSnap.modelo:''):'';
+    const tipoLabel={gasolina:'⛽ Gasolina',averia:'🔧 Avería',seguro:'🛡️ Seguro',itv:'🔍 ITV',otro:'📦 Otro'}[tipo]||tipo;
+    await db.ref('familias/'+familiaData.id+'/gastos/g_vh_'+ts).set({
+      importe:parseFloat(imp),categoria:'vehiculo',fecha,
+      nota:tipoLabel+(vhNombre?' — '+vhNombre:'')+(nota?' ('+nota+')':''),
+      autor:currentUser.displayName||currentUser.email.split('@')[0],ts,esVehiculo:true
+    });
     T('modal-gasto-vh').classList.remove('show');hideLoading();showToast('✅ Gasto guardado');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
@@ -1397,6 +1476,73 @@ window.filtrarOtto=f=>{
     const b=T(bid);if(b)b.classList.toggle('active',bid==='fo-'+f||(bid==='fo-todas'&&f==='todas'));
   });
   db.ref('familias/'+familiaData.id+'/otto').once('value').then(s=>renderOtto(s.val()||{}));
+};
+
+// ── EXPORTAR GASTOS EXCEL ──
+window.exportarGastosExcel=async()=>{
+  showLoading();
+  try{
+    const snap=await db.ref('familias/'+familiaData.id+'/gastos').once('value');
+    const todos=snap.val()||{};
+    const entries=Object.entries(todos).sort((a,b)=>(a[1].fecha||'').localeCompare(b[1].fecha||''));
+    // Construir CSV con BOM para Excel español
+    let csv='\uFEFFFecha;Categoría;Nota;Importe (€);Autor\n';
+    entries.forEach(([,g])=>{
+      const fecha=g.fecha||'';
+      const cat=g.categoria||'otro';
+      const nota=(g.nota||'').replace(/;/g,',');
+      const imp=parseFloat(g.importe||0).toFixed(2).replace('.',',');
+      const autor=g.autor||'';
+      csv+=`${fecha};${cat};${nota};${imp};${autor}\n`;
+    });
+    // Total
+    const total=entries.reduce((s,[,g])=>s+parseFloat(g.importe||0),0);
+    csv+=`\n;;;TOTAL;${total.toFixed(2).replace('.',',')}\n`;
+    // Descargar
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='gastos_familia_'+new Date().toISOString().split('T')[0]+'.csv';
+    a.click();URL.revokeObjectURL(url);
+    hideLoading();showToast('✅ Excel descargado');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+
+// ── EDITAR TAREA ──
+window.abrirEditarTarea=async id=>{
+  const snap=await dbG('familias/'+familiaData.id+'/tareas/'+id);
+  if(!snap)return;
+  T('edit-tarea-id').value=id;
+  T('edit-tarea-nombre').value=snap.nombre||'';
+  T('edit-tarea-prioridad').value=snap.prioridad||'normal';
+  T('edit-tarea-fecha').value=snap.fechaLimite||'';
+  const sel=T('edit-tarea-asignado');
+  sel.innerHTML='<option value="">👥 Todos</option>';
+  for(const uid of Object.keys(familiaData.miembros||{})){
+    const u=await dbG('users/'+uid);if(!u)continue;
+    const o=document.createElement('option');
+    o.value=uid;o.textContent=uid===currentUser.uid?'Yo':(u.name||u.email).split(' ')[0];
+    if(snap.asignadoA===uid)o.selected=true;
+    sel.appendChild(o);
+  }
+  T('modal-editar-tarea').classList.add('show');
+};
+window.guardarEdicionTarea=async()=>{
+  const id=T('edit-tarea-id').value;
+  const nombre=T('edit-tarea-nombre').value.trim();
+  if(!nombre)return showToast('El nombre no puede estar vacío');
+  showLoading();
+  try{
+    const asignadoA=T('edit-tarea-asignado').value||null;
+    let asignadoNombre='';
+    if(asignadoA){const u=await dbG('users/'+asignadoA);asignadoNombre=asignadoA===currentUser.uid?'Yo':(u?(u.name||u.email).split(' ')[0]:'');}
+    await db.ref('familias/'+familiaData.id+'/tareas/'+id).update({
+      nombre,prioridad:T('edit-tarea-prioridad').value,
+      asignadoA,asignadoNombre,fechaLimite:T('edit-tarea-fecha').value||null
+    });
+    T('modal-editar-tarea').classList.remove('show');
+    hideLoading();showToast('✅ Tarea actualizada');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
 
 // ===== AUTH STATE =====
