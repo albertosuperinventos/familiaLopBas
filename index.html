@@ -286,10 +286,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   <div class="modules-section">
     <div class="modules-title">Módulos</div>
     <div class="modules-grid">
-      <div class="module-card" style="--mc:#6c63ff" onclick="abrirChat()">
+      <div class="module-card" style="--mc:#e11d48" onclick="abrirEventos()">
         <div class="mc-grad"></div>
-        <div><div class="module-icon">💬</div><div class="module-name">Chat</div><div class="module-badge">Familia</div></div>
-        <div class="module-count" id="badge-chat" style="display:none;background:#6c63ff">0</div>
+        <div><div class="module-icon">📅</div><div class="module-name">Eventos</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-eventos" style="display:none;background:#e11d48">0</div>
       </div>
       <div class="module-card" style="--mc:#43e97b" onclick="abrirCesta()">
         <div class="mc-grad"></div>
@@ -483,29 +483,71 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 </div>
 
-<!-- CHAT -->
-<div class="screen" id="screen-chat">
+<!-- EVENTOS -->
+<div class="screen" id="screen-eventos">
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('home')">←</button>
-    <span class="screen-title">💬 Chat familiar</span>
+    <span class="screen-title">📅 Eventos</span>
+    <button onclick="abrirModalEvento()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#e11d48,#fb7185);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
   </div>
-  <div class="chat-container">
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="emoji-picker" id="emoji-picker">
-      <span onclick="addEmoji('😀')">😀</span><span onclick="addEmoji('😂')">😂</span><span onclick="addEmoji('❤️')">❤️</span>
-      <span onclick="addEmoji('👍')">👍</span><span onclick="addEmoji('👋')">👋</span><span onclick="addEmoji('🎉')">🎉</span>
-      <span onclick="addEmoji('😍')">😍</span><span onclick="addEmoji('🥰')">🥰</span><span onclick="addEmoji('😎')">😎</span>
-      <span onclick="addEmoji('🤔')">🤔</span><span onclick="addEmoji('😴')">😴</span><span onclick="addEmoji('🙏')">🙏</span>
-      <span onclick="addEmoji('✅')">✅</span><span onclick="addEmoji('⚠️')">⚠️</span><span onclick="addEmoji('🔥')">🔥</span>
-      <span onclick="addEmoji('💪')">💪</span><span onclick="addEmoji('🍕')">🍕</span><span onclick="addEmoji('🐾')">🐾</span>
+  <div class="filter-bar">
+    <button class="chip active" id="fev-todos" onclick="filtrarEventos('todos')">Todos</button>
+    <button class="chip" id="fev-proximos" onclick="filtrarEventos('proximos')">Próximos</button>
+    <button class="chip" id="fev-mes" onclick="filtrarEventos('mes')">Este mes</button>
+    <button class="chip" id="fev-pasados" onclick="filtrarEventos('pasados')">Pasados</button>
+  </div>
+  <div class="screen-body">
+    <div id="eventos-proximo" style="margin:12px 16px 0;display:none">
+      <div style="background:linear-gradient(135deg,#e11d48,#fb7185);border-radius:var(--radius);padding:16px;color:white;box-shadow:0 4px 16px rgba(225,29,72,.3)">
+        <div style="font-size:11px;opacity:.8;margin-bottom:2px">Próximo evento</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:18px;font-weight:800" id="eventos-proximo-txt">—</div>
+        <div style="font-size:12px;opacity:.8;margin-top:2px" id="eventos-proximo-fecha">—</div>
+      </div>
     </div>
-    <div class="chat-input-bar">
-      <button class="btn-icon" onclick="toggleEmojiPicker()">😊</button>
-      <input type="text" id="chat-input" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')enviarMensaje()">
-      <input type="file" id="chat-foto-input" accept="image/*" style="display:none" onchange="enviarFotoChat(this)">
-      <button class="btn-icon" onclick="document.getElementById('chat-foto-input').click()">📷</button>
-      <button class="btn-send" onclick="enviarMensaje()">➤</button>
+    <div id="eventos-lista" style="padding:12px 0 0"></div>
+    <div id="eventos-empty" class="empty-state" style="display:none"><div class="ei">📅</div><p>Sin eventos</p><small>Pulsa + Añadir para empezar</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- MODAL EVENTO -->
+<div class="modal-overlay" id="modal-evento">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nuevo evento</div>
+    <div class="fg">
+      <label>Tipo</label>
+      <select id="ev-tipo" onchange="actualizarCamposEvento()">
+        <option value="cumpleaños">🎂 Cumpleaños</option>
+        <option value="comunion">⛪ Comunión</option>
+        <option value="boda">💍 Boda</option>
+        <option value="partido">⚽ Partido</option>
+        <option value="torneo">🏆 Torneo</option>
+        <option value="graduacion">🎓 Graduación</option>
+        <option value="fiesta">🎉 Fiesta</option>
+        <option value="viaje">✈️ Viaje</option>
+        <option value="otro">📅 Otro</option>
+      </select>
     </div>
+    <div class="fg"><label>Descripción</label><input type="text" id="ev-desc" placeholder="Ej: Cumpleaños de Carmen, Partido Gelves..."></div>
+    <div class="fg" id="ev-fecha-group">
+      <label id="ev-fecha-label">Fecha</label>
+      <input type="date" id="ev-fecha">
+    </div>
+    <div class="fg" id="ev-hora-group"><label>Hora (opcional)</label><input type="time" id="ev-hora"></div>
+    <div class="fg" id="ev-anual-group" style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <input type="checkbox" id="ev-anual" style="width:18px;height:18px;accent-color:var(--accent)" checked>
+      <label for="ev-anual" style="font-size:14px;text-transform:none;letter-spacing:0;font-weight:500">Se repite cada año</label>
+    </div>
+    <div class="fg"><label>Lugar (opcional)</label><input type="text" id="ev-lugar" placeholder="Ej: Campo municipal, Iglesia..."></div>
+    <div class="fg"><label>Notas (opcional)</label><textarea id="ev-notas" placeholder="Detalles adicionales..."></textarea></div>
+    <button class="btn-primary" onclick="guardarEvento()">Guardar evento</button>
+    <button class="btn-sec" onclick="T('modal-evento').classList.remove('show')">Cancelar</button>
   </div>
 </div>
 
@@ -520,6 +562,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div style="display:flex;gap:8px;margin-bottom:12px">
       <button type="button" onclick="document.getElementById('gasto-foto-camara').click()" style="flex:1;padding:10px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">📷 Cámara</button>
       <button type="button" onclick="document.getElementById('gasto-foto-galeria').click()" style="flex:1;padding:10px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">🖼️ Galería</button>
+      <button type="button" id="btn-ocr-ticket" onclick="analizarTicket()" style="flex:1;padding:10px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;color:white;display:none">🤖 Analizar</button>
     </div>
     <input type="file" id="gasto-foto-camara" accept="image/*" capture="environment" style="display:none" onchange="previsualizarFoto(this)">
     <input type="file" id="gasto-foto-galeria" accept="image/*" style="display:none" onchange="previsualizarFoto(this)">
@@ -725,9 +768,8 @@ firebase.initializeApp({
 const auth=firebase.auth(), db=firebase.database();
 const CL_CLOUD='drsy461un', CL_PRESET='familialopbas';
 let currentUser=null,familiaData=null;
-let lCesta=null,lTareas=null,lGastos=null,lMedicos=null,lVehiculos=null,lOtto=null;
+let lCesta=null,lTareas=null,lGastos=null,lMedicos=null,lVehiculos=null,lOtto=null,lEventos=null;
 let tareasData={},filtroT='todas',filtroC='todas',filtroOtto='todas',vhSel=null,fotoB64=null,mesOffset=0;
-let chatListener=null;
 
 const T=id=>document.getElementById(id);
 window.showLoading=()=>T('loading').classList.add('show');
@@ -818,14 +860,12 @@ async function cargarHome(){
     await renderMiembros(fd.miembros||{});
     hideLoading();showScreen('home');
     if(!lCesta)suscribirCesta();if(!lTareas)suscribirTareas();if(!lMedicos)suscribirMedicos();
-    if(!lOtto)suscribirOtto();
+    if(!lOtto)suscribirOtto();if(!lEventos)suscribirEventos();
     suscribirListasGuardadas();
     if(ud.role==='hijo')document.querySelectorAll('.module-badge.padres').forEach(b=>b.closest('.module-card').style.opacity='.5');
     // Actualizar botón dark mode
     const t=localStorage.getItem('flb-theme')||'light';
     const dbtn=T('dark-toggle-btn');if(dbtn)dbtn.textContent=t==='dark'?'☀️ Modo claro':'🌙 Modo oscuro';
-    // Actualizar badge de chat
-    actualizarBadgeChat();
   }catch(err){hideLoading();showToast('Error: '+err.message);showScreen('auth');}
 }
 async function renderMiembros(mObj){
@@ -842,20 +882,6 @@ T('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 T('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')unirseAFamilia();});
 
 // ===== CHAT Y NOTIFICACIONES =====
-async function actualizarBadgeChat() {
-  if(!familiaData || !currentUser) return;
-  const ultimoLeidoSnap = await db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).once('value');
-  const ultimoLeido = ultimoLeidoSnap.val() || 0;
-  const mensajesSnap = await db.ref(`familias/${familiaData.id}/chat/mensajes`).once('value');
-  const mensajes = mensajesSnap.val() || {};
-  const noLeidos = Object.values(mensajes).filter(m => m.timestamp > ultimoLeido && m.uid !== currentUser.uid).length;
-  const badge = T('badge-chat');
-  if(badge) {
-    badge.textContent = noLeidos;
-    badge.style.display = noLeidos > 0 ? 'block' : 'none';
-  }
-}
-
 // ── DARK MODE ──
 function toggleDarkMode(){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
@@ -872,70 +898,166 @@ function toggleDarkMode(){
   // El botón se actualiza cuando carga el home
 })();
 
-// ── CHAT MEJORADO ──
-window.abrirChat=()=>{
-  showScreen('chat');if(!familiaData)return;
-  if(chatListener)chatListener.off();
-  db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).set(Date.now());
-  actualizarBadgeChat();
-  chatListener=db.ref(`familias/${familiaData.id}/chat/mensajes`).on('value',snap=>{
-    renderChat(snap.val()||{});
+// ── EVENTOS ──
+let lEventos=null, filtroEv='todos';
+const EV_IC={cumpleaños:'🎂',comunion:'⛪',boda:'💍',partido:'⚽',torneo:'🏆',graduacion:'🎓',fiesta:'🎉',viaje:'✈️',otro:'📅'};
+
+window.abrirEventos=()=>{showScreen('eventos');if(familiaData&&!lEventos)suscribirEventos();};
+function suscribirEventos(){
+  lEventos=db.ref('familias/'+familiaData.id+'/eventos').on('value',snap=>{
+    const data=snap.val()||{};renderEventos(data);
+    // Badge: eventos próximos en 30 días
+    const hStr=hoy();const en30=new Date();en30.setDate(en30.getDate()+30);
+    const en30Str=en30.toISOString().split('T')[0];
+    const n=Object.values(data).filter(e=>{
+      const fEv=proximaFechaEvento(e);
+      return fEv&&fEv>=hStr&&fEv<=en30Str;
+    }).length;
+    const b=T('badge-eventos');if(b){b.textContent=n;b.style.display=n>0?'block':'none';}
   });
-};
-function renderChat(mensajes){
-  const container=T('chat-messages');if(!container)return;
-  const arr=Object.entries(mensajes).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
-  if(!arr.length){container.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px">💬 Sin mensajes aún</div>';return;}
-  let html='',lastDay='';
-  arr.forEach(([id,msg])=>{
-    const esMio=msg.uid===currentUser?.uid;
-    const ts=msg.timestamp||0;
-    const d=new Date(ts);
-    const day=d.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});
-    if(day!==lastDay){html+=`<div class="chat-date-sep">${day}</div>`;lastDay=day;}
-    const hora=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    const contenido=msg.fotoUrl
-      ?`<img src="${msg.fotoUrl}" onclick="window.open('${msg.fotoUrl}','_blank')" loading="lazy">`
-      :escapeHtml(msg.texto||'');
-    html+=`<div class="chat-message ${esMio?'mio':'otro'}">
-      ${!esMio?`<div class="autor">${escapeHtml(msg.autor||'?')}</div>`:''}
-      <div>${contenido}</div>
-      <div class="fecha">${hora}</div>
-    </div>`;
-  });
-  container.innerHTML=html;
-  container.scrollTop=container.scrollHeight;
 }
-function escapeHtml(t){if(!t)return '';const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
-window.toggleEmojiPicker=()=>T('emoji-picker').classList.toggle('show');
-window.addEmoji=e=>{const i=T('chat-input');i.value+=e;i.focus();};
-window.enviarMensaje=async()=>{
-  const input=T('chat-input'),texto=input.value.trim();
-  if(!texto||!familiaData)return;
-  input.value='';T('emoji-picker').classList.remove('show');
-  const u=await dbG('users/'+currentUser.uid);
-  const nombre=u?.name||currentUser.displayName||'Usuario';
-  await db.ref(`familias/${familiaData.id}/chat/mensajes`).push().set({texto,uid:currentUser.uid,autor:nombre,timestamp:Date.now()});
-  db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).set(Date.now());
-  actualizarBadgeChat();
+
+function proximaFechaEvento(ev){
+  if(!ev.fecha) return null;
+  if(!ev.anual) return ev.fecha;
+  // Para anuales, calcular próxima ocurrencia
+  const hoy2=new Date();
+  const [y,m,d]=ev.fecha.split('-');
+  let proxima=new Date(hoy2.getFullYear(),parseInt(m)-1,parseInt(d));
+  if(proxima<hoy2) proxima=new Date(hoy2.getFullYear()+1,parseInt(m)-1,parseInt(d));
+  return proxima.toISOString().split('T')[0];
+}
+
+function renderEventos(data){
+  const lista=T('eventos-lista'),empty=T('eventos-empty');if(!lista)return;
+  const hStr=hoy();
+  const hoy2=new Date(hStr);
+  const manana=new Date(hoy2);manana.setDate(manana.getDate()+1);
+  const mananaStr=manana.toISOString().split('T')[0];
+
+  // Añadir fecha próxima calculada a cada evento
+  let entries=Object.entries(data).map(([id,ev])=>({
+    id,ev,proxima:proximaFechaEvento(ev)
+  })).sort((a,b)=>(a.proxima||'9999').localeCompare(b.proxima||'9999'));
+
+  // Filtrar
+  if(filtroEv==='proximos') entries=entries.filter(e=>e.proxima&&e.proxima>=hStr);
+  else if(filtroEv==='mes'){
+    const mesStr=hStr.slice(0,7);
+    entries=entries.filter(e=>e.proxima&&e.proxima.startsWith(mesStr));
+  } else if(filtroEv==='pasados') entries=entries.filter(e=>e.proxima&&e.proxima<hStr||!e.proxima);
+
+  // Próximo evento destacado
+  const proxCard=T('eventos-proximo');
+  const prox=entries.find(e=>e.proxima&&e.proxima>=hStr);
+  if(prox&&proxCard){
+    proxCard.style.display='block';
+    const diasFaltan=Math.ceil((new Date(prox.proxima)-hoy2)/(1000*60*60*24));
+    const diasTxt=diasFaltan===0?'¡Hoy!':diasFaltan===1?'Mañana':`En ${diasFaltan} días`;
+    T('eventos-proximo-txt').textContent=(EV_IC[prox.ev.tipo]||'📅')+' '+prox.ev.descripcion;
+    T('eventos-proximo-fecha').textContent=`📅 ${prox.proxima.split('-').reverse().join('/')} · ${diasTxt}`;
+  } else if(proxCard) proxCard.style.display='none';
+
+  if(!entries.length){lista.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+
+  lista.innerHTML=entries.map(({id,ev,proxima})=>{
+    const esPasado=proxima&&proxima<hStr;
+    const esHoy=proxima===hStr;
+    const esMañana=proxima===mananaStr;
+    let badge='';
+    if(esHoy) badge=`<span style="background:#dcfce7;color:#15803d;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:6px">🎉 Hoy</span>`;
+    else if(esMañana) badge=`<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:6px">🔔 Mañana</span>`;
+    else if(esPasado) badge=`<span style="background:var(--bg3);color:var(--text3);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">Pasado</span>`;
+    else if(proxima) badge=`<span style="background:#fef3c7;color:#92400e;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">📅 ${proxima.split('-').reverse().join('/')}</span>`;
+    return `<div class="item-card" style="opacity:${esPasado?.6:1}">
+      <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#e11d48,#fb7185);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${EV_IC[ev.tipo]||'📅'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;display:flex;align-items:center;flex-wrap:wrap">${ev.descripcion||'—'}${badge}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">
+          ${ev.lugar?'📍 '+ev.lugar+' · ':''}${ev.hora?ev.hora+' · ':''}${ev.anual?'🔁 Anual':''}
+        </div>
+        ${ev.notas?`<div style="font-size:11px;color:var(--text2);margin-top:2px">${ev.notas}</div>`:''}
+      </div>
+      <div onclick="borrarEvento('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div>
+    </div>`;
+  }).join('');
+}
+
+window.abrirModalEvento=()=>{
+  T('ev-fecha').value=hoy();T('ev-hora').value='';T('ev-desc').value='';
+  T('ev-lugar').value='';T('ev-notas').value='';T('ev-anual').checked=true;
+  actualizarCamposEvento();
+  T('modal-evento').classList.add('show');
 };
-window.enviarFotoChat=async input=>{
-  const file=input.files[0];if(!file||!familiaData)return;
+window.actualizarCamposEvento=()=>{
+  const tipo=T('ev-tipo').value;
+  const esAnual=['cumpleaños'].includes(tipo);
+  T('ev-anual').checked=esAnual;
+  // Mostrar/ocultar hora según tipo
+  const conHora=['partido','torneo','comunion','boda','graduacion','fiesta','viaje','otro'];
+  T('ev-hora-group').style.display=conHora.includes(tipo)?'block':'none';
+};
+window.guardarEvento=async()=>{
+  const desc=T('ev-desc').value.trim();if(!desc)return showToast('Añade una descripción');
+  const fecha=T('ev-fecha').value;if(!fecha)return showToast('Selecciona una fecha');
   showLoading();
   try{
-    const r=new FileReader();
-    r.onload=async e=>{
-      const fd=new FormData();fd.append('file',e.target.result);fd.append('upload_preset',CL_PRESET);
-      const res=await fetch(`https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`,{method:'POST',body:fd});
-      const data=await res.json();
-      const u=await dbG('users/'+currentUser.uid);
-      await db.ref(`familias/${familiaData.id}/chat/mensajes`).push().set({fotoUrl:data.secure_url,uid:currentUser.uid,autor:u?.name||currentUser.displayName||'Usuario',timestamp:Date.now()});
-      db.ref(`familias/${familiaData.id}/chat/ultimoLeido/${currentUser.uid}`).set(Date.now());
-      hideLoading();input.value='';
-    };
-    r.readAsDataURL(file);
+    await db.ref('familias/'+familiaData.id+'/eventos/ev_'+Date.now()).set({
+      tipo:T('ev-tipo').value,descripcion:desc,fecha,
+      hora:T('ev-hora').value||null,anual:T('ev-anual').checked,
+      lugar:T('ev-lugar').value||null,notas:T('ev-notas').value||null,
+      autor:currentUser.displayName||'',ts:Date.now()
+    });
+    T('modal-evento').classList.remove('show');hideLoading();showToast('✅ Evento guardado');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
+window.borrarEvento=id=>db.ref('familias/'+familiaData.id+'/eventos/'+id).remove();
+window.filtrarEventos=f=>{
+  filtroEv=f;
+  ['fev-todos','fev-proximos','fev-mes','fev-pasados'].forEach(bid=>{
+    const b=T(bid);if(b)b.classList.toggle('active',bid==='fev-'+f);
+  });
+  db.ref('familias/'+familiaData.id+'/eventos').once('value').then(s=>renderEventos(s.val()||{}));
+};
+
+// ── PWA INSTALL BANNER ──
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  mostrarBannerPWA();
+});
+window.addEventListener('appinstalled',()=>{
+  ocultarBannerPWA();deferredPrompt=null;
+  localStorage.setItem('flb-pwa-installed','1');
+});
+function mostrarBannerPWA(){
+  if(localStorage.getItem('flb-pwa-installed')==='1') return;
+  if(window.matchMedia('(display-mode: standalone)').matches) return;
+  let banner=T('pwa-banner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='pwa-banner';
+    banner.style.cssText='position:fixed;bottom:80px;left:16px;right:16px;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:500;box-shadow:0 4px 20px rgba(108,99,255,.4)';
+    banner.innerHTML=`<img src="icon-192.png" style="width:36px;height:36px;border-radius:8px;flex-shrink:0">
+      <div style="flex:1"><div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:14px">Instalar FamiliaLopBas</div><div style="font-size:12px;opacity:.85">Accede más rápido desde tu móvil</div></div>
+      <button onclick="instalarPWA()" style="background:white;color:#6c63ff;border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0">Instalar</button>
+      <button onclick="ocultarBannerPWA()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:28px;height:28px;color:white;font-size:16px;cursor:pointer;flex-shrink:0">×</button>`;
+    document.body.appendChild(banner);
+  }
+}
+function ocultarBannerPWA(){const b=T('pwa-banner');if(b)b.remove();}
+window.instalarPWA=async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  const{outcome}=await deferredPrompt.userChoice;
+  if(outcome==='accepted'){localStorage.setItem('flb-pwa-installed','1');ocultarBannerPWA();}
+  deferredPrompt=null;
+};
+// Comprobar si ya está instalada al cargar
+if(window.matchMedia('(display-mode: standalone)').matches){
+  localStorage.setItem('flb-pwa-installed','1');
+}
 
 // ── CESTA — LISTAS GUARDADAS ──
 window.guardarListaCesta=async()=>{
@@ -998,7 +1120,6 @@ async function iniciarFCM(){
     fcmMessaging.onMessage(payload => {
       const { title, body } = payload.notification || {};
       showToast((title||'FamiliaLopBas')+': '+(body||''));
-      actualizarBadgeChat();
     });
   }catch(e){ console.log('FCM error:', e.message); }
 }
@@ -1295,9 +1416,76 @@ function renderGastos(entries,todos){
   empty.style.display='none';
   lista.innerHTML=entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([id,g])=>`<div class="item-card"><div style="width:40px;height:40px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${CAT_IC[g.categoria]||'📦'}</div><div style="flex:1;min-width:0"><div style="font-weight:500">${g.nota||g.categoria||'Gasto'}</div><div style="font-size:11px;color:var(--text3)">${g.fecha||''} · ${g.autor||''}</div></div>${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0" onclick="window.open('${g.fotoUrl}','_blank')">`:''}  <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-left:8px;flex-shrink:0">${fmtE(g.importe)}</div><div onclick="borrarGasto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`).join('');
 }
-window.abrirModalGasto=()=>{T('gasto-fecha').value=hoy();fotoB64=null;T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>';T('modal-gasto').classList.add('show');};
+window.abrirModalGasto=()=>{T('gasto-fecha').value=hoy();fotoB64=null;T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>';const btnOcr=T('btn-ocr-ticket');if(btnOcr)btnOcr.style.display='none';T('modal-gasto').classList.add('show');};
 window.cerrarModalGasto=()=>T('modal-gasto').classList.remove('show');
-window.previsualizarFoto=input=>{const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{fotoB64=e.target.result;T('gasto-foto-preview').innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;};r.readAsDataURL(file);};
+window.previsualizarFoto=input=>{
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    fotoB64=e.target.result;
+    T('gasto-foto-preview').innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+    // Mostrar botón analizar
+    const btnOcr=T('btn-ocr-ticket');if(btnOcr)btnOcr.style.display='block';
+  };
+  r.readAsDataURL(file);
+};
+
+const CLAUDE_API_KEY='sk-ant-api03-sNGIQky9TMs6YXymJWyF46mOz1MWx1h6Oh7O_CuUMC7vtWUw-AyfH0__ArSBKTjcwr0KWf6OopP51hct6aVREw-VZU33QAA';
+
+window.analizarTicket=async()=>{
+  if(!fotoB64)return showToast('Primero añade una foto del ticket');
+  const btn=T('btn-ocr-ticket');
+  btn.textContent='⏳ Analizando...';btn.disabled=true;
+  try{
+    // Extraer base64 puro sin el prefijo data:image/...;base64,
+    const b64=fotoB64.split(',')[1];
+    const mediaType=fotoB64.split(';')[0].split(':')[1];
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':CLAUDE_API_KEY,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-opus-4-5',
+        max_tokens:500,
+        messages:[{
+          role:'user',
+          content:[
+            {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
+            {type:'text',text:`Analiza este ticket o factura y extrae:
+1. Importe total (número con decimales, sin símbolo €)
+2. Fecha (formato YYYY-MM-DD, si no aparece pon null)
+3. Establecimiento o tienda (nombre corto)
+4. Categoría más apropiada de esta lista: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, otro
+
+Responde ÚNICAMENTE con JSON válido sin backticks:
+{"importe": número, "fecha": "YYYY-MM-DD o null", "establecimiento": "nombre", "categoria": "categoria"}`}
+          ]
+        }]
+      })
+    });
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error?.message||'Error API');
+    const texto=data.content[0].text.trim();
+    const resultado=JSON.parse(texto);
+    // Rellenar formulario
+    if(resultado.importe) T('gasto-importe').value=resultado.importe;
+    if(resultado.fecha&&resultado.fecha!=='null') T('gasto-fecha').value=resultado.fecha;
+    if(resultado.categoria) T('gasto-categoria').value=resultado.categoria;
+    if(resultado.establecimiento) T('gasto-nota').value=resultado.establecimiento;
+    btn.textContent='✅ Analizado';
+    showToast('✅ Ticket analizado — revisa los datos');
+  }catch(err){
+    btn.textContent='❌ Error';
+    showToast('Error al analizar: '+err.message);
+    console.error('OCR error:',err);
+  }finally{
+    setTimeout(()=>{btn.textContent='🤖 Analizar';btn.disabled=false;},2000);
+  }
+};
 window.guardarGasto=async()=>{
   const imp=T('gasto-importe').value;if(!imp)return showToast('Introduce el importe');
   showLoading();
