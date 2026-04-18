@@ -278,6 +278,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="pm-item" onclick="mostrarCodigo()">🔗 Código familia</div>
       <div class="pm-item">👤 Rol: <span id="mi-rol-label" style="color:var(--accent);margin-left:4px">—</span></div>
       <div class="pm-item" onclick="toggleDarkMode()" id="dark-toggle-btn">🌙 Modo oscuro</div>
+      <div class="pm-item" onclick="abrirConfigApiKey()">🔑 API Key Claude</div>
       <div class="pm-divider"></div>
       <div class="pm-item pm-logout" onclick="doLogout()">🚪 Cerrar sesión</div>
     </div>
@@ -742,6 +743,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 </div>
 
+<!-- MODAL API KEY -->
+<div class="modal-overlay" id="modal-apikey">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 API Key Claude</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5">Necesaria para el OCR de tickets. Se guarda solo en este dispositivo, nunca en el servidor.<br><br>Consíguela en <strong>console.anthropic.com</strong></p>
+    <div class="fg"><label>API Key</label><input type="password" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off"></div>
+    <button class="btn-primary" onclick="guardarApiKey()">Guardar</button>
+    <button class="btn-sec" onclick="T('modal-apikey').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-codigo">
   <div class="modal-sheet" style="text-align:center">
     <div class="modal-handle"></div>
@@ -1071,8 +1084,8 @@ window.instalarPWA=async()=>{
   if(outcome==='accepted'){localStorage.setItem('flb-pwa-installed','1');ocultarBannerPWA();}
   deferredPrompt=null;
 };
-// Mostrar banner al cargar si no está instalada y no fue descartada recientemente
-if(!esPWAInstalada()&&!localStorage.getItem('flb-pwa-dismissed')){
+// Mostrar banner al cargar si no está instalada
+if(!esPWAInstalada()){
   setTimeout(mostrarBannerPWA, 3000);
 }
 if(esPWAInstalada()){
@@ -1450,21 +1463,37 @@ window.previsualizarFoto=input=>{
   r.readAsDataURL(file);
 };
 
-const CLAUDE_API_KEY='sk-ant-api03-sNGIQky9TMs6YXymJWyF46mOz1MWx1h6Oh7O_CuUMC7vtWUw-AyfH0__ArSBKTjcwr0KWf6OopP51hct6aVREw-VZU33QAA';
+// ── API KEY CLAUDE ──
+function getClaudeApiKey(){ return localStorage.getItem('flb-claude-key')||''; }
+window.abrirConfigApiKey=()=>{
+  T('profile-menu').classList.remove('open');
+  const k=getClaudeApiKey();
+  T('apikey-input').value=k?'••••••••••••••••••••'+k.slice(-6):'';
+  T('modal-apikey').classList.add('show');
+};
+window.guardarApiKey=()=>{
+  const val=T('apikey-input').value.trim();
+  if(!val||val.startsWith('••')){ T('modal-apikey').classList.remove('show'); return; }
+  if(!val.startsWith('sk-ant-')){ showToast('❌ Key inválida — debe empezar por sk-ant-'); return; }
+  localStorage.setItem('flb-claude-key', val);
+  T('modal-apikey').classList.remove('show');
+  showToast('✅ API Key guardada');
+};
 
 window.analizarTicket=async()=>{
   if(!fotoB64)return showToast('Primero añade una foto del ticket');
+  const apiKey=getClaudeApiKey();
+  if(!apiKey){ showToast('⚠️ Configura la API Key de Claude primero (menú de perfil)'); abrirConfigApiKey(); return; }
   const btn=T('btn-ocr-ticket');
   btn.textContent='⏳ Analizando...';btn.disabled=true;
   try{
-    // Extraer base64 puro sin el prefijo data:image/...;base64,
     const b64=fotoB64.split(',')[1];
     const mediaType=fotoB64.split(';')[0].split(':')[1];
     const response=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key':CLAUDE_API_KEY,
+        'x-api-key':apiKey,
         'anthropic-version':'2023-06-01',
         'anthropic-dangerous-direct-browser-access':'true'
       },
@@ -1488,10 +1517,8 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
       })
     });
     const data=await response.json();
-    if(!response.ok)throw new Error(data.error?.message||'Error API');
-    const texto=data.content[0].text.trim();
-    const resultado=JSON.parse(texto);
-    // Rellenar formulario
+    if(!response.ok)throw new Error(data.error?.message||'Error API '+response.status);
+    const resultado=JSON.parse(data.content[0].text.trim());
     if(resultado.importe) T('gasto-importe').value=resultado.importe;
     if(resultado.fecha&&resultado.fecha!=='null') T('gasto-fecha').value=resultado.fecha;
     if(resultado.categoria) T('gasto-categoria').value=resultado.categoria;
@@ -1500,7 +1527,7 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
     showToast('✅ Ticket analizado — revisa los datos');
   }catch(err){
     btn.textContent='❌ Error';
-    showToast('Error al analizar: '+err.message);
+    showToast('Error: '+err.message);
     console.error('OCR error:',err);
   }finally{
     setTimeout(()=>{btn.textContent='🤖 Analizar';btn.disabled=false;},2000);
