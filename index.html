@@ -1031,31 +1031,51 @@ window.addEventListener('appinstalled',()=>{
   ocultarBannerPWA();deferredPrompt=null;
   localStorage.setItem('flb-pwa-installed','1');
 });
+function esPWAInstalada(){
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone===true ||
+    localStorage.getItem('flb-pwa-installed')==='1';
+}
 function mostrarBannerPWA(){
-  if(localStorage.getItem('flb-pwa-installed')==='1') return;
-  if(window.matchMedia('(display-mode: standalone)').matches) return;
-  let banner=T('pwa-banner');
-  if(!banner){
-    banner=document.createElement('div');
-    banner.id='pwa-banner';
-    banner.style.cssText='position:fixed;bottom:80px;left:16px;right:16px;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:500;box-shadow:0 4px 20px rgba(108,99,255,.4)';
+  if(esPWAInstalada()) return;
+  if(T('pwa-banner')) return;
+  const banner=document.createElement('div');
+  banner.id='pwa-banner';
+  banner.style.cssText='position:fixed;bottom:80px;left:16px;right:16px;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:500;box-shadow:0 4px 20px rgba(108,99,255,.4)';
+  const esIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||
+    (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(esIOS){
+    banner.innerHTML=`<img src="icon-192.png" style="width:36px;height:36px;border-radius:8px;flex-shrink:0">
+      <div style="flex:1"><div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:14px">Instalar FamiliaLopBas</div><div style="font-size:11px;opacity:.85">Pulsa Compartir ↑ → "Añadir a pantalla de inicio"</div></div>
+      <button onclick="ocultarBannerPWA()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:28px;height:28px;color:white;font-size:16px;cursor:pointer;flex-shrink:0">×</button>`;
+  } else {
     banner.innerHTML=`<img src="icon-192.png" style="width:36px;height:36px;border-radius:8px;flex-shrink:0">
       <div style="flex:1"><div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:14px">Instalar FamiliaLopBas</div><div style="font-size:12px;opacity:.85">Accede más rápido desde tu móvil</div></div>
-      <button onclick="instalarPWA()" style="background:white;color:#6c63ff;border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0">Instalar</button>
+      <button onclick="instalarPWA()" style="background:white;color:#6c63ff;border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0">${deferredPrompt?'Instalar':'Añadir'}</button>
       <button onclick="ocultarBannerPWA()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:28px;height:28px;color:white;font-size:16px;cursor:pointer;flex-shrink:0">×</button>`;
-    document.body.appendChild(banner);
   }
+  document.body.appendChild(banner);
 }
-function ocultarBannerPWA(){const b=T('pwa-banner');if(b)b.remove();}
+function ocultarBannerPWA(){
+  const b=T('pwa-banner');if(b)b.remove();
+  localStorage.setItem('flb-pwa-dismissed','1');
+}
 window.instalarPWA=async()=>{
-  if(!deferredPrompt)return;
+  if(!deferredPrompt){
+    // Fallback: instrucciones manuales
+    showToast('Pulsa los 3 puntos del navegador → Añadir a pantalla de inicio');
+    return;
+  }
   deferredPrompt.prompt();
   const{outcome}=await deferredPrompt.userChoice;
   if(outcome==='accepted'){localStorage.setItem('flb-pwa-installed','1');ocultarBannerPWA();}
   deferredPrompt=null;
 };
-// Comprobar si ya está instalada al cargar
-if(window.matchMedia('(display-mode: standalone)').matches){
+// Mostrar banner al cargar si no está instalada y no fue descartada recientemente
+if(!esPWAInstalada()&&!localStorage.getItem('flb-pwa-dismissed')){
+  setTimeout(mostrarBannerPWA, 3000);
+}
+if(esPWAInstalada()){
   localStorage.setItem('flb-pwa-installed','1');
 }
 
@@ -1449,7 +1469,7 @@ window.analizarTicket=async()=>{
         'anthropic-dangerous-direct-browser-access':'true'
       },
       body:JSON.stringify({
-        model:'claude-opus-4-5',
+        model:'claude-haiku-4-5-20251001',
         max_tokens:500,
         messages:[{
           role:'user',
