@@ -1,4 +1,4 @@
-const CACHE = 'familialopbas-v2';
+const CACHE = 'familialopbas-v5';
 const ASSETS = [
   '.',
   'index.html',
