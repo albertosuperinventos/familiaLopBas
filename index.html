@@ -8,51 +8,6 @@
 <title>FamiliaLopBas</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>FamilialopBas</title>
-<link href="https://fonts.googleapis.com/css2?family=Nurito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  -bg:#f2f4f8; --bg2:#ffffff; --bg3:#e8ecf4; --card:#ffffff;
-  -border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
-  -text:#1a1a2e; --text2:#6b7280; --text3:#9ca3af;
-  -accent:#6c63ff; --accent2:#ff6584; --accent3:#00c875;
-  -radius:18px; --radius-sm:12px;
-  -shadow:0 2px 12px rgba(0,0,0,0.07); --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
-}
-</style>
-
-<script>
-// ===== CÓDIGO PARA API KEY =====
-function getApiKey() {
-    let key = localStorage.getItem('anthropic_api_key');
-    if (key) {
-        return key.trim().replace(/^["']|["']$/g, '');
-    }
-    return 'sk-ant-tu-key-hardcodeada-aqui'; // Cambia esto por tu key real
-}
-
-const originalFetch = window.fetch;
-window.fetch = function(url, options) {
-    if (url.includes('api.anthropic.com') && options?.headers) {
-        options.headers['x-api-key'] = getApiKey();
-    }
-    return originalFetch(url, options);
-};
-// ===== FIN DEL CÓDIGO =====
-</script>
-
-</head>
-<body>
-<!-- El resto de tu contenido aquí -->
-</body>
-</html>
 :root {
   --bg:#f2f4f8; --bg2:#ffffff; --bg3:#e8ecf4; --card:#ffffff;
   --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
@@ -1563,7 +1518,9 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
     });
     const data=await response.json();
     if(!response.ok)throw new Error(data.error?.message||'Error API '+response.status);
-    const resultado=JSON.parse(data.content[0].text.trim());
+    const textoRaw=data.content[0].text.trim();
+    const textoLimpio=textoRaw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    const resultado=JSON.parse(textoLimpio);
     if(resultado.importe) T('gasto-importe').value=resultado.importe;
     if(resultado.fecha&&resultado.fecha!=='null') T('gasto-fecha').value=resultado.fecha;
     if(resultado.categoria) T('gasto-categoria').value=resultado.categoria;
