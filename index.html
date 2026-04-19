@@ -749,7 +749,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="modal-handle"></div>
     <div class="modal-title">🔑 API Key Claude</div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5">Necesaria para el OCR de tickets. Se guarda solo en este dispositivo, nunca en el servidor.<br><br>Consíguela en <strong>console.anthropic.com</strong></p>
-    <div class="fg"><label>API Key</label><input type="password" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off"></div>
+    <div class="fg"><label>API Key</label><input type="text" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off" style="font-size:11px;word-break:break-all"></div>
     <button class="btn-primary" onclick="guardarApiKey()">Guardar</button>
     <button class="btn-sec" onclick="T('modal-apikey').classList.remove('show')">Cancelar</button>
   </div>
@@ -1464,20 +1464,23 @@ window.previsualizarFoto=input=>{
 };
 
 // ── API KEY CLAUDE ──
-function getClaudeApiKey(){ return localStorage.getItem('flb-claude-key')||''; }
+function getClaudeApiKey(){ 
+  return (localStorage.getItem('flb-claude-key')||sessionStorage.getItem('flb-claude-key')||'').trim(); 
+}
 window.abrirConfigApiKey=()=>{
   T('profile-menu').classList.remove('open');
   const k=getClaudeApiKey();
-  T('apikey-input').value=k?'••••••••••••••••••••'+k.slice(-6):'';
+  T('apikey-input').value=k||'';
   T('modal-apikey').classList.add('show');
 };
 window.guardarApiKey=()=>{
   const val=T('apikey-input').value.trim();
-  if(!val||val.startsWith('••')){ T('modal-apikey').classList.remove('show'); return; }
+  if(!val){ T('modal-apikey').classList.remove('show'); return; }
   if(!val.startsWith('sk-ant-')){ showToast('❌ Key inválida — debe empezar por sk-ant-'); return; }
   localStorage.setItem('flb-claude-key', val);
+  sessionStorage.setItem('flb-claude-key', val);
   T('modal-apikey').classList.remove('show');
-  showToast('✅ API Key guardada');
+  showToast('✅ API Key guardada: ...'+val.slice(-6));
 };
 
 window.analizarTicket=async()=>{
