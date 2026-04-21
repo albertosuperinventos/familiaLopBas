@@ -324,6 +324,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div><div class="module-icon">🐾</div><div class="module-name">Otto</div><div class="module-badge">Familia</div></div>
         <div class="module-count" id="badge-otto" style="display:none;background:#f97316">0</div>
       </div>
+      <div class="module-card" style="--mc:#10b981" onclick="abrirPrecios()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🏷️</div><div class="module-name">Precios</div><div class="module-badge">Historial OCR</div></div>
+      </div>
     </div>
     <button class="btn-notificaciones" id="btn-notif" onclick="solicitarPermisoNotificaciones()">
       🔔 Activar notificaciones
@@ -553,6 +557,35 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 </div>
 
 <!-- MODAL GASTO -->
+<!-- PRECIOS -->
+<div class="screen" id="screen-precios">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🏷️ Historial de precios</span>
+    <button onclick="exportarPreciosXLS()" style="margin-left:auto;padding:8px 12px;background:var(--bg3);border:none;border-radius:20px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">📊 XLS</button>
+  </div>
+  <div class="input-bar">
+    <input id="precios-buscar" type="text" placeholder="Buscar producto..." style="flex:1" oninput="filtrarPrecios()">
+  </div>
+  <div class="filter-bar">
+    <button class="chip active" id="fp-todos" onclick="filtrarPreciosCat('todos')">Todos</button>
+    <button class="chip" id="fp-supermercado" onclick="filtrarPreciosCat('supermercado')">🛒</button>
+    <button class="chip" id="fp-vehiculo" onclick="filtrarPreciosCat('vehiculo')">🚗</button>
+    <button class="chip" id="fp-otto" onclick="filtrarPreciosCat('otto')">🐾</button>
+    <button class="chip" id="fp-otro" onclick="filtrarPreciosCat('otro')">📦</button>
+  </div>
+  <div class="screen-body">
+    <div id="precios-lista" style="padding:12px 0 0"></div>
+    <div id="precios-empty" class="empty-state" style="display:none"><div class="ei">🏷️</div><p>Sin historial de precios</p><small>Usa el OCR de tickets para guardar precios</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-gasto">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -573,12 +606,39 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     </div>
     <div class="fg">
       <label>Categoría</label>
-      <select id="gasto-categoria">
+      <select id="gasto-categoria" onchange="actualizarSelectorAsignacion()">
         <option value="supermercado">🛒 Supermercado</option><option value="restaurante">🍽️ Restaurante</option>
         <option value="luz">💡 Luz</option><option value="agua">💧 Agua</option><option value="gas">🔥 Gas</option>
         <option value="telefono">📱 Teléfono/Internet</option><option value="ropa">👕 Ropa</option>
         <option value="colegio">🎒 Colegio</option><option value="medico">🏥 Médico/Farmacia</option>
-        <option value="ocio">🎭 Ocio</option><option value="transporte">🚌 Transporte</option><option value="otro">📦 Otro</option>
+        <option value="ocio">🎭 Ocio</option><option value="transporte">🚌 Transporte</option>
+        <option value="vehiculo">🚗 Vehículo</option><option value="otto">🐾 Otto</option>
+        <option value="otro">📦 Otro</option>
+      </select>
+    </div>
+    <!-- Selector vehículo (aparece si categoría = vehiculo) -->
+    <div class="fg" id="gasto-vehiculo-group" style="display:none">
+      <label>Vehículo</label>
+      <select id="gasto-vehiculo-sel"><option value="">Sin asignar</option></select>
+    </div>
+    <!-- Tipo gasto vehículo -->
+    <div class="fg" id="gasto-vh-tipo-group" style="display:none">
+      <label>Tipo</label>
+      <select id="gasto-vh-tipo">
+        <option value="gasolina">⛽ Gasolina</option><option value="averia">🔧 Avería</option>
+        <option value="seguro">🛡️ Seguro</option><option value="itv">🔍 ITV</option><option value="otro">📦 Otro</option>
+      </select>
+    </div>
+    <div class="fg" id="gasto-vh-km-group" style="display:none">
+      <label>Km actuales (opcional)</label>
+      <input type="number" id="gasto-vh-km" placeholder="Ej: 47500">
+    </div>
+    <!-- Selector Otto (aparece si categoría = otto) -->
+    <div class="fg" id="gasto-otto-group" style="display:none">
+      <label>Tipo gasto Otto</label>
+      <select id="gasto-otto-tipo">
+        <option value="vacuna">💉 Vacuna</option><option value="revision">🩺 Revisión</option>
+        <option value="compra">🛍️ Compra/Pienso</option><option value="medicacion">💊 Medicación</option><option value="otro">📦 Otro</option>
       </select>
     </div>
     <div class="fg"><label>Nota (opcional)</label><input type="text" id="gasto-nota" placeholder="Descripción..."></div>
@@ -1311,7 +1371,7 @@ function renderTareas(items){
         <div style="font-weight:500;${t.completada?'text-decoration:line-through':''}display:flex;align-items:center;flex-wrap:wrap;gap:4px">
           ${t.prioridad==='alta'?'🔴 ':t.prioridad==='baja'?'🔵 ':''}${t.nombre}${fechaBadge}
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px">${t.asignadoNombre?'👤 '+t.asignadoNombre:'👥 Todos'} · por ${t.autor||'?'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${t.asignadoNombre?'👤 '+t.asignadoNombre:'👥 Todos'} · por ${t.autor||'?'}${t.completada&&t.completadaPor?` · ✅ ${t.completadaPor}`:''}</div>
       </div>
       <div onclick="borrarTarea('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div>
     </div>`;
@@ -1329,7 +1389,19 @@ window.addTarea=async()=>{
   });
   inp.value='';T('tarea-fecha').value='';inp.focus();
 };
-window.completarTarea=(id,v)=>db.ref('familias/'+familiaData.id+'/tareas/'+id).update({completada:v});
+window.completarTarea=async(id,v)=>{
+  const update={completada:v};
+  if(v){
+    // Registrar quién completó y cuándo
+    const u=await dbG('users/'+currentUser.uid);
+    update.completadaPor=u?.name||currentUser.displayName||'?';
+    update.completadaTs=Date.now();
+  } else {
+    update.completadaPor=null;
+    update.completadaTs=null;
+  }
+  db.ref('familias/'+familiaData.id+'/tareas/'+id).update(update);
+};
 window.borrarTarea=id=>db.ref('familias/'+familiaData.id+'/tareas/'+id).remove();
 window.filtrarTareas=f=>{
   filtroT=f;
@@ -1449,8 +1521,75 @@ function renderGastos(entries,todos){
   empty.style.display='none';
   lista.innerHTML=entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([id,g])=>`<div class="item-card"><div style="width:40px;height:40px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${CAT_IC[g.categoria]||'📦'}</div><div style="flex:1;min-width:0"><div style="font-weight:500">${g.nota||g.categoria||'Gasto'}</div><div style="font-size:11px;color:var(--text3)">${g.fecha||''} · ${g.autor||''}</div></div>${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0" onclick="window.open('${g.fotoUrl}','_blank')">`:''}  <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-left:8px;flex-shrink:0">${fmtE(g.importe)}</div><div onclick="borrarGasto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`).join('');
 }
-window.abrirModalGasto=()=>{T('gasto-fecha').value=hoy();fotoB64=null;T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>';const btnOcr=T('btn-ocr-ticket');if(btnOcr)btnOcr.style.display='none';T('modal-gasto').classList.add('show');};
+window.abrirModalGasto=async()=>{
+  T('gasto-fecha').value=hoy();fotoB64=null;
+  T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>';
+  const btnOcr=T('btn-ocr-ticket');if(btnOcr)btnOcr.style.display='none';
+  T('gasto-vehiculo-group').style.display='none';
+  T('gasto-vh-tipo-group').style.display='none';
+  T('gasto-vh-km-group').style.display='none';
+  T('gasto-otto-group').style.display='none';
+  // Cargar vehículos en selector
+  const vhSnap=await db.ref('familias/'+familiaData.id+'/vehiculos').once('value');
+  const vhs=vhSnap.val()||{};
+  const sel=T('gasto-vehiculo-sel');
+  sel.innerHTML='<option value="">Sin asignar</option>';
+  Object.entries(vhs).forEach(([id,v])=>{
+    const o=document.createElement('option');o.value=id;
+    o.textContent=(v.marca||'')+' '+(v.modelo||'')+' '+(v.matricula?'('+v.matricula+')':'');
+    sel.appendChild(o);
+  });
+  T('modal-gasto').classList.add('show');
+};
 window.cerrarModalGasto=()=>T('modal-gasto').classList.remove('show');
+
+window.actualizarSelectorAsignacion=()=>{
+  const cat=T('gasto-categoria').value;
+  T('gasto-vehiculo-group').style.display=cat==='vehiculo'?'block':'none';
+  T('gasto-vh-tipo-group').style.display=cat==='vehiculo'?'block':'none';
+  T('gasto-vh-km-group').style.display=cat==='vehiculo'?'block':'none';
+  T('gasto-otto-group').style.display=cat==='otto'?'block':'none';
+};
+
+window.guardarGasto=async()=>{
+  const imp=T('gasto-importe').value;if(!imp)return showToast('Introduce el importe');
+  showLoading();
+  try{
+    let fotoUrl=null;
+    if(fotoB64){
+      const fd=new FormData();fd.append('file',fotoB64);fd.append('upload_preset',CL_PRESET);
+      const res=await fetch(`https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`,{method:'POST',body:fd});
+      const data=await res.json();fotoUrl=data.secure_url;
+    }
+    const cat=T('gasto-categoria').value;
+    const ts=Date.now();
+    // Guardar en gastos generales
+    await db.ref('familias/'+familiaData.id+'/gastos/g_'+ts).set({
+      importe:parseFloat(imp),categoria:cat,fecha:T('gasto-fecha').value,
+      nota:T('gasto-nota').value,fotoUrl,
+      autor:currentUser.displayName||currentUser.email.split('@')[0],ts
+    });
+    // Si es vehículo, sincronizar con módulo vehículos
+    const vhId=T('gasto-vehiculo-sel').value;
+    if(cat==='vehiculo'&&vhId){
+      const km=T('gasto-vh-km').value||null;
+      await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhId+'/gastos/vhg_'+ts).set({
+        tipo:T('gasto-vh-tipo').value,importe:parseFloat(imp),
+        fecha:T('gasto-fecha').value,km,nota:T('gasto-nota').value,ts
+      });
+      if(km) await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhId+'/km').set(km);
+    }
+    // Si es Otto, sincronizar con módulo Otto
+    if(cat==='otto'){
+      await db.ref('familias/'+familiaData.id+'/otto/o_'+ts).set({
+        tipo:T('gasto-otto-tipo').value,descripcion:T('gasto-nota').value||'Gasto Otto',
+        fecha:T('gasto-fecha').value,importe:parseFloat(imp),
+        autor:currentUser.displayName||'',ts
+      });
+    }
+    cerrarModalGasto();hideLoading();showToast('✅ Gasto guardado');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
 window.previsualizarFoto=input=>{
   const file=input.files[0];if(!file)return;
   const r=new FileReader();
@@ -1511,10 +1650,11 @@ window.analizarTicket=async()=>{
 1. Importe total (número con decimales, sin símbolo €)
 2. Fecha (formato YYYY-MM-DD, si no aparece pon null)
 3. Establecimiento o tienda (nombre corto)
-4. Categoría más apropiada de esta lista: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, otro
+4. Categoría más apropiada: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
+5. Lista de productos con precio unitario (si aparecen en el ticket)
 
 Responde ÚNICAMENTE con JSON válido sin backticks:
-{"importe": número, "fecha": "YYYY-MM-DD o null", "establecimiento": "nombre", "categoria": "categoria"}`}
+{"importe": número, "fecha": "YYYY-MM-DD o null", "establecimiento": "nombre", "categoria": "categoria", "productos": [{"nombre": "producto", "precio": número}]}`}
           ]
         }]
       })
@@ -1526,10 +1666,24 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
     const resultado=JSON.parse(textoLimpio);
     if(resultado.importe) T('gasto-importe').value=resultado.importe;
     if(resultado.fecha&&resultado.fecha!=='null') T('gasto-fecha').value=resultado.fecha;
-    if(resultado.categoria) T('gasto-categoria').value=resultado.categoria;
+    if(resultado.categoria){
+      T('gasto-categoria').value=resultado.categoria;
+      actualizarSelectorAsignacion();
+    }
     if(resultado.establecimiento) T('gasto-nota').value=resultado.establecimiento;
+    // Guardar productos en historial de precios
+    if(resultado.productos&&resultado.productos.length&&familiaData){
+      await guardarPreciosOCR(
+        resultado.productos,
+        resultado.establecimiento||'',
+        resultado.fecha||hoy(),
+        resultado.categoria||'otro'
+      );
+      showToast(`✅ Analizado · ${resultado.productos.length} productos guardados`);
+    } else {
+      showToast('✅ Ticket analizado — revisa los datos');
+    }
     btn.textContent='✅ Analizado';
-    showToast('✅ Ticket analizado — revisa los datos');
   }catch(err){
     btn.textContent='❌ Error';
     showToast('Error: '+err.message);
@@ -1538,21 +1692,88 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
     setTimeout(()=>{btn.textContent='🤖 Analizar';btn.disabled=false;},2000);
   }
 };
-window.guardarGasto=async()=>{
-  const imp=T('gasto-importe').value;if(!imp)return showToast('Introduce el importe');
-  showLoading();
-  try{
-    let fotoUrl=null;
-    if(fotoB64){
-      const fd=new FormData();fd.append('file',fotoB64);fd.append('upload_preset',CL_PRESET);
-      const res=await fetch(`https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`,{method:'POST',body:fd});
-      const data=await res.json();fotoUrl=data.secure_url;
-    }
-    await db.ref('familias/'+familiaData.id+'/gastos/g_'+Date.now()).set({importe:parseFloat(imp),categoria:T('gasto-categoria').value,fecha:T('gasto-fecha').value,nota:T('gasto-nota').value,fotoUrl,autor:currentUser.displayName||currentUser.email.split('@')[0],ts:Date.now()});
-    cerrarModalGasto();hideLoading();showToast('✅ Gasto guardado');
-  }catch(err){hideLoading();showToast('Error: '+err.message);}
-};
 window.borrarGasto=id=>db.ref('familias/'+familiaData.id+'/gastos/'+id).remove();
+
+// ── HISTORIAL PRECIOS OCR ──
+let preciosData=[], filtroPreciosCat='todos', filtroPreciosBusq='';
+
+window.abrirPrecios=()=>{ showScreen('precios'); cargarPrecios(); };
+
+async function cargarPrecios(){
+  const snap=await db.ref('familias/'+familiaData.id+'/precios').once('value');
+  preciosData=Object.entries(snap.val()||{}).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+  renderPrecios();
+}
+
+function renderPrecios(){
+  const lista=T('precios-lista'),empty=T('precios-empty');
+  let entries=preciosData;
+  if(filtroPreciosCat!=='todos') entries=entries.filter(([,p])=>p.categoria===filtroPreciosCat);
+  if(filtroPreciosBusq) entries=entries.filter(([,p])=>(p.producto||'').toLowerCase().includes(filtroPreciosBusq.toLowerCase()));
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  // Agrupar por producto
+  const grupos={};
+  entries.forEach(([id,p])=>{
+    const key=(p.producto||'').toLowerCase();
+    if(!grupos[key]) grupos[key]={producto:p.producto,categoria:p.categoria,registros:[]};
+    grupos[key].registros.push({id,...p});
+  });
+  lista.innerHTML=Object.values(grupos).map(g=>{
+    const sorted=g.registros.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const ultPrecio=sorted[0];
+    const minPrecio=Math.min(...sorted.map(r=>r.precio));
+    const maxPrecio=Math.max(...sorted.map(r=>r.precio));
+    const tendencia=sorted.length>1?(sorted[0].precio>sorted[1].precio?'📈':'📉'):'';
+    return `<div class="item-card" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div style="display:flex;align-items:center;width:100%;gap:8px">
+        <div style="flex:1;font-weight:600">${g.producto||'—'} ${tendencia}</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;color:var(--accent)">${fmtE(ultPrecio.precio)}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);width:100%">
+        ${CAT_IC[g.categoria]||'📦'} ${ultPrecio.establecimiento||''} · ${ultPrecio.fecha||''}
+        ${sorted.length>1?` · Min: ${fmtE(minPrecio)} Max: ${fmtE(maxPrecio)} (${sorted.length} registros)`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.filtrarPrecios=()=>{ filtroPreciosBusq=T('precios-buscar').value; renderPrecios(); };
+window.filtrarPreciosCat=cat=>{
+  filtroPreciosCat=cat;
+  ['fp-todos','fp-supermercado','fp-vehiculo','fp-otto','fp-otro'].forEach(bid=>{
+    const b=T(bid);if(b)b.classList.toggle('active',bid==='fp-'+cat);
+  });
+  renderPrecios();
+};
+
+window.exportarPreciosXLS=()=>{
+  let csv='\uFEFFProducto;Precio (€);Establecimiento;Categoría;Fecha\n';
+  preciosData.forEach(([,p])=>{
+    csv+=`${p.producto||''};${parseFloat(p.precio||0).toFixed(2).replace('.',',')};${p.establecimiento||''};${p.categoria||''};${p.fecha||''}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='precios_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();URL.revokeObjectURL(url);
+  showToast('✅ Exportado');
+};
+
+async function guardarPreciosOCR(productos, establecimiento, fecha, categoria){
+  if(!productos||!productos.length) return;
+  const batch={};
+  productos.forEach(p=>{
+    if(!p.nombre||!p.precio) return;
+    const id='precio_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    batch[id]={
+      producto:p.nombre, precio:parseFloat(p.precio),
+      establecimiento, fecha, categoria, ts:Date.now()
+    };
+  });
+  if(Object.keys(batch).length)
+    await db.ref('familias/'+familiaData.id+'/precios').update(batch);
+}
 
 // ===== MÉDICOS (código original) =====
 window.abrirMedicos=()=>{showScreen('medicos');if(familiaData&&!lMedicos)suscribirMedicos();};
