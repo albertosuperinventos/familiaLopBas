@@ -1350,6 +1350,7 @@ function renderTareas(items){
   else if(filtroT==='completadas')entries=entries.filter(([,t])=>t.completada);
   else if(filtroT==='mias')entries=entries.filter(([,t])=>!t.completada&&(!t.asignadoA||t.asignadoA===currentUser.uid));
   else if(filtroT==='vencidas')entries=entries.filter(([,t])=>!t.completada&&t.fechaLimite&&t.fechaLimite<h);
+  else entries=entries.filter(([,t])=>!t.completada); // 'todas' = solo pendientes
   if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
   const pb={alta:'#fecaca',normal:'var(--border)',baja:'#dbeafe'};
@@ -1543,12 +1544,25 @@ window.abrirModalGasto=async()=>{
 };
 window.cerrarModalGasto=()=>T('modal-gasto').classList.remove('show');
 
-window.actualizarSelectorAsignacion=()=>{
+window.actualizarSelectorAsignacion=async()=>{
   const cat=T('gasto-categoria').value;
   T('gasto-vehiculo-group').style.display=cat==='vehiculo'?'block':'none';
   T('gasto-vh-tipo-group').style.display=cat==='vehiculo'?'block':'none';
   T('gasto-vh-km-group').style.display=cat==='vehiculo'?'block':'none';
   T('gasto-otto-group').style.display=cat==='otto'?'block':'none';
+  // Cargar vehículos si se selecciona categoría vehículo
+  if(cat==='vehiculo'&&familiaData){
+    const snap=await dbG('familias/'+familiaData.id+'/vehiculos');
+    const sel=T('gasto-vehiculo-sel');
+    sel.innerHTML='<option value="">Sin asignar</option>';
+    Object.entries(snap||{}).forEach(([id,v])=>{
+      const o=document.createElement('option');
+      o.value=id;o.textContent=`${v.marca||''} ${v.modelo||''} ${v.matricula?'('+v.matricula+')':''}`.trim();
+      sel.appendChild(o);
+    });
+    // Si solo hay un vehículo, seleccionarlo automáticamente
+    if(Object.keys(snap||{}).length===1) sel.selectedIndex=1;
+  }
 };
 
 window.guardarGasto=async()=>{
@@ -1650,11 +1664,12 @@ window.analizarTicket=async()=>{
 1. Importe total (número con decimales, sin símbolo €)
 2. Fecha (formato YYYY-MM-DD, si no aparece pon null)
 3. Establecimiento o tienda (nombre corto)
-4. Categoría más apropiada: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
-5. Lista de productos con precio unitario (si aparecen en el ticket)
+4. Categoría: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
+5. Si es ticket de gasolina: litros (número), precio_litro (número €/L)
+6. Lista de productos con precio unitario (si aparecen)
 
 Responde ÚNICAMENTE con JSON válido sin backticks:
-{"importe": número, "fecha": "YYYY-MM-DD o null", "establecimiento": "nombre", "categoria": "categoria", "productos": [{"nombre": "producto", "precio": número}]}`}
+{"importe": número, "fecha": "YYYY-MM-DD o null", "establecimiento": "nombre", "categoria": "categoria", "litros": número_o_null, "precio_litro": número_o_null, "productos": [{"nombre": "producto", "precio": número}]}`}
           ]
         }]
       })
@@ -1669,18 +1684,24 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
     if(resultado.categoria){
       T('gasto-categoria').value=resultado.categoria;
       actualizarSelectorAsignacion();
+      // Si es vehículo, rellenar tipo gasolina y litros automáticamente
+      if(resultado.categoria==='vehiculo'){
+        T('gasto-vh-tipo').value='gasolina';
+        if(resultado.litros) T('gasto-vh-km').placeholder=resultado.litros+' L · '+(resultado.precio_litro?resultado.precio_litro+'€/L':'');
+      }
     }
     if(resultado.establecimiento) T('gasto-nota').value=resultado.establecimiento;
-    // Guardar productos en historial de precios
-    if(resultado.productos&&resultado.productos.length&&familiaData){
-      await guardarPreciosOCR(
-        resultado.productos,
-        resultado.establecimiento||'',
-        resultado.fecha||hoy(),
-        resultado.categoria||'otro'
-      );
-      showToast(`✅ Analizado · ${resultado.productos.length} productos guardados`);
-    } else {
+    // Guardar en historial precios — incluir gasolina como producto
+    let productos=resultado.productos||[];
+    if(resultado.categoria==='vehiculo'&&resultado.litros&&resultado.precio_litro){
+      productos=[{nombre:'Gasolina ('+resultado.establecimiento+')',precio:resultado.precio_litro},...productos];
+      // Guardar litros en el campo km placeholder para que el usuario lo vea
+      showToast(`⛽ ${resultado.litros}L a ${resultado.precio_litro}€/L — selecciona vehículo`);
+    }
+    if(productos.length&&familiaData){
+      await guardarPreciosOCR(productos, resultado.establecimiento||'', resultado.fecha||hoy(), resultado.categoria||'otro');
+      if(resultado.categoria!=='vehiculo') showToast(`✅ Analizado · ${productos.length} productos guardados`);
+    } else if(resultado.categoria!=='vehiculo'){
       showToast('✅ Ticket analizado — revisa los datos');
     }
     btn.textContent='✅ Analizado';
