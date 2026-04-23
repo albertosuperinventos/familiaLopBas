@@ -284,6 +284,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     </div>
   </div>
   <div class="members-bar" id="members-bar"></div>
+  <!-- RESUMEN DIARIO -->
+  <div id="resumen-diario" style="margin:12px 16px 0;display:none">
+    <div style="background:linear-gradient(135deg,#1e293b,#334155);border-radius:var(--radius);padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📋 Pendientes hoy</div>
+      <div id="resumen-items" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+  </div>
   <div class="modules-section">
     <div class="modules-title">Módulos</div>
     <div class="modules-grid">
@@ -327,6 +334,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="module-card" style="--mc:#10b981" onclick="abrirPrecios()">
         <div class="mc-grad"></div>
         <div><div class="module-icon">🏷️</div><div class="module-name">Precios</div><div class="module-badge">Historial OCR</div></div>
+      </div>
+      <div class="module-card" style="--mc:#8b5cf6" onclick="abrirPersonal()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">👤</div><div class="module-name">Personal</div><div class="module-badge" style="background:#ede9fe;color:#6d28d9">Solo tú</div></div>
+        <div class="module-count" id="badge-personal" style="display:none;background:#8b5cf6">0</div>
       </div>
     </div>
     <button class="btn-notificaciones" id="btn-notif" onclick="solicitarPermisoNotificaciones()">
@@ -516,6 +528,78 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
     <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
     <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- PERSONAL -->
+<div class="screen" id="screen-personal">
+  <div class="screen-header" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);border:none;padding-bottom:12px">
+    <button class="back-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.2);color:white;border:none">←</button>
+    <div style="flex:1">
+      <div class="screen-title" style="color:white" id="personal-title-name">Mi espacio</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">🔒 Privado · Solo visible para ti</div>
+    </div>
+  </div>
+  <!-- Tabs -->
+  <div style="display:flex;background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10">
+    <button id="ptab-tareas" onclick="switchPersonalTab('tareas')" style="flex:1;padding:13px;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:var(--accent);border-bottom:2.5px solid var(--accent);transition:all .2s;font-family:'DM Sans',sans-serif">✅ Tareas</button>
+    <button id="ptab-recordatorios" onclick="switchPersonalTab('recordatorios')" style="flex:1;padding:13px;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:var(--text3);border-bottom:2.5px solid transparent;transition:all .2s;font-family:'DM Sans',sans-serif">🔔 Recordatorios</button>
+  </div>
+
+  <!-- Panel Tareas Personales -->
+  <div id="ppanel-tareas" style="display:flex;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:100px">
+    <div class="input-bar" style="flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <input id="ptarea-input" type="text" placeholder="Nueva tarea personal..." style="flex:1" onkeydown="if(event.key==='Enter')addPersonalTarea()">
+        <select id="ptarea-prioridad" style="padding:11px 10px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none">
+          <option value="normal">⚪ Normal</option><option value="alta">🔴 Alta</option><option value="baja">🔵 Baja</option>
+        </select>
+        <button class="add-btn" onclick="addPersonalTarea()">+</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;color:var(--text2);white-space:nowrap">📅 Fecha:</span>
+        <input id="ptarea-fecha" type="date" style="flex:1;padding:8px 12px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none">
+        <button onclick="T('ptarea-fecha').value=''" style="padding:7px 10px;background:var(--bg3);border:none;border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <button class="chip active" id="pft-todas" onclick="filtrarPersonalTareas('todas')">Todas</button>
+      <button class="chip" id="pft-pendientes" onclick="filtrarPersonalTareas('pendientes')">Pendientes</button>
+      <button class="chip" id="pft-alta" onclick="filtrarPersonalTareas('alta')">🔴 Alta</button>
+      <button class="chip" id="pft-completadas" onclick="filtrarPersonalTareas('completadas')">Completadas</button>
+    </div>
+    <div id="ptareas-lista" style="padding:12px 0 0"></div>
+    <div id="ptareas-empty" class="empty-state" style="display:none"><div class="ei">✅</div><p>Sin tareas personales</p><small>Añade tu primera tarea arriba</small></div>
+  </div>
+
+  <!-- Panel Recordatorios -->
+  <div id="ppanel-recordatorios" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:100px">
+    <div class="input-bar" style="flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <input id="prec-input" type="text" placeholder="Nuevo recordatorio..." style="flex:1" onkeydown="if(event.key==='Enter')addPersonalRecordatorio()">
+        <button class="add-btn" onclick="addPersonalRecordatorio()">+</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input id="prec-fecha" type="date" style="flex:1;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none">
+        <input id="prec-hora" type="time" value="09:00" style="padding:9px 12px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none">
+      </div>
+      <select id="prec-tipo" style="padding:9px 12px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none">
+        <option value="general">📌 General</option>
+        <option value="medico">🏥 Médico</option>
+        <option value="trabajo">💼 Trabajo</option>
+        <option value="personal">👤 Personal</option>
+        <option value="urgente">🚨 Urgente</option>
+      </select>
+    </div>
+    <div id="prec-lista" style="padding:12px 0 0"></div>
+    <div id="prec-empty" class="empty-state" style="display:none"><div class="ei">🔔</div><p>Sin recordatorios</p><small>Añade un recordatorio arriba</small></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>Personal</div>
     <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
   </div>
 </div>
@@ -935,6 +1019,8 @@ async function cargarHome(){
     if(!lCesta)suscribirCesta();if(!lTareas)suscribirTareas();if(!lMedicos)suscribirMedicos();
     if(!lOtto)suscribirOtto();if(!lEventos)suscribirEventos();
     suscribirListasGuardadas();
+    suscribirPersonalTareas(); suscribirPersonalRec();
+    setTimeout(actualizarResumenDiario, 1200);
     if(ud.role==='hijo')document.querySelectorAll('.module-badge.padres').forEach(b=>b.closest('.module-card').style.opacity='.5');
     // Actualizar botón dark mode
     const t=localStorage.getItem('flb-theme')||'light';
@@ -1844,6 +1930,7 @@ window.guardarCita=async()=>{
       }
     }
     T('modal-cita').classList.remove('show');hideLoading();showToast('✅ Cita guardada');
+    actualizarResumenDiario();
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
 window.borrarCita=id=>db.ref('familias/'+familiaData.id+'/citas/'+id).remove();
@@ -1998,6 +2085,7 @@ window.guardarOtto=async()=>{
     T('modal-otto').classList.remove('show');
     T('otto-desc').value='';T('otto-importe').value='';T('otto-notas').value='';T('otto-proxima').value='';
     hideLoading();showToast('✅ Registro guardado');
+    actualizarResumenDiario();
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
 window.borrarOtto=id=>db.ref('familias/'+familiaData.id+'/otto/'+id).remove();
@@ -2075,6 +2163,240 @@ window.guardarEdicionTarea=async()=>{
     hideLoading();showToast('✅ Tarea actualizada');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
+
+// ===== MÓDULO PERSONAL =====
+let lPersonalTareas=null, lPersonalRec=null;
+let personalTareasFiltro='todas';
+
+window.abrirPersonal=()=>{
+  showScreen('personal');
+  const nombre=(currentUser.displayName||'').split(' ')[0]||'Mi';
+  T('personal-title-name').textContent=nombre+"'s Personal";
+  if(!lPersonalTareas) suscribirPersonalTareas();
+  if(!lPersonalRec) suscribirPersonalRec();
+  switchPersonalTab('tareas');
+};
+
+window.switchPersonalTab=tab=>{
+  const esTareas=tab==='tareas';
+  T('ppanel-tareas').style.display=esTareas?'flex':'none';
+  T('ppanel-recordatorios').style.display=esTareas?'none':'flex';
+  const tabT=T('ptab-tareas'), tabR=T('ptab-recordatorios');
+  tabT.style.color=esTareas?'var(--accent)':'var(--text3)';
+  tabT.style.borderBottomColor=esTareas?'var(--accent)':'transparent';
+  tabR.style.color=esTareas?'var(--text3)':'var(--accent)';
+  tabR.style.borderBottomColor=esTareas?'transparent':'var(--accent)';
+};
+
+// ── Tareas Personales ──
+function suscribirPersonalTareas(){
+  if(!currentUser) return;
+  lPersonalTareas=db.ref('users/'+currentUser.uid+'/personalTareas').on('value',snap=>{
+    renderPersonalTareas(snap.val()||{});
+    actualizarResumenDiario();
+  });
+}
+
+function renderPersonalTareas(data){
+  const lista=T('ptareas-lista'), empty=T('ptareas-empty');
+  if(!lista) return;
+  const h=hoy();
+  let entries=Object.entries(data).sort((a,b)=>(a[1].ts||0)-(b[1].ts||0));
+  if(personalTareasFiltro==='pendientes') entries=entries.filter(([,t])=>!t.hecha);
+  else if(personalTareasFiltro==='alta') entries=entries.filter(([,t])=>t.prioridad==='alta'&&!t.hecha);
+  else if(personalTareasFiltro==='completadas') entries=entries.filter(([,t])=>t.hecha);
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const PRIO={alta:{color:'#dc2626',bg:'#fef2f2',ico:'🔴'},normal:{color:'var(--text2)',bg:'var(--bg3)',ico:'⚪'},baja:{color:'#2563eb',bg:'#eff6ff',ico:'🔵'}};
+  lista.innerHTML=entries.map(([id,t])=>{
+    const p=PRIO[t.prioridad||'normal'];
+    const vencida=t.fechaLimite&&t.fechaLimite<h&&!t.hecha;
+    return `<div class="item-card" style="opacity:${t.hecha?.6:1};transition:opacity .2s">
+      <div onclick="togglePersonalTarea('${id}',${t.hecha?'false':'true'})" style="width:24px;height:24px;border-radius:50%;border:2px solid ${t.hecha?'var(--accent3)':'var(--border2)'};background:${t.hecha?'var(--accent3)':'transparent'};cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;transition:all .2s">${t.hecha?'✓':''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;text-decoration:${t.hecha?'line-through':''};color:${t.hecha?'var(--text3)':'var(--text)'}">${t.nombre||'—'}</div>
+        <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;padding:2px 7px;border-radius:8px;background:${p.bg};color:${p.color};font-weight:600">${p.ico} ${t.prioridad||'normal'}</span>
+          ${t.fechaLimite?`<span style="font-size:10px;color:${vencida?'#dc2626':'var(--text3)'}">📅 ${t.fechaLimite.split('-').reverse().join('/')}${vencida?' ⚠️':''}</span>`:''}
+        </div>
+      </div>
+      <div onclick="borrarPersonalTarea('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div>
+    </div>`;
+  }).join('');
+}
+
+window.addPersonalTarea=async()=>{
+  const nombre=T('ptarea-input').value.trim();
+  if(!nombre) return showToast('Escribe una tarea');
+  try{
+    await db.ref('users/'+currentUser.uid+'/personalTareas/pt_'+Date.now()).set({
+      nombre, prioridad:T('ptarea-prioridad').value,
+      fechaLimite:T('ptarea-fecha').value||null, hecha:false, ts:Date.now()
+    });
+    T('ptarea-input').value=''; T('ptarea-fecha').value='';
+    showToast('✅ Tarea añadida');
+  }catch(e){showToast('Error: '+e.message);}
+};
+
+window.togglePersonalTarea=async(id, hecha)=>{
+  await db.ref('users/'+currentUser.uid+'/personalTareas/'+id).update({hecha:hecha==='true'||hecha===true});
+};
+
+window.borrarPersonalTarea=id=>{
+  if(confirm('¿Eliminar esta tarea?')) db.ref('users/'+currentUser.uid+'/personalTareas/'+id).remove();
+};
+
+window.filtrarPersonalTareas=f=>{
+  personalTareasFiltro=f;
+  ['pft-todas','pft-pendientes','pft-alta','pft-completadas'].forEach(bid=>{
+    const b=T(bid); if(b) b.classList.toggle('active', bid==='pft-'+f);
+  });
+  db.ref('users/'+currentUser.uid+'/personalTareas').once('value').then(s=>renderPersonalTareas(s.val()||{}));
+};
+
+// ── Recordatorios Personales ──
+function suscribirPersonalRec(){
+  if(!currentUser) return;
+  lPersonalRec=db.ref('users/'+currentUser.uid+'/personalRecordatorios').on('value',snap=>{
+    renderPersonalRec(snap.val()||{});
+    actualizarResumenDiario();
+    const data=snap.val()||{};
+    const pend=Object.values(data).filter(r=>!r.hecho).length;
+    const b=T('badge-personal');
+    if(b){b.textContent=pend;b.style.display=pend>0?'block':'none';}
+  });
+}
+
+const REC_IC={general:'📌',medico:'🏥',trabajo:'💼',personal:'👤',urgente:'🚨'};
+function renderPersonalRec(data){
+  const lista=T('prec-lista'), empty=T('prec-empty');
+  if(!lista) return;
+  const h=hoy();
+  let entries=Object.entries(data).sort((a,b)=>{
+    const fa=a[1].fecha||'9999', fb=b[1].fecha||'9999';
+    return fa.localeCompare(fb) || (a[1].hora||'').localeCompare(b[1].hora||'');
+  });
+  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  lista.innerHTML=entries.map(([id,r])=>{
+    const esHoy=r.fecha===h, vencido=r.fecha&&r.fecha<h&&!r.hecho;
+    const ic=REC_IC[r.tipo||'general']||'📌';
+    return `<div class="item-card" style="opacity:${r.hecho?.55:1};border-left:3px solid ${esHoy?'var(--accent)':vencido?'#dc2626':'var(--border)'}">
+      <div style="font-size:22px;flex-shrink:0">${ic}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;text-decoration:${r.hecho?'line-through':''};color:${r.hecho?'var(--text3)':'var(--text)'}">${r.texto||'—'}</div>
+        <div style="font-size:11px;color:${vencido?'#dc2626':esHoy?'var(--accent)':'var(--text3)'};margin-top:2px">
+          ${r.fecha?'📅 '+r.fecha.split('-').reverse().join('/'):''}${r.hora?' · ⏰ '+r.hora:''}
+          ${esHoy?' · <strong style="color:var(--accent)">HOY</strong>':''}${vencido?' ⚠️ Vencido':''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div onclick="marcarRecordatorio('${id}',${!r.hecho})" style="width:26px;height:26px;border-radius:50%;border:2px solid ${r.hecho?'var(--accent3)':'var(--border2)'};background:${r.hecho?'var(--accent3)':'transparent'};cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:white">${r.hecho?'✓':''}</div>
+        <div onclick="borrarRecordatorio('${id}')" style="color:var(--text3);cursor:pointer;font-size:18px">×</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.addPersonalRecordatorio=async()=>{
+  const texto=T('prec-input').value.trim();
+  if(!texto) return showToast('Escribe un recordatorio');
+  try{
+    await db.ref('users/'+currentUser.uid+'/personalRecordatorios/rec_'+Date.now()).set({
+      texto, tipo:T('prec-tipo').value,
+      fecha:T('prec-fecha').value||null, hora:T('prec-hora').value||null,
+      hecho:false, ts:Date.now()
+    });
+    T('prec-input').value='';
+    showToast('🔔 Recordatorio añadido');
+  }catch(e){showToast('Error: '+e.message);}
+};
+
+window.marcarRecordatorio=async(id, hecho)=>{
+  await db.ref('users/'+currentUser.uid+'/personalRecordatorios/'+id).update({hecho});
+};
+
+window.borrarRecordatorio=id=>{
+  db.ref('users/'+currentUser.uid+'/personalRecordatorios/'+id).remove();
+};
+
+// ===== RESUMEN DIARIO DE PENDIENTES =====
+async function actualizarResumenDiario(){
+  if(!currentUser||!familiaData) return;
+  const h=hoy();
+  const items=[];
+
+  // 1. Citas médicas de hoy y mañana
+  try{
+    const manana=new Date(); manana.setDate(manana.getDate()+1);
+    const mananaStr=manana.toISOString().split('T')[0];
+    const cSnap=await db.ref('familias/'+familiaData.id+'/citas').once('value');
+    const citas=cSnap.val()||{};
+    Object.values(citas).forEach(c=>{
+      if(c.fecha===h) items.push({ic:'🏥',txt:`Cita médica: <strong>${c.especialidad||'Médico'}</strong>${c.hora?' a las '+c.hora:''}${c.miembroNombre?' · '+c.miembroNombre:''}`,tipo:'cita',urgente:true});
+      else if(c.fecha===mananaStr) items.push({ic:'🏥',txt:`Cita mañana: <strong>${c.especialidad||'Médico'}</strong>${c.hora?' a las '+c.hora:''}`,tipo:'cita',urgente:false});
+    });
+  }catch(e){}
+
+  // 2. Citas veterinarias Otto (proxima = hoy o mañana)
+  try{
+    const manana=new Date(); manana.setDate(manana.getDate()+1);
+    const mananaStr=manana.toISOString().split('T')[0];
+    const oSnap=await db.ref('familias/'+familiaData.id+'/otto').once('value');
+    const otto=oSnap.val()||{};
+    Object.values(otto).forEach(o=>{
+      if(o.proxima===h) items.push({ic:'🐾',txt:`Otto · <strong>${o.descripcion||o.tipo}</strong> hoy`,tipo:'otto',urgente:true});
+      else if(o.proxima===mananaStr) items.push({ic:'🐾',txt:`Otto · <strong>${o.descripcion||o.tipo}</strong> mañana`,tipo:'otto',urgente:false});
+    });
+  }catch(e){}
+
+  // 3. Tareas familiares vencidas o de hoy asignadas a mí
+  try{
+    const tSnap=await db.ref('familias/'+familiaData.id+'/tareas').once('value');
+    const tareas=tSnap.val()||{};
+    Object.values(tareas).forEach(t=>{
+      if(t.hecha) return;
+      const esMia=!t.asignadoA||t.asignadoA===currentUser.uid;
+      if(!esMia) return;
+      if(t.fechaLimite===h) items.push({ic:'✅',txt:`Tarea hoy: <strong>${t.nombre}</strong>`,tipo:'tarea',urgente:false});
+      else if(t.fechaLimite&&t.fechaLimite<h) items.push({ic:'⚠️',txt:`Tarea vencida: <strong>${t.nombre}</strong>`,tipo:'tarea',urgente:true});
+    });
+  }catch(e){}
+
+  // 4. Mis tareas personales pendientes de hoy o vencidas
+  try{
+    const ptSnap=await db.ref('users/'+currentUser.uid+'/personalTareas').once('value');
+    const ptareas=ptSnap.val()||{};
+    Object.values(ptareas).forEach(t=>{
+      if(t.hecha) return;
+      if(t.fechaLimite===h) items.push({ic:'👤',txt:`Personal hoy: <strong>${t.nombre}</strong>`,tipo:'personal',urgente:false});
+      else if(t.fechaLimite&&t.fechaLimite<h) items.push({ic:'⚠️',txt:`Personal vencida: <strong>${t.nombre}</strong>`,tipo:'personal',urgente:true});
+    });
+  }catch(e){}
+
+  // 5. Mis recordatorios de hoy
+  try{
+    const recSnap=await db.ref('users/'+currentUser.uid+'/personalRecordatorios').once('value');
+    const recs=recSnap.val()||{};
+    Object.values(recs).forEach(r=>{
+      if(r.hecho) return;
+      if(r.fecha===h) items.push({ic:REC_IC[r.tipo||'general']||'🔔',txt:`Recordatorio: <strong>${r.texto}</strong>${r.hora?' a las '+r.hora:''}`,tipo:'rec',urgente:false});
+    });
+  }catch(e){}
+
+  const card=T('resumen-diario');
+  const cont=T('resumen-items');
+  if(!items.length){if(card)card.style.display='none';return;}
+  card.style.display='block';
+  // Ordenar: urgentes primero
+  items.sort((a,b)=>(b.urgente?1:0)-(a.urgente?1:0));
+  cont.innerHTML=items.map(it=>`
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border-radius:10px;padding:7px 10px">
+      <span style="font-size:16px;flex-shrink:0">${it.ic}</span>
+      <span style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.4">${it.txt}</span>
+      ${it.urgente?'<span style="margin-left:auto;font-size:9px;background:#dc2626;color:white;border-radius:6px;padding:2px 6px;font-weight:700;flex-shrink:0">URGENTE</span>':''}
+    </div>`).join('');
+}
 
 // ===== AUTH STATE =====
 auth.onAuthStateChanged(async user=>{
