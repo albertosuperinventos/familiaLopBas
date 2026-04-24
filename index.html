@@ -1871,12 +1871,15 @@ Responde SOLO con JSON válido:
       }
     }
     if(resultado.establecimiento) T('gasto-nota').value=resultado.establecimiento;
-    // Guardar en historial precios — incluir gasolina como producto
+    // Guardar en historial precios
     let productos=resultado.productos||[];
     if(resultado.categoria==='vehiculo'&&resultado.litros&&resultado.precio_litro){
-      productos=[{nombre:'Gasolina ('+resultado.establecimiento+')',precio:resultado.precio_litro},...productos];
-      // Guardar litros en el campo km placeholder para que el usuario lo vea
+      productos=[{nombre:'Gasolina '+resultado.establecimiento,precio:resultado.precio_litro},...productos];
       showToast(`⛽ ${resultado.litros}L a ${resultado.precio_litro}€/L — selecciona vehículo`);
+    }
+    // Si no hay productos individuales, guardar el ticket como producto genérico
+    if(!productos.length && resultado.importe){
+      productos=[{nombre:resultado.establecimiento||'Compra', precio:parseFloat(resultado.importe)}];
     }
     if(productos.length&&familiaData){
       await guardarPreciosOCR(productos, resultado.establecimiento||'', resultado.fecha||hoy(), resultado.categoria||'otro');
