@@ -1822,18 +1822,18 @@ window.analizarTicket=async()=>{
           role:'user',
           content:[
             {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
-            {type:'text',text:`Analiza este ticket o factura y extrae datos. IMPORTANTE: en los nombres de productos NO uses comillas, apóstrofes ni caracteres especiales.
+            {type:'text',text:`Analiza este ticket y extrae TODOS los productos con su precio unitario. Usa nombres simples en mayúsculas sin caracteres especiales ni comillas. Si no puedes leer algún producto, escríbelo como PRODUCTO.
 
-Extrae:
-1. Importe total (número)
-2. Fecha (YYYY-MM-DD o null)
-3. Establecimiento (nombre corto, sin comillas)
-4. Categoria: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
-5. Si es gasolina: litros y precio_litro
-6. Lista de productos con precio (nombres simplificados sin caracteres especiales)
+Extrae también:
+- importe: total del ticket (número)
+- fecha: YYYY-MM-DD o null
+- establecimiento: nombre del supermercado o tienda (sin comillas)
+- categoria: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
+- litros: si es gasolina (número o null)
+- precio_litro: si es gasolina (número o null)
 
-Responde SOLO con JSON válido:
-{"importe":0,"fecha":"YYYY-MM-DD","establecimiento":"nombre","categoria":"cat","litros":null,"precio_litro":null,"productos":[{"nombre":"producto","precio":0}]}`}
+Responde SOLO con JSON válido sin backticks ni caracteres especiales en los textos:
+{"importe":0,"fecha":"YYYY-MM-DD","establecimiento":"NOMBRE","categoria":"cat","litros":null,"precio_litro":null,"productos":[{"nombre":"PRODUCTO","precio":0.00}]}`}
           ]
         }]
       })
@@ -1929,10 +1929,12 @@ function renderPrecios(){
     const minPrecio=Math.min(...sorted.map(r=>r.precio));
     const maxPrecio=Math.max(...sorted.map(r=>r.precio));
     const tendencia=sorted.length>1?(sorted[0].precio>sorted[1].precio?'📈':'📉'):'';
+    const idsParaBorrar=sorted.map(r=>`'${r.id}'`).join(',');
     return `<div class="item-card" style="flex-direction:column;align-items:flex-start;gap:4px">
       <div style="display:flex;align-items:center;width:100%;gap:8px">
         <div style="flex:1;font-weight:600">${g.producto||'—'} ${tendencia}</div>
         <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;color:var(--accent)">${fmtE(ultPrecio.precio)}</div>
+        <div onclick="borrarPrecioGrupo([${idsParaBorrar}])" style="color:var(--text3);cursor:pointer;font-size:18px;padding:4px">×</div>
       </div>
       <div style="font-size:11px;color:var(--text3);width:100%">
         ${CAT_IC[g.categoria]||'📦'} ${ultPrecio.establecimiento||''} · ${ultPrecio.fecha||''}
@@ -1941,6 +1943,14 @@ function renderPrecios(){
     </div>`;
   }).join('');
 }
+
+window.borrarPrecioGrupo=async ids=>{
+  if(!confirm(`¿Eliminar este producto y sus ${ids.length} registro(s)?`)) return;
+  for(const id of ids){
+    await db.ref('familias/'+familiaData.id+'/precios/'+id).remove();
+  }
+  showToast('✅ Eliminado');
+};
 
 window.filtrarPrecios=()=>{ filtroPreciosBusq=T('precios-buscar').value; renderPrecios(); };
 window.filtrarPreciosCat=cat=>{
