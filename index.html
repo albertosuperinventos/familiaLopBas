@@ -1822,16 +1822,18 @@ window.analizarTicket=async()=>{
           role:'user',
           content:[
             {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
-            {type:'text',text:`Analiza este ticket o factura y extrae:
-1. Importe total (número con decimales, sin símbolo €)
-2. Fecha (formato YYYY-MM-DD, si no aparece pon null)
-3. Establecimiento o tienda (nombre corto)
-4. Categoría: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
-5. Si es ticket de gasolina: litros (número), precio_litro (número €/L)
-6. Lista de productos con precio unitario (si aparecen)
+            {type:'text',text:`Analiza este ticket o factura y extrae datos. IMPORTANTE: en los nombres de productos NO uses comillas, apóstrofes ni caracteres especiales.
 
-Responde ÚNICAMENTE con JSON válido sin backticks:
-{"importe": número, "fecha": "YYYY-MM-DD o null", "establecimiento": "nombre", "categoria": "categoria", "litros": número_o_null, "precio_litro": número_o_null, "productos": [{"nombre": "producto", "precio": número}]}`}
+Extrae:
+1. Importe total (número)
+2. Fecha (YYYY-MM-DD o null)
+3. Establecimiento (nombre corto, sin comillas)
+4. Categoria: supermercado, restaurante, luz, agua, gas, telefono, ropa, colegio, medico, ocio, transporte, vehiculo, otro
+5. Si es gasolina: litros y precio_litro
+6. Lista de productos con precio (nombres simplificados sin caracteres especiales)
+
+Responde SOLO con JSON válido:
+{"importe":0,"fecha":"YYYY-MM-DD","establecimiento":"nombre","categoria":"cat","litros":null,"precio_litro":null,"productos":[{"nombre":"producto","precio":0}]}`}
           ]
         }]
       })
@@ -1840,7 +1842,23 @@ Responde ÚNICAMENTE con JSON válido sin backticks:
     if(!response.ok)throw new Error(data.error?.message||'Error API '+response.status);
     const textoRaw=data.content[0].text.trim();
     const textoLimpio=textoRaw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-    const resultado=JSON.parse(textoLimpio);
+    let resultado;
+    try {
+      resultado=JSON.parse(textoLimpio);
+    } catch(parseErr){
+      // Intentar extraer solo los campos básicos con regex si el JSON falla
+      const imp = textoLimpio.match(/"importe"\s*:\s*([\d.]+)/);
+      const fec = textoLimpio.match(/"fecha"\s*:\s*"([^"]+)"/);
+      const est = textoLimpio.match(/"establecimiento"\s*:\s*"([^"]+)"/);
+      const cat = textoLimpio.match(/"categoria"\s*:\s*"([^"]+)"/);
+      resultado = {
+        importe: imp ? parseFloat(imp[1]) : null,
+        fecha: fec ? fec[1] : null,
+        establecimiento: est ? est[1] : null,
+        categoria: cat ? cat[1] : null,
+        productos: []
+      };
+    }
     if(resultado.importe) T('gasto-importe').value=resultado.importe;
     if(resultado.fecha&&resultado.fecha!=='null') T('gasto-fecha').value=resultado.fecha;
     if(resultado.categoria){
