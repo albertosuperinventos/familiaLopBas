@@ -642,10 +642,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       </div>
       <div style="display:flex;gap:12px;margin-top:4px">
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="personal-aviso-email" style="accent-color:var(--accent)"> 📧 Email
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="personal-aviso-telegram" style="accent-color:var(--accent)"> ✈️ Telegram
+          <input type="checkbox" id="personal-aviso-telegram" style="accent-color:var(--accent)" checked> ✈️ Aviso por Telegram
         </label>
       </div>
     </div>
@@ -2512,7 +2509,6 @@ window.guardarPersonal = async () => {
   const avisoTipo = T('personal-aviso-tipo').value;
   const avisoHora = T('personal-aviso-hora').value;
   const avisoXhoras = T('personal-aviso-xhoras').value;
-  const avisoEmail = T('personal-aviso-email').checked;
   const avisoTelegram = T('personal-aviso-telegram').checked;
   try {
     await db.ref('users/' + currentUser.uid + '/personal/' + id).set({
@@ -2521,21 +2517,19 @@ window.guardarPersonal = async () => {
       fecha: T('personal-fecha').value || null,
       hora: T('personal-hora').value || null,
       prioridad: T('personal-prioridad').value,
-      aviso: { tipo: avisoTipo, hora: avisoHora, xhoras: avisoXhoras, email: avisoEmail, telegram: avisoTelegram },
+      aviso: { tipo: avisoTipo, hora: avisoHora, xhoras: avisoXhoras, telegram: avisoTelegram },
       hecho: false,
       ts: Date.now()
     });
     T('modal-personal').classList.remove('show');
     showToast('✅ Guardado');
-    // Programar aviso si hay configuración
-    if(avisoTipo !== 'ninguno' && (avisoEmail || avisoTelegram)){
-      await programarAvisoPersonal(id, texto, T('personal-fecha').value, avisoTipo, avisoHora, avisoXhoras, avisoEmail, avisoTelegram);
+    if(avisoTipo !== 'ninguno' && avisoTelegram){
+      await programarAvisoPersonal(id, texto, T('personal-fecha').value, avisoTipo, avisoHora, avisoXhoras, avisoTelegram);
     }
   } catch (e) { showToast('Error: ' + e.message); }
 };
 
-async function programarAvisoPersonal(id, texto, fecha, tipo, hora, xhoras, email, telegram){
-  // Calcular timestamp del aviso
+async function programarAvisoPersonal(id, texto, fecha, tipo, hora, xhoras, telegram){
   let tsAviso = null;
   const ahora = new Date();
   if(tipo === 'x-horas'){
@@ -2547,11 +2541,8 @@ async function programarAvisoPersonal(id, texto, fecha, tipo, hora, xhoras, emai
     tsAviso = d.getTime();
   }
   if(!tsAviso || tsAviso <= Date.now()) return;
-  // Guardar el aviso en Firebase para que el bot lo procese
   await db.ref('users/'+currentUser.uid+'/avisosPersonales/av_'+Date.now()).set({
-    tareaId: id, texto, tsAviso, email, telegram,
-    emailAddr: (await dbG('users/'+currentUser.uid+'/email'))||'',
-    enviado: false, ts: Date.now()
+    tareaId: id, texto, tsAviso, telegram, enviado: false, ts: Date.now()
   });
   showToast('🔔 Aviso programado para '+new Date(tsAviso).toLocaleString('es-ES',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}));
 }
