@@ -2562,11 +2562,17 @@ window.guardarPersonal = async () => {
 
 async function programarAvisoPersonal(id, texto, fecha, tipo, hora, xhoras, telegram){
   let tsAviso = null;
-  const ahora = new Date();
   if(tipo === 'x-horas'){
     tsAviso = Date.now() + (parseInt(xhoras)||1) * 3600000;
-  } else if(tipo === 'hora-fija' && fecha && hora){
-    tsAviso = new Date(fecha+'T'+hora).getTime();
+  } else if(tipo === 'hora-fija' && hora){
+    // Si no hay fecha, usar hoy
+    const fechaBase = fecha || hoy();
+    tsAviso = new Date(fechaBase+'T'+hora).getTime();
+    // Si ya pasó hoy, programar para mañana
+    if(tsAviso <= Date.now()){
+      const manana = new Date(); manana.setDate(manana.getDate()+1);
+      tsAviso = new Date(manana.toISOString().split('T')[0]+'T'+hora).getTime();
+    }
   } else if(tipo === 'dia-antes' && fecha && hora){
     const d = new Date(fecha+'T'+hora); d.setDate(d.getDate()-1);
     tsAviso = d.getTime();
@@ -2575,7 +2581,7 @@ async function programarAvisoPersonal(id, texto, fecha, tipo, hora, xhoras, tele
   await db.ref('users/'+currentUser.uid+'/avisosPersonales/av_'+Date.now()).set({
     tareaId: id, texto, tsAviso, telegram, enviado: false, ts: Date.now()
   });
-  showToast('🔔 Aviso programado para '+new Date(tsAviso).toLocaleString('es-ES',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}));
+  showToast('🔔 Aviso: '+new Date(tsAviso).toLocaleString('es-ES',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}));
 }
 
 // ===== AUTH STATE =====
