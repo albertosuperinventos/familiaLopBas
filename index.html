@@ -282,6 +282,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="pm-item">👤 Rol: <span id="mi-rol-label" style="color:var(--accent);margin-left:4px">—</span></div>
       <div class="pm-item" onclick="toggleDarkMode()" id="dark-toggle-btn">🌙 Modo oscuro</div>
       <div class="pm-item" onclick="abrirConfigApiKey()">🔑 API Key Claude</div>
+      <div class="pm-item" onclick="mostrarConfigEmail()">📧 Email notificaciones</div>
       <div class="pm-item" onclick="mostrarVinculacionTelegram()">✈️ Vincular Telegram</div>
       <div class="pm-item" onclick="descargarIcono()">💾 Guardar icono</div>
       <div class="pm-divider"></div>
@@ -1001,6 +1002,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Comparte con tu familia para unirse</div>
     <button class="btn-primary" onclick="copiarCodigo()">📋 Copiar código</button>
     <button class="btn-sec" onclick="document.getElementById('modal-codigo').classList.remove('show')">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL EMAIL NOTIFICACIONES -->
+<div class="modal-overlay" id="modal-email-notif">
+  <div class="modal-sheet" style="text-align:center">
+    <div class="modal-handle"></div>
+    <div style="font-size:40px;margin-bottom:8px">📧</div>
+    <div class="modal-title">Email de notificaciones</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5">Email Gmail donde recibirás los avisos personales. Debe ser una cuenta <strong>@gmail.com</strong>.</p>
+    <div class="fg" style="text-align:left">
+      <label>Email Gmail</label>
+      <input type="email" id="email-notif-input" placeholder="tucuenta@gmail.com" autocomplete="email">
+    </div>
+    <div id="email-notif-estado" style="font-size:13px;padding:8px;border-radius:var(--radius-sm);margin-bottom:12px;display:none"></div>
+    <button class="btn-primary" onclick="guardarEmailNotif()">💾 Guardar</button>
+    <button class="btn-sec" onclick="T('modal-email-notif').classList.remove('show')">Cerrar</button>
   </div>
 </div>
 
@@ -2479,6 +2497,33 @@ window.guardarNota = async () => {
 };
 window.borrarNota = id => { if(confirm('¿Eliminar esta nota?')) db.ref('users/'+currentUser.uid+'/notas/'+id).remove(); };
 
+// ── EMAIL NOTIFICACIONES ──
+window.mostrarConfigEmail = async () => {
+  T('profile-menu').classList.remove('open');
+  const emailActual = await db.ref('users/'+currentUser.uid+'/emailNotif').once('value').then(s=>s.val()) || '';
+  T('email-notif-input').value = emailActual;
+  const estado = T('email-notif-estado');
+  if(emailActual) {
+    estado.style.display='block';
+    estado.style.background='#dcfce7';estado.style.color='#15803d';
+    estado.textContent='✅ Email configurado: '+emailActual;
+  } else {
+    estado.style.display='none';
+  }
+  T('modal-email-notif').classList.add('show');
+};
+window.guardarEmailNotif = async () => {
+  const email = T('email-notif-input').value.trim().toLowerCase();
+  if(!email) return showToast('Escribe un email');
+  if(!email.includes('@gmail.com')) return showToast('⚠️ Debe ser una cuenta @gmail.com');
+  await db.ref('users/'+currentUser.uid+'/emailNotif').set(email);
+  const estado = T('email-notif-estado');
+  estado.style.display='block';
+  estado.style.background='#dcfce7';estado.style.color='#15803d';
+  estado.textContent='✅ Guardado: '+email;
+  showToast('📧 Email de notificaciones guardado');
+};
+
 // ── VINCULACIÓN TELEGRAM PERSONAL ──
 function generarCodigoVinculacion(uid){
   // Código determinista basado en uid — 6 caracteres alfanuméricos
@@ -2595,9 +2640,13 @@ async function programarAvisosPersonales(id, texto, fecha, hora, telegram, email
 
   if (!tsAvisos.length) return;
 
+  // Recuperar emailAddr de notificaciones guardado en el perfil
+  const emailAddr = await db.ref('users/' + currentUser.uid + '/emailNotif').once('value').then(s => s.val()) || null;
+
   // Guardar UN solo documento de aviso con el array tsAvisos
   await db.ref('users/' + currentUser.uid + '/avisosPersonales/av_' + Date.now()).set({
     tareaId: id, texto, telegram, email,
+    emailAddr,
     tsAvisos,
     ts: Date.now()
   });
