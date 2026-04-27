@@ -620,29 +620,46 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <option value="baja">🔵 Baja</option>
       </select>
     </div>
-    <!-- Aviso personal -->
-    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">🔔 Aviso personal</div>
-      <div class="fg" style="margin-bottom:8px">
-        <label>Cuándo avisar</label>
-        <select id="personal-aviso-tipo">
-          <option value="ninguno">Sin aviso</option>
-          <option value="hora-fija">A una hora fija del día</option>
-          <option value="dia-antes">El día antes</option>
-          <option value="x-horas">En X horas desde ahora</option>
-        </select>
+    <!-- Aviso personal MULTI -->
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">🔔 Avisos personales</div>
+
+      <!-- Aviso: día antes -->
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:8px;border:1.5px solid var(--border)">
+        <input type="checkbox" id="av-dia-antes" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0">
+        <label for="av-dia-antes" style="font-size:13px;font-weight:600;flex:1;cursor:pointer">📅 El día antes</label>
+        <input type="time" id="av-dia-antes-hora" value="18:00" style="padding:6px 8px;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:90px">
       </div>
-      <div class="fg" id="personal-aviso-hora-group" style="display:none">
-        <label>Hora del aviso</label>
-        <input type="time" id="personal-aviso-hora" value="09:00">
+
+      <!-- Aviso: mismo día -->
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:8px;border:1.5px solid var(--border)">
+        <input type="checkbox" id="av-mismo-dia" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0">
+        <label for="av-mismo-dia" style="font-size:13px;font-weight:600;flex:1;cursor:pointer">⏰ El mismo día</label>
+        <input type="time" id="av-mismo-dia-hora" value="09:00" style="padding:6px 8px;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:90px">
       </div>
-      <div class="fg" id="personal-aviso-xhoras-group" style="display:none">
-        <label>Horas desde ahora</label>
-        <input type="number" id="personal-aviso-xhoras" placeholder="Ej: 2" min="1" max="72">
+
+      <!-- Aviso: hora fija (sin fecha necesaria) -->
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:8px;border:1.5px solid var(--border)">
+        <input type="checkbox" id="av-hora-fija" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0">
+        <label for="av-hora-fija" style="font-size:13px;font-weight:600;flex:1;cursor:pointer">🕐 Hora fija hoy</label>
+        <input type="time" id="av-hora-fija-hora" value="08:00" style="padding:6px 8px;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:90px">
       </div>
-      <div style="display:flex;gap:12px;margin-top:4px">
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="personal-aviso-telegram" style="accent-color:var(--accent)" checked> ✈️ Aviso por Telegram
+
+      <!-- Aviso: en X horas -->
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:12px;border:1.5px solid var(--border)">
+        <input type="checkbox" id="av-x-horas" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0">
+        <label for="av-x-horas" style="font-size:13px;font-weight:600;flex:1;cursor:pointer">⏱️ En X horas</label>
+        <input type="number" id="av-x-horas-num" min="1" max="72" value="2" style="padding:6px 8px;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:70px;text-align:center">
+        <span style="font-size:12px;color:var(--text2)">h</span>
+      </div>
+
+      <!-- Canales de envío -->
+      <div style="display:flex;gap:16px;padding-top:8px;border-top:1px solid var(--border)">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:600">
+          <input type="checkbox" id="personal-aviso-telegram" style="accent-color:var(--accent)" checked> ✈️ Telegram
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:600">
+          <input type="checkbox" id="personal-aviso-email" style="accent-color:var(--accent)"> 📧 Email
         </label>
       </div>
     </div>
@@ -2353,6 +2370,10 @@ window.abrirModalPersonal = () => {
   T('personal-fecha').value = '';
   T('personal-hora').value = '';
   T('personal-prioridad').value = 'normal';
+  // Reset checkboxes de avisos
+  ['av-dia-antes','av-mismo-dia','av-hora-fija','av-x-horas'].forEach(id => { const el=T(id); if(el) el.checked=false; });
+  T('personal-aviso-telegram').checked = true;
+  T('personal-aviso-email').checked = false;
   T('modal-personal').classList.add('show');
 };
 
@@ -2367,25 +2388,6 @@ window.editarPersonal = async id => {
   T('personal-hora').value = snap.hora || '';
   T('personal-prioridad').value = snap.prioridad || 'normal';
   T('modal-personal').classList.add('show');
-};
-
-window.guardarPersonal = async () => {
-  const texto = T('personal-texto').value.trim();
-  if (!texto) return showToast('Escribe una descripción');
-  const id = T('personal-edit-id').value || ('p_' + Date.now());
-  try {
-    await db.ref('users/' + currentUser.uid + '/personal/' + id).set({
-      tipo: T('personal-tipo').value,
-      texto,
-      fecha: T('personal-fecha').value || null,
-      hora: T('personal-hora').value || null,
-      prioridad: T('personal-prioridad').value,
-      hecho: false,
-      ts: Date.now()
-    });
-    T('modal-personal').classList.remove('show');
-    showToast('✅ Guardado');
-  } catch (e) { showToast('Error: ' + e.message); }
 };
 
 window.togglePersonal = async (id, hecho) => {
@@ -2477,12 +2479,6 @@ window.guardarNota = async () => {
 };
 window.borrarNota = id => { if(confirm('¿Eliminar esta nota?')) db.ref('users/'+currentUser.uid+'/notas/'+id).remove(); };
 
-// ── AVISOS MODAL PERSONAL ──
-T('personal-aviso-tipo').addEventListener('change', function(){
-  T('personal-aviso-hora-group').style.display = this.value==='hora-fija'||this.value==='dia-antes' ? 'block':'none';
-  T('personal-aviso-xhoras-group').style.display = this.value==='x-horas' ? 'block':'none';
-});
-
 // ── VINCULACIÓN TELEGRAM PERSONAL ──
 function generarCodigoVinculacion(uid){
   // Código determinista basado en uid — 6 caracteres alfanuméricos
@@ -2532,56 +2528,84 @@ window.descargarIcono = () => {
   showToast('📥 Icono descargado — asígnalo manualmente al acceso directo');
 };
 
-// ── GUARDAR PERSONAL CON AVISO ──
+// ── GUARDAR PERSONAL CON MULTI-AVISO ──
 window.guardarPersonal = async () => {
   const texto = T('personal-texto').value.trim();
   if (!texto) return showToast('Escribe una descripción');
   const id = T('personal-edit-id').value || ('p_' + Date.now());
-  const avisoTipo = T('personal-aviso-tipo').value;
-  const avisoHora = T('personal-aviso-hora').value;
-  const avisoXhoras = T('personal-aviso-xhoras').value;
+  const fecha = T('personal-fecha').value || null;
+  const hora  = T('personal-hora').value  || null;
   const avisoTelegram = T('personal-aviso-telegram').checked;
+  const avisoEmail    = T('personal-aviso-email').checked;
+
   try {
     await db.ref('users/' + currentUser.uid + '/personal/' + id).set({
       tipo: T('personal-tipo').value,
-      texto,
-      fecha: T('personal-fecha').value || null,
-      hora: T('personal-hora').value || null,
+      texto, fecha, hora,
       prioridad: T('personal-prioridad').value,
-      aviso: { tipo: avisoTipo, hora: avisoHora, xhoras: avisoXhoras, telegram: avisoTelegram },
       hecho: false,
       ts: Date.now()
     });
     T('modal-personal').classList.remove('show');
     showToast('✅ Guardado');
-    if(avisoTipo !== 'ninguno' && avisoTelegram){
-      await programarAvisoPersonal(id, texto, T('personal-fecha').value, avisoTipo, avisoHora, avisoXhoras, avisoTelegram);
+
+    // Recoger los avisos marcados y programarlos
+    if (avisoTelegram || avisoEmail) {
+      await programarAvisosPersonales(id, texto, fecha, hora, avisoTelegram, avisoEmail);
     }
   } catch (e) { showToast('Error: ' + e.message); }
 };
 
-async function programarAvisoPersonal(id, texto, fecha, tipo, hora, xhoras, telegram){
-  let tsAviso = null;
-  if(tipo === 'x-horas'){
-    tsAviso = Date.now() + (parseInt(xhoras)||1) * 3600000;
-  } else if(tipo === 'hora-fija' && hora){
-    // Si no hay fecha, usar hoy
-    const fechaBase = fecha || hoy();
-    tsAviso = new Date(fechaBase+'T'+hora).getTime();
-    // Si ya pasó hoy, programar para mañana
-    if(tsAviso <= Date.now()){
-      const manana = new Date(); manana.setDate(manana.getDate()+1);
-      tsAviso = new Date(manana.toISOString().split('T')[0]+'T'+hora).getTime();
-    }
-  } else if(tipo === 'dia-antes' && fecha && hora){
-    const d = new Date(fecha+'T'+hora); d.setDate(d.getDate()-1);
-    tsAviso = d.getTime();
+async function programarAvisosPersonales(id, texto, fecha, hora, telegram, email) {
+  const ahora = Date.now();
+  const tsAvisos = [];
+
+  // Día antes
+  if (T('av-dia-antes').checked && fecha) {
+    const horaDA = T('av-dia-antes-hora').value || '18:00';
+    const d = new Date(fecha + 'T' + horaDA);
+    d.setDate(d.getDate() - 1);
+    if (d.getTime() > ahora) tsAvisos.push({ tipo: 'dia-antes', ts: d.getTime(), enviado: false });
   }
-  if(!tsAviso || tsAviso <= Date.now()) return;
-  await db.ref('users/'+currentUser.uid+'/avisosPersonales/av_'+Date.now()).set({
-    tareaId: id, texto, tsAviso, telegram, enviado: false, ts: Date.now()
+
+  // Mismo día
+  if (T('av-mismo-dia').checked && fecha) {
+    const horaSD = T('av-mismo-dia-hora').value || '09:00';
+    const d = new Date(fecha + 'T' + horaSD);
+    if (d.getTime() > ahora) tsAvisos.push({ tipo: 'mismo-dia', ts: d.getTime(), enviado: false });
+  }
+
+  // Hora fija hoy (o fecha si está puesta)
+  if (T('av-hora-fija').checked) {
+    const horaHF = T('av-hora-fija-hora').value || '08:00';
+    const fechaBase = fecha || hoy();
+    let d = new Date(fechaBase + 'T' + horaHF);
+    if (d.getTime() <= ahora) {
+      // si ya pasó, programar mañana
+      d = new Date(d.getTime() + 86400000);
+    }
+    tsAvisos.push({ tipo: 'hora-fija', ts: d.getTime(), enviado: false });
+  }
+
+  // En X horas
+  if (T('av-x-horas').checked) {
+    const horas = parseInt(T('av-x-horas-num').value) || 2;
+    tsAvisos.push({ tipo: 'x-horas', ts: ahora + horas * 3600000, enviado: false });
+  }
+
+  if (!tsAvisos.length) return;
+
+  // Guardar UN solo documento de aviso con el array tsAvisos
+  await db.ref('users/' + currentUser.uid + '/avisosPersonales/av_' + Date.now()).set({
+    tareaId: id, texto, telegram, email,
+    tsAvisos,
+    ts: Date.now()
   });
-  showToast('🔔 Aviso: '+new Date(tsAviso).toLocaleString('es-ES',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}));
+
+  // Toast con el primer aviso próximo
+  const primero = tsAvisos.reduce((a, b) => a.ts < b.ts ? a : b);
+  showToast('🔔 ' + tsAvisos.length + ' aviso(s) · próximo: ' +
+    new Date(primero.ts).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }));
 }
 
 // ===== AUTH STATE =====
