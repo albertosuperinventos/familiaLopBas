@@ -507,8 +507,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <button onclick="abrirModalEvento()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#e11d48,#fb7185);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
   </div>
   <div class="filter-bar">
-    <button class="chip active" id="fev-todos" onclick="filtrarEventos('todos')">Todos</button>
-    <button class="chip" id="fev-proximos" onclick="filtrarEventos('proximos')">Próximos</button>
+    <button class="chip" id="fev-todos" onclick="filtrarEventos('todos')">Todos</button>
+    <button class="chip active" id="fev-proximos" onclick="filtrarEventos('proximos')">Próximos</button>
     <button class="chip" id="fev-mes" onclick="filtrarEventos('mes')">Este mes</button>
     <button class="chip" id="fev-pasados" onclick="filtrarEventos('pasados')">Pasados</button>
   </div>
@@ -1169,7 +1169,7 @@ function toggleDarkMode(){
 })();
 
 // ── EVENTOS ──
-let filtroEv='todos';
+let filtroEv='proximos';
 const EV_IC={cumpleaños:'🎂',comunion:'⛪',boda:'💍',partido:'⚽',torneo:'🏆',graduacion:'🎓',fiesta:'🎉',viaje:'✈️',otro:'📅'};
 
 window.abrirEventos=()=>{showScreen('eventos');if(familiaData&&!lEventos)suscribirEventos();};
