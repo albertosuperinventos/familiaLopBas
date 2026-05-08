@@ -205,6 +205,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 #panel-notas-personal{display:none;flex-direction:column;flex:1}
 .ptab-active{color:var(--accent)!important;border-bottom-color:var(--accent)!important}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -2312,27 +2313,33 @@ window.exportarGastosExcel = async () => {
       .filter(([,g]) => g.fecha >= fechaDesde && g.fecha <= fechaHasta)
       .sort((a,b) => (a[1].fecha||'').localeCompare(b[1].fecha||''));
 
-    // Generar CSV con dos secciones: detalle y resumen por categoría
-    const sep = ';';
-    let csv = '\uFEFF';
+    const total = entries.reduce((s,[,g]) => s + parseFloat(g.importe||0), 0);
 
-    // Sección 1: Detalle
-    csv += `GASTOS FAMILIA — ${fechaDesde} a ${fechaHasta}\n`;
-    csv += `Fecha${sep}Categoría${sep}Nota${sep}Importe (€)${sep}Autor\n`;
+    // ── HOJA 1: Gastos Total ──
+    const datosHoja1 = [['Fecha','Categoría','Nota','Importe (€)','Autor']];
     entries.forEach(([,g]) => {
-      const fecha = g.fecha||'';
-      const cat = g.categoria||'otro';
-      const nota = (g.nota||'').replace(/;/g,',');
-      const imp = parseFloat(g.importe||0).toFixed(2).replace('.',',');
-      const autor = g.autor||'';
-      csv += `${fecha}${sep}${cat}${sep}${nota}${sep}${imp}${sep}${autor}\n`;
+      datosHoja1.push([
+        g.fecha||'',
+        g.categoria||'otro',
+        g.nota||'',
+        parseFloat(g.importe||0),
+        g.autor||''
+      ]);
     });
-    const total = entries.reduce((s,[,g])=>s+parseFloat(g.importe||0),0);
-    csv += `\n${sep}${sep}TOTAL${sep}${total.toFixed(2).replace('.',',')}\n`;
+    datosHoja1.push(['','','TOTAL', total, '']);
 
-    // Sección 2: Resumen por categoría
-    csv += `\nRESUMEN POR CATEGORÍA\n`;
-    csv += `Categoría${sep}Nº Gastos${sep}Total (€)${sep}% sobre Total\n`;
+    const ws1 = XLSX.utils.aoa_to_sheet(datosHoja1);
+
+    // Ancho columnas hoja1
+    ws1['!cols'] = [{wch:12},{wch:14},{wch:40},{wch:12},{wch:14}];
+
+    // Formato moneda columna D (importe)
+    for(let i = 2; i <= entries.length + 2; i++) {
+      const cell = ws1[`D${i}`];
+      if(cell) cell.z = '#,##0.00 €';
+    }
+
+    // ── HOJA 2: Por Categoría ──
     const porCat = {};
     entries.forEach(([,g]) => {
       const c = g.categoria||'otro';
@@ -2340,20 +2347,37 @@ window.exportarGastosExcel = async () => {
       porCat[c].count++;
       porCat[c].total += parseFloat(g.importe||0);
     });
+
+    const datosHoja2 = [['Categoría','Nº Gastos','Total (€)','% sobre Total']];
     Object.entries(porCat)
       .sort((a,b) => b[1].total - a[1].total)
       .forEach(([cat, d]) => {
-        const pct = total > 0 ? (d.total/total*100).toFixed(1).replace('.',',') : '0,0';
-        csv += `${cat}${sep}${d.count}${sep}${d.total.toFixed(2).replace('.',',')}${sep}${pct}%\n`;
+        datosHoja2.push([
+          cat.toUpperCase(),
+          d.count,
+          d.total,
+          total > 0 ? d.total/total : 0
+        ]);
       });
+    datosHoja2.push(['TOTAL', entries.length, total, 1]);
 
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `gastos_familia_${fechaDesde}_${fechaHasta}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const ws2 = XLSX.utils.aoa_to_sheet(datosHoja2);
+    ws2['!cols'] = [{wch:16},{wch:12},{wch:14},{wch:16}];
+
+    // Formato moneda y porcentaje hoja2
+    for(let i = 2; i <= Object.keys(porCat).length + 2; i++) {
+      const c3 = ws2[`C${i}`]; if(c3) c3.z = '#,##0.00 €';
+      const d4 = ws2[`D${i}`]; if(d4) d4.z = '0.0%';
+    }
+
+    // ── Libro y descarga ──
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws1, 'Gastos Total');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Por Categoría');
+
+    const nombreArchivo = `gastos_familia_${fechaDesde}_${fechaHasta}.xlsx`;
+    XLSX.writeFile(wb, nombreArchivo);
+
     hideLoading();
     showToast(`✅ Excel descargado (${entries.length} gastos)`);
   } catch(err) { hideLoading(); showToast('Error: '+err.message); }
