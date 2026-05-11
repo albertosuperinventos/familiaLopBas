@@ -2751,6 +2751,7 @@ async function renderMenuSemana() {
     card.style.cssText = `min-width:100px;max-width:100px;background:var(--bg2);border-radius:14px;padding:12px 10px;cursor:pointer;
       border:${seleccionado ? '2px solid var(--accent)' : esHoy ? '2px solid var(--accent3)' : '1px solid var(--border)'};
       flex-shrink:0;transition:all .2s`;
+    const fechaDiaCard = new Date(key + 'T12:00:00');
     card.onclick = () => { menuDiaSeleccionado = key; renderMenuSemana(); };
 
     const diaLabel = DIAS_SEMANA[i];
@@ -2785,7 +2786,8 @@ async function renderMenuSemana() {
 
   // Render detalle
   const datos = menuData[menuDiaSeleccionado] || {};
-  const fechaDet = new Date(menuDiaSeleccionado + 'T12:00:00');
+  const [y,m,d] = menuDiaSeleccionado.split('-').map(Number);
+  const fechaDet = new Date(y, m-1, d);
   const diaIdx = fechaDet.getDay() === 0 ? 6 : fechaDet.getDay() - 1;
   const diaTexto = DIAS_SEMANA[diaIdx] + ' ' + formatFechaMini(fechaDet);
 
