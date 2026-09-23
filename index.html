@@ -157,7 +157,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .foto-prev img{width:100%;height:100%;object-fit:cover}
 .gasto-total{margin:16px 16px 0;background:linear-gradient(135deg,#6c63ff,#a78bfa);border-radius:var(--radius);padding:20px;color:white;box-shadow:0 4px 16px rgba(108,99,255,.3)}
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 0}
-.cat-card{background:white;border-radius:var(--radius-sm);padding:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.cat-card{background:white;border-radius:var(--radius-sm);padding:12px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;transition:border-color .15s}
+.cat-card.activa{border:2px solid var(--accent);padding:11px}
+.gf-row{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 0;scrollbar-width:none}
+.gf-row::-webkit-scrollbar{display:none}
+.gf-row.sub .chip{border-color:#f59e0b;color:#d97706}
+.gf-row.sub .chip.active{background:#f59e0b;border-color:#f59e0b;color:white}
+.btn-asignar{margin-top:6px;padding:4px 10px;border:1.5px solid #f59e0b;background:transparent;color:#d97706;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer}
+.vh-gastos{background:var(--bg);border-top:1px solid var(--border)}
+.vh-gasto{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.vh-gasto:last-child{border-bottom:none}
 .cita-card{background:white;border-radius:var(--radius-sm);margin:0 16px 10px;box-shadow:var(--shadow);border:1px solid var(--border)}
 .cita-date-box{background:linear-gradient(135deg,#00d4ff,#0ea5e9);border-radius:10px;padding:8px 10px;text-align:center;color:white;min-width:46px;flex-shrink:0}
 .vh-card{background:white;border-radius:var(--radius);margin:0 16px 12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden}
@@ -490,9 +499,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <!-- Gráfica últimos 6 meses -->
     <div id="gastos-grafica" class="grafica-wrap"></div>
     <div class="cat-grid" id="gastos-cats"></div>
-    <div style="padding:16px 16px 0;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Movimientos</div>
+    <div id="gastos-filtros"></div>
+    <div id="gastos-mov-header" style="padding:16px 16px 0;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Movimientos</div>
     <div id="gastos-lista" style="padding:8px 0 0"></div>
-    <div id="gastos-empty" class="empty-state" style="display:none"><div class="ei">💶</div><p>Sin gastos este mes</p><small>Pulsa + Añadir para registrar uno</small></div>
+    <div id="gastos-empty" class="empty-state" style="display:none"><div class="ei">💶</div><p id="gastos-empty-p">Sin gastos este mes</p><small id="gastos-empty-s">Pulsa + Añadir para registrar uno</small></div>
   </div>
   <div class="bottom-nav">
     <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
@@ -832,10 +842,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <!-- Tipo gasto vehículo -->
     <div class="fg" id="gasto-vh-tipo-group" style="display:none">
       <label>Tipo</label>
-      <select id="gasto-vh-tipo">
+      <select id="gasto-vh-tipo" onchange="actualizarLitrosGasto()">
         <option value="gasolina">⛽ Gasolina</option><option value="averia">🔧 Avería</option>
         <option value="seguro">🛡️ Seguro</option><option value="itv">🔍 ITV</option><option value="otro">📦 Otro</option>
       </select>
+    </div>
+    <div class="fg" id="gasto-vh-litros-group" style="display:none">
+      <label>Litros (opcional)</label>
+      <input type="number" id="gasto-vh-litros" placeholder="0,00" step="0.01">
     </div>
     <div class="fg" id="gasto-vh-km-group" style="display:none">
       <label>Km actuales (opcional)</label>
@@ -921,6 +935,28 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="fg"><label>Nota</label><input type="text" id="vhg-nota" placeholder="Descripción..."></div>
     <button class="btn-primary" onclick="guardarGastoVehiculo()">Guardar</button>
     <button class="btn-sec" onclick="document.getElementById('modal-gasto-vh').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL ASIGNAR VEHÍCULO A GASTO -->
+<div class="modal-overlay" id="modal-asignar-vh">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Asignar vehículo</div>
+    <div id="asig-info" style="font-size:13px;color:var(--text2);margin-bottom:14px"></div>
+    <div class="fg"><label>Vehículo</label><select id="asig-vh"></select></div>
+    <div class="fg"><label>Tipo</label>
+      <select id="asig-tipo" onchange="document.getElementById('asig-litros-group').style.display=this.value==='gasolina'?'block':'none'">
+        <option value="gasolina">⛽ Gasolina</option><option value="averia">🔧 Avería</option>
+        <option value="seguro">🛡️ Seguro</option><option value="itv">🔍 ITV</option><option value="otro">📦 Otro</option>
+      </select>
+    </div>
+    <div class="fr">
+      <div class="fg" id="asig-litros-group"><label>Litros (opcional)</label><input type="number" id="asig-litros" placeholder="0,00" step="0.01"></div>
+      <div class="fg"><label>Km (opcional)</label><input type="number" id="asig-km" placeholder="Ej: 47500"></div>
+    </div>
+    <button class="btn-primary" onclick="guardarAsignacionVh()">Asignar</button>
+    <button class="btn-sec" onclick="document.getElementById('modal-asignar-vh').classList.remove('show')">Cancelar</button>
   </div>
 </div>
 
@@ -1114,6 +1150,8 @@ const CL_CLOUD='drsy461un', CL_PRESET='familialopbas';
 let currentUser=null,familiaData=null;
 let lCesta=null,lTareas=null,lGastos=null,lMedicos=null,lVehiculos=null,lOtto=null,lEventos=null;
 let tareasData={},filtroT='todas',filtroC='todas',filtroOtto='todas',vhSel=null,fotoB64=null,mesOffset=0;
+let filtroGCat='todas',filtroGVh='todos',gastosUlt=null,vhCache={},lVhCache=null,vhUlt=null,asigGastoId=null;
+const vhAbiertos=new Set();
 
 const T=id=>document.getElementById(id);
 window.showLoading=()=>T('loading').classList.add('show');
@@ -1159,7 +1197,7 @@ window.doGoogleLogin=async()=>{
   try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
   catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
 };
-window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=null;};
+window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=lVhCache=null;vhCache={};gastosUlt=null;vhUlt=null;};
 window.crearFamilia=async()=>{
   if(!currentUser)return showToast('Sin sesión');showLoading();
   try{
@@ -1207,6 +1245,7 @@ async function cargarHome(){
     if(!lOtto)suscribirOtto();if(!lEventos)suscribirEventos();
     suscribirListasGuardadas();suscribirNotas();
     suscribirPersonal();
+    migrarEnlaceGastos().catch(e=>console.warn('Migración gastos:',e));
     if(ud.role==='hijo')document.querySelectorAll('.module-badge.padres').forEach(b=>b.closest('.module-card').style.opacity='.5');
     // Actualizar botón dark mode
     const t=localStorage.getItem('flb-theme')||'light';
@@ -1719,7 +1758,7 @@ window.abrirLocalizacion = () => {
 // ===== GASTOS (código original) =====
 window.abrirGastos=()=>{
   if(familiaData?.userRole==='hijo'){showToast('Solo los padres pueden ver los gastos');return;}
-  mesOffset=0;showScreen('gastos');
+  mesOffset=0;filtroGCat='todas';filtroGVh='todos';showScreen('gastos');
   actualizarPeriodoGastos();
   if(familiaData&&!lGastos)suscribirGastos();
 };
@@ -1745,6 +1784,10 @@ window.cambiarMesGastos=dir=>{
 };
 const CAT_IC={supermercado:'🛒',restaurante:'🍽️',luz:'💡',agua:'💧',gas:'🔥',telefono:'📱',ropa:'👕',colegio:'🎒',medico:'🏥',ocio:'🎭',transporte:'🚌',vehiculo:'🚗',otto:'🐾',otro:'📦'};
 function suscribirGastos(){
+  if(!lVhCache)lVhCache=db.ref('familias/'+familiaData.id+'/vehiculos').on('value',snap=>{
+    vhCache=snap.val()||{};
+    if(gastosUlt)renderGastos(gastosUlt.entries,gastosUlt.todos);
+  });
   lGastos=db.ref('familias/'+familiaData.id+'/gastos').on('value',snap=>{
     const todos=snap.val()||{};
     const mes=getMesStr(mesOffset);
@@ -1783,45 +1826,98 @@ window.irAMes=ms=>{
     renderGastos(delMes,todos);
   });
 };
+function vhNom(v){return v?`${v.marca||''} ${v.modelo||''}`.trim():'';}
+function nombreVhGasto(g){
+  if(g.vehiculoId&&vhCache[g.vehiculoId])return vhNom(vhCache[g.vehiculoId]);
+  return g.vehiculoId?(g.vehiculoNombre||''):'';
+}
+function rerenderGastos(){if(gastosUlt)renderGastos(gastosUlt.entries,gastosUlt.todos);}
+window.filtrarGastosCat=c=>{
+  filtroGCat=(filtroGCat===c&&c!=='todas')?'todas':c;
+  filtroGVh='todos';rerenderGastos();
+};
+window.filtrarGastosVh=v=>{filtroGVh=v;rerenderGastos();};
+function renderFiltrosGastos(entries,cats){
+  const box=T('gastos-filtros');if(!box)return;
+  const orden=Object.keys(cats).sort((a,b)=>cats[b]-cats[a]);
+  if(filtroGCat!=='todas'&&!orden.includes(filtroGCat))orden.unshift(filtroGCat);
+  let html=`<div class="gf-row"><button class="chip${filtroGCat==='todas'?' active':''}" onclick="filtrarGastosCat('todas')">Todas</button>`+
+    orden.map(c=>`<button class="chip${filtroGCat===c?' active':''}" onclick="filtrarGastosCat('${c}')">${CAT_IC[c]||'📦'} ${c}</button>`).join('')+`</div>`;
+  if(filtroGCat==='vehiculo'){
+    const hayVh=entries.filter(([,g])=>g.categoria==='vehiculo');
+    const sinAsig=hayVh.some(([,g])=>!g.vehiculoId);
+    const ids=new Set(Object.keys(vhCache));
+    hayVh.forEach(([,g])=>{if(g.vehiculoId)ids.add(g.vehiculoId);});
+    html+=`<div class="gf-row sub"><button class="chip${filtroGVh==='todos'?' active':''}" onclick="filtrarGastosVh('todos')">Todos</button>`+
+      [...ids].map(id=>{
+        const nom=vhCache[id]?vhNom(vhCache[id]):((hayVh.find(([,g])=>g.vehiculoId===id)||[,{}])[1].vehiculoNombre||'Vehículo');
+        return `<button class="chip${filtroGVh===id?' active':''}" onclick="filtrarGastosVh('${id}')">🚗 ${nom}</button>`;
+      }).join('')+
+      (sinAsig?`<button class="chip${filtroGVh==='none'?' active':''}" onclick="filtrarGastosVh('none')">Sin asignar</button>`:'')+`</div>`;
+  }
+  box.innerHTML=html;
+}
 function renderGastos(entries,todos){
+  gastosUlt={entries,todos};
   const lista=T('gastos-lista'),empty=T('gastos-empty');
   const total=entries.reduce((s,[,g])=>s+parseFloat(g.importe||0),0);
   T('gastos-total-amt').textContent=fmtE(total);
   if(todos)renderGraficaGastos(todos);
   const cats={};entries.forEach(([,g])=>{const c=g.categoria||'otro';cats[c]=(cats[c]||0)+parseFloat(g.importe||0);});
-  T('gastos-cats').innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([c,v])=>`<div class="cat-card"><div style="font-size:20px;margin-bottom:4px">${CAT_IC[c]||'📦'}</div><div style="font-size:11px;color:var(--text2)">${c}</div><div style="font-family:'Nunito',sans-serif;font-size:16px;font-weight:800">${fmtE(v)}</div></div>`).join('');
-  if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
+  T('gastos-cats').innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([c,v])=>`<div class="cat-card${filtroGCat===c?' activa':''}" onclick="filtrarGastosCat('${c}')"><div style="font-size:20px;margin-bottom:4px">${CAT_IC[c]||'📦'}</div><div style="font-size:11px;color:var(--text2)">${c}</div><div style="font-family:'Nunito',sans-serif;font-size:16px;font-weight:800">${fmtE(v)}</div></div>`).join('');
+  renderFiltrosGastos(entries,cats);
+  // Aplicar filtros
+  let filtradas=entries;
+  if(filtroGCat!=='todas')filtradas=filtradas.filter(([,g])=>(g.categoria||'otro')===filtroGCat);
+  if(filtroGCat==='vehiculo'&&filtroGVh!=='todos')filtradas=filtradas.filter(([,g])=>filtroGVh==='none'?!g.vehiculoId:g.vehiculoId===filtroGVh);
+  const hdr=T('gastos-mov-header');
+  if(hdr){
+    if(filtroGCat==='todas')hdr.textContent='Movimientos';
+    else{
+      const totF=filtradas.reduce((s,[,g])=>s+parseFloat(g.importe||0),0);
+      let etq=(CAT_IC[filtroGCat]||'📦')+' '+filtroGCat;
+      if(filtroGCat==='vehiculo'&&filtroGVh==='none')etq='🚗 Sin asignar';
+      else if(filtroGCat==='vehiculo'&&filtroGVh!=='todos')etq='🚗 '+(vhCache[filtroGVh]?vhNom(vhCache[filtroGVh]):'Vehículo');
+      hdr.textContent=`Movimientos · ${etq} · ${fmtE(totF)}`;
+    }
+  }
+  if(!filtradas.length){
+    lista.innerHTML='';empty.style.display='block';
+    T('gastos-empty-p').textContent=filtroGCat==='todas'?'Sin gastos este mes':'Sin gastos con este filtro este mes';
+    T('gastos-empty-s').textContent=filtroGCat==='todas'?'Pulsa + Añadir para registrar uno':'Cambia de mes o pulsa Todas';
+    return;
+  }
   empty.style.display='none';
-  lista.innerHTML=entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([id,g])=>`<div class="item-card"><div style="width:40px;height:40px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${CAT_IC[g.categoria]||'📦'}</div><div style="flex:1;min-width:0"><div style="font-weight:500">${g.nota||g.categoria||'Gasto'}</div><div style="font-size:11px;color:var(--text3)">${g.fecha||''} · ${g.autor||''}</div></div>${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0" onclick="window.open('${g.fotoUrl}','_blank')">`:''}  <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-left:8px;flex-shrink:0">${fmtE(g.importe)}</div><div onclick="borrarGasto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`).join('');
+  lista.innerHTML=filtradas.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([id,g])=>{
+    const esVh=g.categoria==='vehiculo';
+    const vn=esVh?nombreVhGasto(g):'';
+    const tagVh=vn&&!(g.nota||'').includes(vn)?' · 🚗 '+vn:'';
+    const sinAsig=esVh&&!g.vehiculoId;
+    return `<div class="item-card"><div style="width:40px;height:40px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${CAT_IC[g.categoria]||'📦'}</div><div style="flex:1;min-width:0"><div style="font-weight:500">${g.nota||g.categoria||'Gasto'}</div><div style="font-size:11px;color:var(--text3)">${g.fecha||''} · ${g.autor||''}${tagVh}</div>${sinAsig?`<button class="btn-asignar" onclick="abrirAsignarVh('${id}')">Asignar vehículo</button>`:''}</div>${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0" onclick="window.open('${g.fotoUrl}','_blank')">`:''}  <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-left:8px;flex-shrink:0">${fmtE(g.importe)}</div><div onclick="borrarGasto('${id}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div></div>`;
+  }).join('');
 }
 window.abrirModalGasto=async()=>{
   T('gasto-fecha').value=hoy();fotoB64=null;
   T('gasto-foto-preview').innerHTML='<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:4px">📷</div><div style="font-size:12px">Sin foto</div></div>';
   const btnOcr=T('btn-ocr-ticket');if(btnOcr)btnOcr.style.display='none';
-  T('gasto-vehiculo-group').style.display='none';
-  T('gasto-vh-tipo-group').style.display='none';
-  T('gasto-vh-km-group').style.display='none';
-  T('gasto-otto-group').style.display='none';
-  // Cargar vehículos en selector
-  const vhSnap=await db.ref('familias/'+familiaData.id+'/vehiculos').once('value');
-  const vhs=vhSnap.val()||{};
-  const sel=T('gasto-vehiculo-sel');
-  sel.innerHTML='<option value="">Sin asignar</option>';
-  Object.entries(vhs).forEach(([id,v])=>{
-    const o=document.createElement('option');o.value=id;
-    o.textContent=(v.marca||'')+' '+(v.modelo||'')+' '+(v.matricula?'('+v.matricula+')':'');
-    sel.appendChild(o);
-  });
+  T('gasto-vh-litros').value='';T('gasto-vh-km').value='';
+  // Mostrar/ocultar grupos según la categoría actual y cargar vehículos
+  await actualizarSelectorAsignacion();
   T('modal-gasto').classList.add('show');
 };
 window.cerrarModalGasto=()=>T('modal-gasto').classList.remove('show');
 
+window.actualizarLitrosGasto=()=>{
+  const ver=T('gasto-categoria').value==='vehiculo'&&T('gasto-vh-tipo').value==='gasolina';
+  T('gasto-vh-litros-group').style.display=ver?'block':'none';
+};
 window.actualizarSelectorAsignacion=async()=>{
   const cat=T('gasto-categoria').value;
   T('gasto-vehiculo-group').style.display=cat==='vehiculo'?'block':'none';
   T('gasto-vh-tipo-group').style.display=cat==='vehiculo'?'block':'none';
   T('gasto-vh-km-group').style.display=cat==='vehiculo'?'block':'none';
   T('gasto-otto-group').style.display=cat==='otto'?'block':'none';
+  actualizarLitrosGasto();
   // Cargar vehículos si se selecciona categoría vehículo
   if(cat==='vehiculo'&&familiaData){
     const snap=await dbG('familias/'+familiaData.id+'/vehiculos');
@@ -1839,6 +1935,9 @@ window.actualizarSelectorAsignacion=async()=>{
 
 window.guardarGasto=async()=>{
   const imp=T('gasto-importe').value;if(!imp)return showToast('Introduce el importe');
+  // Si es vehículo y hay vehículos dados de alta, obligar a elegir uno
+  if(T('gasto-categoria').value==='vehiculo'&&!T('gasto-vehiculo-sel').value&&T('gasto-vehiculo-sel').options.length>1)
+    return showToast('🚗 Elige el vehículo');
   showLoading();
   try{
     let fotoUrl=null;
@@ -1849,28 +1948,36 @@ window.guardarGasto=async()=>{
     }
     const cat=T('gasto-categoria').value;
     const ts=Date.now();
-    // Guardar en gastos generales
-    await db.ref('familias/'+familiaData.id+'/gastos/g_'+ts).set({
+    const vhId=cat==='vehiculo'?T('gasto-vehiculo-sel').value:'';
+    const gasto={
       importe:parseFloat(imp),categoria:cat,fecha:T('gasto-fecha').value,
       nota:T('gasto-nota').value,fotoUrl,
       autor:currentUser.displayName||currentUser.email.split('@')[0],ts
-    });
-    // Si es vehículo, sincronizar con módulo vehículos
-    const vhId=T('gasto-vehiculo-sel').value;
-    if(cat==='vehiculo'&&vhId){
+    };
+    if(vhId){
+      gasto.vehiculoId=vhId;
+      gasto.vehiculoNombre=vhNom(vhCache[vhId]||(await dbG('familias/'+familiaData.id+'/vehiculos/'+vhId)));
+      gasto.vhGastoId='vhg_'+ts;
+    }
+    if(cat==='otto')gasto.ottoId='o_'+ts;
+    // Guardar en gastos generales
+    await db.ref('familias/'+familiaData.id+'/gastos/g_'+ts).set(gasto);
+    // Si es vehículo, sincronizar con módulo vehículos (enlazado)
+    if(vhId){
       const km=T('gasto-vh-km').value||null;
+      const litros=T('gasto-vh-tipo').value==='gasolina'?(T('gasto-vh-litros').value||null):null;
       await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhId+'/gastos/vhg_'+ts).set({
         tipo:T('gasto-vh-tipo').value,importe:parseFloat(imp),
-        fecha:T('gasto-fecha').value,km,nota:T('gasto-nota').value,ts
+        fecha:T('gasto-fecha').value,litros,km,nota:T('gasto-nota').value,ts,gastoId:'g_'+ts
       });
       if(km) await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhId+'/km').set(km);
     }
-    // Si es Otto, sincronizar con módulo Otto
+    // Si es Otto, sincronizar con módulo Otto (enlazado)
     if(cat==='otto'){
       await db.ref('familias/'+familiaData.id+'/otto/o_'+ts).set({
         tipo:T('gasto-otto-tipo').value,descripcion:T('gasto-nota').value||'Gasto Otto',
         fecha:T('gasto-fecha').value,importe:parseFloat(imp),
-        autor:currentUser.displayName||'',ts
+        autor:currentUser.displayName||'',ts,gastoId:'g_'+ts
       });
     }
     cerrarModalGasto();hideLoading();showToast('✅ Gasto guardado');
@@ -1977,7 +2084,8 @@ Responde SOLO con JSON válido sin backticks ni caracteres especiales en los tex
       // Si es vehículo, rellenar tipo gasolina y litros automáticamente
       if(resultado.categoria==='vehiculo'){
         T('gasto-vh-tipo').value='gasolina';
-        if(resultado.litros) T('gasto-vh-km').placeholder=resultado.litros+' L · '+(resultado.precio_litro?resultado.precio_litro+'€/L':'');
+        if(resultado.litros) T('gasto-vh-litros').value=resultado.litros;
+        actualizarLitrosGasto();
       }
     }
     if(resultado.establecimiento) T('gasto-nota').value=resultado.establecimiento;
@@ -2006,7 +2114,97 @@ Responde SOLO con JSON válido sin backticks ni caracteres especiales en los tex
     setTimeout(()=>{btn.textContent='🤖 Analizar';btn.disabled=false;},2000);
   }
 };
-window.borrarGasto=id=>db.ref('familias/'+familiaData.id+'/gastos/'+id).remove();
+window.borrarGasto=async id=>{
+  const fid=familiaData.id;
+  const g=await dbG('familias/'+fid+'/gastos/'+id);
+  if(!g)return;
+  const up={};up['gastos/'+id]=null;
+  if(g.vehiculoId&&g.vhGastoId){
+    if(!confirm('¿Borrar este gasto? También se borrará del vehículo.'))return;
+    up['vehiculos/'+g.vehiculoId+'/gastos/'+g.vhGastoId]=null;
+  }else if(g.ottoId){
+    if(!confirm('¿Borrar este gasto? También se quitará de Otto.'))return;
+    const o=await dbG('familias/'+fid+'/otto/'+g.ottoId);
+    if(o){
+      // Si el registro de Otto tiene próxima fecha (vacuna/revisión) se conserva, solo se le quita el importe
+      if(o.proxima){up['otto/'+g.ottoId+'/importe']=null;up['otto/'+g.ottoId+'/gastoId']=null;}
+      else up['otto/'+g.ottoId]=null;
+    }
+  }
+  try{await db.ref('familias/'+fid).update(up);}catch(err){showToast('Error: '+err.message);}
+};
+
+// ── ASIGNAR VEHÍCULO A GASTO SIN ASIGNAR ──
+window.abrirAsignarVh=id=>{
+  const g=gastosUlt?.todos?.[id];if(!g)return;
+  const ids=Object.keys(vhCache);
+  if(!ids.length)return showToast('Añade primero un vehículo en Vehículos');
+  asigGastoId=id;
+  T('asig-info').textContent=`${(g.fecha||'').split('-').reverse().join('/')} · ${g.nota||'Gasto'} · ${fmtE(g.importe)}`;
+  const sel=T('asig-vh');
+  sel.innerHTML=(ids.length>1?'<option value="">Selecciona...</option>':'')+ids.map(v=>`<option value="${v}">${vhNom(vhCache[v])}${vhCache[v].matricula?' ('+vhCache[v].matricula+')':''}</option>`).join('');
+  T('asig-tipo').value='gasolina';T('asig-litros-group').style.display='block';
+  T('asig-litros').value='';T('asig-km').value='';
+  T('modal-asignar-vh').classList.add('show');
+};
+window.guardarAsignacionVh=async()=>{
+  const vid=T('asig-vh').value;if(!vid)return showToast('Elige el vehículo');
+  const fid=familiaData.id,id=asigGastoId;
+  showLoading();
+  try{
+    const g=await dbG('familias/'+fid+'/gastos/'+id);
+    if(!g){hideLoading();return showToast('El gasto ya no existe');}
+    const tipo=T('asig-tipo').value;
+    const km=T('asig-km').value||null;
+    const litros=tipo==='gasolina'?(T('asig-litros').value||null):null;
+    const key='vhg_'+Date.now();
+    const up={};
+    up['vehiculos/'+vid+'/gastos/'+key]={tipo,importe:parseFloat(g.importe||0),fecha:g.fecha||hoy(),litros,km,nota:g.nota||'',ts:g.ts||Date.now(),gastoId:id};
+    up['gastos/'+id+'/vehiculoId']=vid;
+    up['gastos/'+id+'/vehiculoNombre']=vhNom(vhCache[vid]);
+    up['gastos/'+id+'/vhGastoId']=key;
+    if(km)up['vehiculos/'+vid+'/km']=km;
+    await db.ref('familias/'+fid).update(up);
+    T('modal-asignar-vh').classList.remove('show');hideLoading();showToast('✅ Gasto asignado');
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+
+// ── MIGRACIÓN ÚNICA: enlazar gastos antiguos con Vehículos y Otto ──
+async function migrarEnlaceGastos(){
+  const fid=familiaData.id;
+  if(await dbG('familias/'+fid+'/migraciones/enlaceGastosV1'))return;
+  const [gastos,vehiculos,otto]=await Promise.all([
+    dbG('familias/'+fid+'/gastos'),dbG('familias/'+fid+'/vehiculos'),dbG('familias/'+fid+'/otto')
+  ]);
+  const G=gastos||{},up={};let n=0;
+  // Vehículos: vhg_TS  <->  g_vh_TS (creado en Vehículos) o g_TS (creado en Gastos)
+  Object.entries(vehiculos||{}).forEach(([vid,v])=>{
+    Object.entries(v.gastos||{}).forEach(([k,vg])=>{
+      if(vg.gastoId)return;
+      const t=k.replace('vhg_','');
+      const gid=[`g_vh_${t}`,`g_${t}`].find(c=>G[c]&&G[c].categoria==='vehiculo'&&!G[c].vehiculoId);
+      if(!gid)return;
+      up[`gastos/${gid}/vehiculoId`]=vid;
+      up[`gastos/${gid}/vehiculoNombre`]=vhNom(v);
+      up[`gastos/${gid}/vhGastoId`]=k;
+      up[`vehiculos/${vid}/gastos/${k}/gastoId`]=gid;
+      n++;
+    });
+  });
+  // Otto: o_TS  <->  g_otto_TS (creado en Otto) o g_TS (creado en Gastos)
+  Object.entries(otto||{}).forEach(([k,o])=>{
+    if(o.gastoId)return;
+    const t=k.replace('o_','');
+    const gid=[`g_otto_${t}`,`g_${t}`].find(c=>G[c]&&G[c].categoria==='otto'&&!G[c].ottoId);
+    if(!gid)return;
+    up[`gastos/${gid}/ottoId`]=k;
+    up[`otto/${k}/gastoId`]=gid;
+    n++;
+  });
+  up['migraciones/enlaceGastosV1']=Date.now();
+  await db.ref('familias/'+fid).update(up);
+  if(n)console.log('Migración gastos: '+n+' enlaces creados');
+}
 
 // ── HISTORIAL PRECIOS OCR ──
 let preciosData=[], filtroPreciosCat='todos', filtroPreciosBusq='';
@@ -2160,7 +2358,33 @@ window.abrirVehiculos=()=>{
 function suscribirVehiculos(){
   lVehiculos=db.ref('familias/'+familiaData.id+'/vehiculos').on('value',snap=>renderVehiculos(snap.val()||{}));
 }
+const VH_TIPO_IC={gasolina:'⛽',averia:'🔧',seguro:'🛡️',itv:'🔍',otro:'📦'};
+const VH_TIPO_LB={gasolina:'Gasolina',averia:'Avería',seguro:'Seguro',itv:'ITV',otro:'Otro'};
+window.toggleGastosVh=id=>{vhAbiertos.has(id)?vhAbiertos.delete(id):vhAbiertos.add(id);if(vhUlt)renderVehiculos(vhUlt);};
+function htmlGastosVh(vid,v){
+  const gs=Object.entries(v.gastos||{}).sort((a,b)=>(b[1].fecha||'').localeCompare(a[1].fecha||'')||((b[1].ts||0)-(a[1].ts||0)));
+  if(!gs.length)return `<div class="vh-gastos"><div style="padding:12px 16px;font-size:13px;color:var(--text3)">Sin gastos registrados</div></div>`;
+  return `<div class="vh-gastos">`+gs.map(([gid,g])=>`<div class="vh-gasto">
+    <div style="font-size:18px;flex-shrink:0">${VH_TIPO_IC[g.tipo]||'📦'}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:600">${VH_TIPO_LB[g.tipo]||'Gasto'}${g.nota?' · <span style="font-weight:400;color:var(--text2)">'+g.nota+'</span>':''}</div>
+      <div style="font-size:11px;color:var(--text3)">${(g.fecha||'').split('-').reverse().join('/')}${g.litros?' · '+g.litros+' L':''}${g.km?' · '+parseInt(g.km).toLocaleString('es-ES')+' km':''}</div>
+    </div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;flex-shrink:0">${fmtE(g.importe)}</div>
+    <div onclick="borrarGastoVh('${vid}','${gid}')" style="color:var(--text3);cursor:pointer;font-size:20px;padding:4px">×</div>
+  </div>`).join('')+`</div>`;
+}
+window.borrarGastoVh=async(vid,gid)=>{
+  const fid=familiaData.id;
+  const g=await dbG('familias/'+fid+'/vehiculos/'+vid+'/gastos/'+gid);
+  if(!g)return;
+  if(!confirm(g.gastoId?'¿Borrar este gasto? También se borrará de Gastos.':'¿Borrar este gasto?'))return;
+  const up={};up['vehiculos/'+vid+'/gastos/'+gid]=null;
+  if(g.gastoId)up['gastos/'+g.gastoId]=null;
+  try{await db.ref('familias/'+fid).update(up);}catch(err){showToast('Error: '+err.message);}
+};
 function renderVehiculos(vhs){
+  vhUlt=vhs;
   const lista=T('vehiculos-lista'),empty=T('vehiculos-empty');
   const entries=Object.entries(vhs);
   if(!entries.length){lista.innerHTML='';empty.style.display='block';return;}
@@ -2188,6 +2412,8 @@ function renderVehiculos(vhs){
     <div class="vh-row"><span style="font-size:13px;color:var(--text2)">🔍 ITV</span><span style="font-size:13px;font-weight:600;${itvAlert?'color:#dc2626':''}">${v.itv?v.itv.split('-').reverse().join('/'):'—'} ${itvAlert?'⚠️':''}</span></div>
     ${v.revisionKm?`<div class="vh-row"><span style="font-size:13px;color:var(--text2)">🔧 Revisión</span><span style="font-size:13px;font-weight:600;${revAlert?'color:#dc2626':''}">${parseInt(v.revisionKm).toLocaleString('es-ES')} km ${revAlert?'⚠️ Pendiente':''}</span></div>`:''}
     ${ultGas?`<div class="vh-row"><span style="font-size:13px;color:var(--text2)">⛽ Último repostaje</span><span style="font-size:13px;font-weight:600">${fmtE(ultGas.importe)}${ultGas.litros?' · '+ultGas.litros+'L':''}${pxl?' · '+pxl+'€/L':''}</span></div>`:''}
+    <div class="vh-row" style="cursor:pointer" onclick="toggleGastosVh('${id}')"><span style="font-size:13px;color:var(--text2)">🧾 Gastos (${gastos.length})</span><span style="font-size:12px;font-weight:700;color:#d97706">${vhAbiertos.has(id)?'Ocultar ▲':'Ver ▼'}</span></div>
+    ${vhAbiertos.has(id)?htmlGastosVh(id,v):''}
     <div class="vh-row" style="border:none;padding:12px 16px;gap:8px">
       <button onclick="abrirModalGastoVh('${id}','${(v.marca||'')+' '+(v.modelo||'')}','${id}')" style="padding:8px 14px;background:linear-gradient(135deg,#ffa500,#f59e0b);border:none;border-radius:20px;color:white;font-size:12px;font-weight:700;cursor:pointer">+ Gasto</button>
       <button onclick="borrarVehiculo('${id}')" style="padding:8px 14px;background:var(--bg3);border:none;border-radius:20px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">Eliminar</button>
@@ -2207,7 +2433,17 @@ window.guardarVehiculo=async()=>{
     T('modal-vehiculo').classList.remove('show');hideLoading();showToast('✅ Vehículo añadido');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
-window.borrarVehiculo=id=>{if(confirm('¿Eliminar vehículo y todos sus gastos?'))db.ref('familias/'+familiaData.id+'/vehiculos/'+id).remove();};
+window.borrarVehiculo=async id=>{
+  if(!confirm('¿Eliminar vehículo? Sus gastos se conservarán en Gastos como "sin asignar".'))return;
+  const fid=familiaData.id;
+  const gastos=await dbG('familias/'+fid+'/gastos')||{};
+  const up={};up['vehiculos/'+id]=null;
+  Object.entries(gastos).forEach(([gid,g])=>{
+    if(g.vehiculoId===id){up['gastos/'+gid+'/vehiculoId']=null;up['gastos/'+gid+'/vehiculoNombre']=null;up['gastos/'+gid+'/vhGastoId']=null;}
+  });
+  vhAbiertos.delete(id);
+  try{await db.ref('familias/'+fid).update(up);}catch(err){showToast('Error: '+err.message);}
+};
 window.abrirModalGastoVh=(id,nombre)=>{
   vhSel=id;
   T('modal-gasto-vh-title').textContent='Gasto — '+nombre;
@@ -2224,7 +2460,7 @@ window.guardarGastoVehiculo=async()=>{
     const litros=T('vhg-litros').value||null,nota=T('vhg-nota').value;
     const km=T('vhg-km').value||null;
     const ts=Date.now();
-    await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/gastos/vhg_'+ts).set({tipo,importe:parseFloat(imp),fecha,litros,km,nota,ts});
+    await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/gastos/vhg_'+ts).set({tipo,importe:parseFloat(imp),fecha,litros,km,nota,ts,gastoId:'g_vh_'+ts});
     // Actualizar km del vehículo si se introdujo
     if(km) await db.ref('familias/'+familiaData.id+'/vehiculos/'+vhSel+'/km').set(km);
     // Sincronizar con gastos generales
@@ -2234,7 +2470,8 @@ window.guardarGastoVehiculo=async()=>{
     await db.ref('familias/'+familiaData.id+'/gastos/g_vh_'+ts).set({
       importe:parseFloat(imp),categoria:'vehiculo',fecha,
       nota:tipoLabel+(vhNombre?' — '+vhNombre:'')+(nota?' ('+nota+')':''),
-      autor:currentUser.displayName||currentUser.email.split('@')[0],ts,esVehiculo:true
+      autor:currentUser.displayName||currentUser.email.split('@')[0],ts,esVehiculo:true,
+      vehiculoId:vhSel,vehiculoNombre:vhNombre.trim(),vhGastoId:'vhg_'+ts
     });
     T('modal-gasto-vh').classList.remove('show');hideLoading();showToast('✅ Gasto guardado');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
@@ -2290,12 +2527,12 @@ window.guardarOtto=async()=>{
       tipo:T('otto-tipo').value,descripcion:desc,
       fecha:T('otto-fecha').value,proxima:T('otto-proxima').value||null,
       importe:imp?parseFloat(imp):null,notas:T('otto-notas').value,
-      autor:currentUser.displayName||'',ts
+      autor:currentUser.displayName||'',ts,gastoId:imp?'g_otto_'+ts:null
     });
     if(imp){
       await db.ref('familias/'+familiaData.id+'/gastos/g_otto_'+ts).set({
         importe:parseFloat(imp),categoria:'otto',fecha:T('otto-fecha').value,
-        nota:'🐾 Otto — '+desc,autor:currentUser.displayName||'',ts
+        nota:'🐾 Otto — '+desc,autor:currentUser.displayName||'',ts,ottoId:'o_'+ts
       });
     }
     T('modal-otto').classList.remove('show');
@@ -2303,7 +2540,17 @@ window.guardarOtto=async()=>{
     hideLoading();showToast('✅ Registro guardado');
   }catch(err){hideLoading();showToast('Error: '+err.message);}
 };
-window.borrarOtto=id=>db.ref('familias/'+familiaData.id+'/otto/'+id).remove();
+window.borrarOtto=async id=>{
+  const fid=familiaData.id;
+  const o=await dbG('familias/'+fid+'/otto/'+id);
+  if(!o)return;
+  const up={};up['otto/'+id]=null;
+  if(o.gastoId){
+    if(!confirm('¿Borrar este registro? Su gasto también se borrará de Gastos.'))return;
+    up['gastos/'+o.gastoId]=null;
+  }
+  try{await db.ref('familias/'+fid).update(up);}catch(err){showToast('Error: '+err.message);}
+};
 window.filtrarOtto=f=>{
   filtroOtto=f;
   ['fo-todas','fo-vacuna','fo-revision','fo-compra'].forEach(bid=>{
