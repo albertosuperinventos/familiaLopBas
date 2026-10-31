@@ -151,6 +151,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);background:white}
 .fg textarea{min-height:80px;resize:vertical}
+.cg-doors{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 4px}
+.cg-door{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:10px;box-shadow:var(--shadow)}
+.cg-door-t{font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;margin-bottom:4px;text-align:center;color:var(--text)}
+.cg-cajon{display:flex;justify-content:space-between;align-items:center;padding:12px 10px;margin-top:6px;border:1.5px solid var(--border2);border-radius:10px;background:var(--bg3);cursor:pointer;font-size:13px;font-weight:600;color:var(--text)}
+.cg-cajon.sel{border-color:#0ea5e9;background:rgba(14,165,233,.12)}
+.cg-n{font-family:'Nunito',sans-serif;font-weight:800;display:flex;align-items:center;gap:5px}
+.cg-dot{width:9px;height:9px;border-radius:50%;background:#ef4444;display:inline-block}
+.cg-item{background:var(--card);border-radius:var(--radius-sm);padding:12px 14px;margin:0 16px 8px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.cg-ic{width:38px;height:38px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.cg-age{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.cg-age.v{background:#dcfce7;color:#15803d}.cg-age.a{background:#fef3c7;color:#b45309}.cg-age.r{background:#fee2e2;color:#b91c1c}
+.cg-btn{padding:7px 10px;border-radius:10px;border:1.5px solid var(--border2);background:transparent;color:var(--text);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.cg-pos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.cg-pos button{padding:9px 4px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-weight:700;cursor:pointer}
+.cg-pos button.sel{border-color:#0ea5e9;background:#0ea5e9;color:white}
+.cg-sec{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;padding:12px 20px 8px}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .btn-sec{width:100%;padding:12px;background:var(--bg3);border:none;border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
 .foto-prev{width:100%;height:160px;background:var(--bg3);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;cursor:pointer;border:2px dashed var(--border2)}
@@ -347,6 +363,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="module-card" style="--mc:#f59e0b" onclick="abrirMenu()">
         <div class="mc-grad"></div>
         <div><div class="module-icon">🍽️</div><div class="module-name">Menú</div><div class="module-badge">Familia</div></div>
+      </div>
+      <div class="module-card" style="--mc:#0ea5e9" onclick="abrirCongelador()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🧊</div><div class="module-name">Congelador</div><div class="module-badge">Familia</div></div>
+        <div class="module-count" id="badge-congelador" style="display:none;background:#ef4444">0</div>
       </div>
       <div class="module-card" style="--mc:#8b5cf6" onclick="abrirPersonal()">
         <div class="mc-grad"></div>
@@ -993,6 +1014,62 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 </div>
 
+<!-- CONGELADOR -->
+<div class="screen" id="screen-congelador">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🧊 Congelador</span>
+    <button onclick="abrirModalCongelador()" style="margin-left:auto;padding:8px 14px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
+  </div>
+  <div class="input-bar">
+    <input type="text" id="cg-buscar" placeholder="🔍 Buscar: pollo, guisantes…" oninput="renderCongelador()" style="flex:1">
+  </div>
+  <div class="screen-body">
+    <div class="cg-doors" id="cg-doors"></div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;padding:2px 16px 0">🟢 &lt;1 mes · 🟡 1-3 meses · 🔴 +3 meses</div>
+    <div class="cg-sec" id="cg-sec-titulo"></div>
+    <div id="cg-lista"></div>
+    <div id="cg-empty" class="empty-state" style="display:none"><div class="ei">🧊</div><p id="cg-empty-txt">Cajón vacío</p><small>Pulsa + Añadir para meter algo</small></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirTareas()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- MODAL CONGELADOR -->
+<div class="modal-overlay" id="modal-congelador">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="cg-modal-titulo">Meter en el congelador</div>
+    <input type="hidden" id="cg-edit-id">
+    <div class="fg"><label>Producto</label><input type="text" id="cg-nombre" list="cg-datalist" placeholder="Pechugas de pollo, merluza…" oninput="cgAutoCategoria()" autocomplete="off"><datalist id="cg-datalist"></datalist></div>
+    <div class="fr">
+      <div class="fg"><label>Cantidad</label><input type="number" id="cg-cantidad" value="1" min="0" step="any"></div>
+      <div class="fg"><label>Unidad</label>
+        <select id="cg-unidad"><option value="uds">uds</option><option value="bolsas">bolsas</option><option value="tápers">tápers</option><option value="raciones">raciones</option><option value="kg">kg</option><option value="g">g</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Puerta izquierda — cajón</label>
+      <div class="cg-pos"><button id="cgp-izq-1" onclick="cgSelPos('izq',1)">1</button><button id="cgp-izq-2" onclick="cgSelPos('izq',2)">2</button><button id="cgp-izq-3" onclick="cgSelPos('izq',3)">3</button></div>
+    </div>
+    <div class="fg"><label>Puerta derecha — cajón</label>
+      <div class="cg-pos"><button id="cgp-der-1" onclick="cgSelPos('der',1)">1</button><button id="cgp-der-2" onclick="cgSelPos('der',2)">2</button><button id="cgp-der-3" onclick="cgSelPos('der',3)">3</button></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Categoría</label>
+        <select id="cg-categoria"><option value="carne">🥩 Carne</option><option value="pescado">🐟 Pescado</option><option value="verdura">🥦 Verdura</option><option value="cocinado">🍲 Cocinado</option><option value="pan">🍞 Pan/masas</option><option value="postre">🍦 Postre/fruta</option><option value="otros">📦 Otros</option></select>
+      </div>
+      <div class="fg"><label>Congelado el</label><input type="date" id="cg-fecha"></div>
+    </div>
+    <button class="btn-primary" onclick="guardarCongelador()">Guardar</button>
+    <button class="btn-sec" id="cg-btn-borrar" onclick="borrarCongeladorDesdeModal()" style="display:none;color:#dc2626">🗑️ Borrar producto</button>
+    <button class="btn-sec" onclick="T('modal-congelador').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
 <!-- MODAL OTTO -->
 <div class="modal-overlay" id="modal-otto">
   <div class="modal-sheet">
@@ -1197,7 +1274,7 @@ window.doGoogleLogin=async()=>{
   try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
   catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
 };
-window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=lVhCache=null;vhCache={};gastosUlt=null;vhUlt=null;};
+window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=lVhCache=null;lCongelador=lCgProd=null;cgItems={};cgProductos={};cgSel=null;vhCache={};gastosUlt=null;vhUlt=null;};
 window.crearFamilia=async()=>{
   if(!currentUser)return showToast('Sin sesión');showLoading();
   try{
@@ -1242,7 +1319,7 @@ async function cargarHome(){
     await renderMiembros(fd.miembros||{});
     hideLoading();showScreen('home');
     if(!lCesta)suscribirCesta();if(!lTareas)suscribirTareas();if(!lMedicos)suscribirMedicos();
-    if(!lOtto)suscribirOtto();if(!lEventos)suscribirEventos();
+    if(!lOtto)suscribirOtto();if(!lEventos)suscribirEventos();if(!lCongelador)suscribirCongelador();
     suscribirListasGuardadas();suscribirNotas();
     suscribirPersonal();
     migrarEnlaceGastos().catch(e=>console.warn('Migración gastos:',e));
@@ -2557,6 +2634,167 @@ window.filtrarOtto=f=>{
     const b=T(bid);if(b)b.classList.toggle('active',bid==='fo-'+f||(bid==='fo-todas'&&f==='todas'));
   });
   db.ref('familias/'+familiaData.id+'/otto').once('value').then(s=>renderOtto(s.val()||{}));
+};
+
+// ── CONGELADOR ──
+let lCongelador=null,lCgProd=null,cgItems={},cgProductos={},cgSel=null,cgPosModal={puerta:'izq',cajon:1};
+const CG_IC={carne:'🥩',pescado:'🐟',verdura:'🥦',cocinado:'🍲',pan:'🍞',postre:'🍦',otros:'📦'};
+const CG_PUERTA={izq:'Izquierda',der:'Derecha'};
+const CG_BASE=[
+  ['Pechugas de pollo','carne'],['Muslos de pollo','carne'],['Carne picada','carne'],['Filetes de ternera','carne'],
+  ['Lomo de cerdo','carne'],['Costillas','carne'],['Hamburguesas','carne'],['Salchichas','carne'],['Albóndigas','carne'],
+  ['Merluza','pescado'],['Salmón','pescado'],['Bacalao','pescado'],['Gambas','pescado'],['Langostinos','pescado'],
+  ['Calamares','pescado'],['Sepia','pescado'],['Varitas de pescado','pescado'],
+  ['Guisantes','verdura'],['Judías verdes','verdura'],['Espinacas','verdura'],['Brócoli','verdura'],['Menestra','verdura'],
+  ['Pimientos','verdura'],['Patatas fritas','verdura'],
+  ['Táper de lentejas','cocinado'],['Táper de garbanzos','cocinado'],['Táper de puchero','cocinado'],['Caldo','cocinado'],
+  ['Croquetas','cocinado'],['Lasaña','cocinado'],['Salsa de tomate','cocinado'],['Pizza','cocinado'],
+  ['Pan','pan'],['Pan de molde','pan'],['Masa de hojaldre','pan'],
+  ['Helado','postre'],['Fruta troceada','postre'],['Hielo','otros']
+];
+function cgNorm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}
+function cgEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function cgListaProductos(){
+  const m=new Map();
+  CG_BASE.forEach(([n,c])=>m.set(cgNorm(n),{nombre:n,categoria:c}));
+  Object.values(cgProductos).forEach(p=>{if(p&&p.nombre)m.set(cgNorm(p.nombre),{nombre:p.nombre,categoria:p.categoria||'otros'});});
+  return [...m.values()].sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+}
+function cgBuscarProducto(nombre){const n=cgNorm(nombre);return cgListaProductos().find(p=>cgNorm(p.nombre)===n)||null;}
+function cgDias(fecha){if(!fecha)return 0;return Math.max(0,Math.floor((new Date(hoy())-new Date(fecha))/864e5));}
+function cgEdad(fecha){
+  const d=cgDias(fecha);
+  const txt=d===0?'hoy':d<14?d+(d===1?' día':' días'):d<60?Math.round(d/7)+' sem':Math.floor(d/30)+' meses';
+  return {d,cls:d<30?'v':d<90?'a':'r',txt};
+}
+window.abrirCongelador=()=>{showScreen('congelador');if(familiaData&&!lCongelador)suscribirCongelador();renderCongelador();};
+function suscribirCongelador(){
+  const base='familias/'+familiaData.id;
+  lCongelador=db.ref(base+'/congelador').on('value',snap=>{
+    cgItems=snap.val()||{};renderCongelador();
+    const n=Object.values(cgItems).filter(it=>cgDias(it.fecha)>=90).length;
+    const b=T('badge-congelador');if(b){b.textContent=n;b.style.display=n>0?'block':'none';}
+  });
+  lCgProd=db.ref(base+'/congeladorProductos').on('value',snap=>{cgProductos=snap.val()||{};cgRellenarDatalist();});
+}
+function cgRellenarDatalist(){
+  const dl=T('cg-datalist');if(!dl)return;
+  dl.innerHTML=cgListaProductos().map(p=>`<option value="${cgEsc(p.nombre)}">`).join('');
+}
+window.cgSelCajon=(puerta,cajon)=>{
+  cgSel=(cgSel&&cgSel.puerta===puerta&&cgSel.cajon===cajon)?null:{puerta,cajon};
+  const q=T('cg-buscar');if(q)q.value='';
+  renderCongelador();
+};
+window.renderCongelador=()=>{
+  const doors=T('cg-doors');if(!doors)return;
+  const entries=Object.entries(cgItems);
+  doors.innerHTML=['izq','der'].map(p=>`
+    <div class="cg-door"><div class="cg-door-t">${CG_PUERTA[p]}</div>
+      ${[1,2,3].map(c=>{
+        const its=entries.filter(([,it])=>it.puerta===p&&Number(it.cajon)===c);
+        const viejo=its.some(([,it])=>cgDias(it.fecha)>=90);
+        const sel=cgSel&&cgSel.puerta===p&&cgSel.cajon===c;
+        return `<div class="cg-cajon${sel?' sel':''}" onclick="cgSelCajon('${p}',${c})"><span>Cajón ${c}</span><span class="cg-n">${its.length}${viejo?'<i class="cg-dot"></i>':''}</span></div>`;
+      }).join('')}
+    </div>`).join('');
+  const q=cgNorm((T('cg-buscar')||{}).value);
+  const lista=T('cg-lista'),empty=T('cg-empty'),tit=T('cg-sec-titulo');
+  let items,mostrarPos=false;
+  if(q){
+    items=entries.filter(([,it])=>cgNorm(it.nombre).includes(q));mostrarPos=true;
+    tit.textContent='Resultados ('+items.length+')';
+    T('cg-empty-txt').textContent='No hay nada que coincida';
+  }else if(cgSel){
+    items=entries.filter(([,it])=>it.puerta===cgSel.puerta&&Number(it.cajon)===cgSel.cajon);
+    tit.textContent=CG_PUERTA[cgSel.puerta]+' · Cajón '+cgSel.cajon+' ('+items.length+')';
+    T('cg-empty-txt').textContent='Cajón vacío';
+  }else{
+    lista.innerHTML='';empty.style.display='none';
+    tit.textContent=entries.length?'Toca un cajón para ver qué tiene':'El congelador está vacío';
+    return;
+  }
+  items.sort((a,b)=>(a[1].fecha||'').localeCompare(b[1].fecha||''));
+  if(!items.length){lista.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  lista.innerHTML=items.map(([id,it])=>{
+    const e=cgEdad(it.fecha);
+    const cant=Number(it.cantidad)||0;
+    const peso=it.unidad==='kg'||it.unidad==='g';
+    const btn=(!peso&&cant>1)?'−1':'Sacar';
+    const pos=mostrarPos?CG_PUERTA[it.puerta]+' C'+it.cajon+' · ':'';
+    const fecha=it.fecha?it.fecha.split('-').reverse().join('/'):'';
+    return `<div class="cg-item">
+      <div class="cg-ic">${CG_IC[it.categoria]||'📦'}</div>
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="abrirModalCongelador('${id}')">
+        <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cgEsc(it.nombre)}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${cgEsc(String(it.cantidad||''))} ${cgEsc(it.unidad||'')} · ${pos}${fecha}</div>
+      </div>
+      <span class="cg-age ${e.cls}">${e.txt}</span>
+      <button class="cg-btn" onclick="sacarCongelador('${id}')">${btn}</button>
+    </div>`;
+  }).join('');
+};
+window.cgSelPos=(puerta,cajon)=>{
+  cgPosModal={puerta,cajon};
+  ['izq','der'].forEach(p=>[1,2,3].forEach(c=>{const b=T('cgp-'+p+'-'+c);if(b)b.classList.toggle('sel',p===puerta&&c===cajon);}));
+};
+window.cgAutoCategoria=()=>{const p=cgBuscarProducto(T('cg-nombre').value);if(p)T('cg-categoria').value=p.categoria;};
+window.abrirModalCongelador=id=>{
+  cgRellenarDatalist();
+  const it=id?cgItems[id]:null;
+  T('cg-edit-id').value=it?id:'';
+  T('cg-modal-titulo').textContent=it?'Editar producto':'Meter en el congelador';
+  T('cg-nombre').value=it?it.nombre:'';
+  T('cg-cantidad').value=it?it.cantidad:1;
+  T('cg-unidad').value=it?(it.unidad||'uds'):'uds';
+  T('cg-categoria').value=it?(it.categoria||'otros'):'carne';
+  T('cg-fecha').value=it?(it.fecha||hoy()):hoy();
+  T('cg-btn-borrar').style.display=it?'block':'none';
+  const pos=it?{puerta:it.puerta,cajon:Number(it.cajon)}:(cgSel||{puerta:'izq',cajon:1});
+  cgSelPos(pos.puerta,pos.cajon);
+  T('modal-congelador').classList.add('show');
+};
+window.guardarCongelador=async()=>{
+  const nombre=T('cg-nombre').value.trim();if(!nombre)return showToast('Escribe el producto');
+  const cantidad=parseFloat(T('cg-cantidad').value);
+  if(!(cantidad>0))return showToast('Pon una cantidad mayor que 0');
+  const categoria=T('cg-categoria').value;
+  const datos={nombre,cantidad,unidad:T('cg-unidad').value,categoria,
+    puerta:cgPosModal.puerta,cajon:cgPosModal.cajon,fecha:T('cg-fecha').value||hoy()};
+  const editId=T('cg-edit-id').value;
+  const base='familias/'+familiaData.id;
+  showLoading();
+  try{
+    if(editId)await db.ref(base+'/congelador/'+editId).update(datos);
+    else{const ts=Date.now();await db.ref(base+'/congelador/cg_'+ts).set({...datos,autor:currentUser.displayName||currentUser.email.split('@')[0],ts});}
+    T('modal-congelador').classList.remove('show');hideLoading();
+    showToast(editId?'✅ Producto actualizado':'🧊 Guardado en el congelador');
+    if(!cgBuscarProducto(nombre)&&confirm('"'+nombre+'" no está en la lista de productos. ¿Guardarlo para la próxima vez?')){
+      await db.ref(base+'/congeladorProductos/p_'+Date.now()).set({nombre,categoria});
+    }
+  }catch(err){hideLoading();showToast('Error: '+err.message);}
+};
+window.sacarCongelador=async id=>{
+  const it=cgItems[id];if(!it)return;
+  const base='familias/'+familiaData.id;
+  const cant=Number(it.cantidad)||0;
+  const peso=it.unidad==='kg'||it.unidad==='g';
+  try{
+    if(!peso&&cant>1){await db.ref(base+'/congelador/'+id).update({cantidad:cant-1});showToast('Quedan '+(cant-1)+' '+(it.unidad||''));return;}
+    if(!confirm('¿Sacar "'+it.nombre+'"? Se quitará del congelador.'))return;
+    await db.ref(base+'/congelador/'+id).remove();
+    if(confirm('Se ha acabado "'+it.nombre+'". ¿Añadirlo a la Cesta?')){
+      await db.ref(base+'/cesta/item_'+Date.now()).set({nombre:it.nombre,cantidad:'',autor:currentUser.displayName||currentUser.email.split('@')[0],tachado:false,ts:Date.now()});
+      showToast('🛒 Añadido a la Cesta');
+    }
+  }catch(err){showToast('Error: '+err.message);}
+};
+window.borrarCongeladorDesdeModal=async()=>{
+  const id=T('cg-edit-id').value;if(!id)return;
+  if(!confirm('¿Borrar este producto del congelador?'))return;
+  try{await db.ref('familias/'+familiaData.id+'/congelador/'+id).remove();T('modal-congelador').classList.remove('show');showToast('🗑️ Borrado');}
+  catch(err){showToast('Error: '+err.message);}
 };
 
 // ── EXPORTAR GASTOS EXCEL ──
