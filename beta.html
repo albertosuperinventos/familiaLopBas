@@ -286,6 +286,63 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .fin-rules td{padding:3px 2px}
 .fin-hidden{display:none!important}
 .fin-beta{position:fixed;top:8px;right:8px;z-index:9999;background:#f59e0b;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:10px;pointer-events:none}
+/* ===== Panel C3 · azul noche ===== */
+.fin-tab.on{background:#172554;border-color:#172554}
+.fin-btn.pri{background:#172554}
+.fin-hero{background:#172554;color:#fff;border-radius:20px;padding:16px 18px;margin-bottom:14px}
+.fin-hero .sm{font-size:13px;opacity:.85}
+.fin-hero .big{font-family:'Nunito',sans-serif;font-weight:900;font-size:40px;line-height:1.1;color:#5eead4;font-variant-numeric:tabular-nums}
+.fin-mini3{display:flex;gap:8px;margin-top:14px}
+.fin-mini3>div{flex:1;min-width:0;background:rgba(255,255,255,.1);border-radius:12px;padding:10px}
+.fin-mini3 small{display:block;font-size:12px;opacity:.8}
+.fin-mini3 b{font-size:15px;font-variant-numeric:tabular-nums}
+.fin-hbtn{margin-top:14px;width:100%;padding:12px;border-radius:12px;border:none;background:#5eead4;color:#172554;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.fin-hnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.fin-hnav span{font-family:'Nunito',sans-serif;font-weight:800;font-size:16px}
+.fin-hnav button{background:rgba(255,255,255,.12);border:none;color:#fff;font-size:20px;cursor:pointer;width:40px;height:36px;border-radius:10px}
+.fin-hnav button:disabled{opacity:.3;cursor:default}
+.fin-donut{display:flex;gap:16px;align-items:center}
+.fin-legend{display:flex;flex-direction:column;gap:7px;font-size:13px;flex:1;min-width:0}
+.fin-legend div{display:flex;justify-content:space-between;gap:8px}
+.fin-legend span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fin-legend b{font-variant-numeric:tabular-nums}
+.fin-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.fin-two>button,.fin-two>div{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:12px;text-align:left;font:inherit;color:var(--text)}
+.fin-two>button{cursor:pointer}
+.fin-two small{display:block;font-size:12px;color:var(--text2)}
+.fin-two b{font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;font-variant-numeric:tabular-nums}
+.fin-bar{height:6px;border-radius:3px;background:#172554;margin-top:4px}
+[data-theme="dark"] .fin-bar{background:#5eead4}
+.fin-cardh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.fin-cardh h3{margin:0}
+.fin-ynav{display:flex;align-items:center;gap:4px}
+.fin-ynav button{border:none;background:var(--bg3);color:var(--text);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:16px}
+.fin-ynav button:disabled{opacity:.35;cursor:default}
+.fin-dots{display:grid;grid-template-columns:62px repeat(12,minmax(0,1fr));gap:6px 4px;align-items:center;font-size:12px}
+.fin-dots .m{text-align:center;color:var(--text2)}
+.fin-dots .l{font-weight:700}
+.fin-dot{width:100%;max-width:20px;aspect-ratio:1;justify-self:center;border-radius:50%;border:none;padding:0;cursor:pointer}
+.fin-dot.ok{background:#16a34a}.fin-dot.pend{background:#f59e0b}.fin-dot.olga{background:#2f6fd6}.fin-dot.no{background:var(--border2)}
+.fin-dot.fut{background:transparent;border:2px dashed var(--border2);cursor:default}
+.fin-dot:focus-visible,.fin-fcard:focus-visible,.fin-hbtn:focus-visible{outline:2px solid #5eead4;outline-offset:2px}
+.fin-ley{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;color:var(--text2)}
+.fin-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fin-ico.sq{border-radius:10px;width:34px;height:34px}
+.fin-day{display:flex;justify-content:space-between;padding:14px 2px 6px;font-size:13px;font-weight:700;color:var(--text2)}
+.fin-day b{font-variant-numeric:tabular-nums}
+.fin-group{background:var(--bg2);border-radius:14px;padding:0 12px}
+.fin-row2{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.fin-group .fin-row2:last-child,.fin-card .fin-row2:last-child{border-bottom:none}
+.fin-row2 .fi-main{flex:1;min-width:0}
+.fin-row2 .fi-desc{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fin-row2 .fi-imp{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fin-fscroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.fin-fcard{flex:0 0 118px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:12px;cursor:pointer;text-align:left;font:inherit;color:var(--text)}
+.fin-fcard .n{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px}
+.fin-fcard .st{font-size:12px;font-weight:700}
+.fin-fcard .st.emitida{color:var(--text2)}.fin-fcard .st.enviada{color:#2f6fd6}.fin-fcard .st.cobrada{color:#16a34a}
+.fin-rend{display:flex;justify-content:space-between;gap:8px;margin-top:12px;padding:12px;border-radius:12px;background:var(--bg3);font-size:14px}
+.fin-rend b{font-variant-numeric:tabular-nums}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1311,8 +1368,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   <div class="screen-body">
     <div class="fin-banner fin-hidden" id="fin-banner-t"></div>
     <div class="fin-tabs" id="fin-ttabs">
-      <button class="fin-tab on" data-tt="fact">Facturas</button>
-      <button class="fin-tab" data-tt="bog">Bogdana</button>
+      <button class="fin-tab on" data-tt="main">Resumen</button>
       <button class="fin-tab" data-tt="contrato">Contrato</button>
     </div>
     <div class="fin-pane" id="fin-tpane"></div>
@@ -3781,7 +3837,7 @@ const dias=(a,b)=>Math.abs((new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/864
 
 // ---------- estado ----------
 const F={fid:null,uid:null,padreOk:false,ref:null,loaded:false,data:{},cls:[],rules:[],
-  bt:'resumen',tt:'fact',filt:{q:'',tag:'',d:'',h:'',s:'',x:false},shown:200,open:new Set(),year:'',
+  bt:'resumen',tt:'main',bmes:'',tyear:'',filt:{q:'',tag:'',d:'',h:'',s:'',x:false},shown:200,open:new Set(),year:'',
   gastos:null,vh:null,noMatch:new Set(),homeRef:null};
 const base=()=>'finanzas/'+F.fid;
 const fref=p=>db.ref(base()+(p?'/'+p:''));
@@ -3883,23 +3939,65 @@ const years=()=>[...new Set(F.cls.map(m=>m.fecha.slice(0,4)))].sort().reverse();
 const yearSel=(id)=>`<select class="fin-in" id="${id}"><option value="">Todo</option>${years().map(y=>`<option ${y===F.year?'selected':''}>${y}</option>`).join('')}</select>`;
 const inYear=m=>!F.year||m.fecha.startsWith(F.year);
 
+// ---------- iconos por categoría ----------
+const ICO={
+  supermercado:['#dcfce7','#15803d','<path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>'],
+  restaurante:['#fee2e2','#b91c1c','<path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 9h2a2 2 0 0 1 0 4h-2"/>'],
+  luz:['#fef9c3','#a16207','<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'],
+  agua:['#e0f2fe','#0369a1','<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>'],
+  gas:['#ffedd5','#c2410c','<path d="M12 3c2 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 3 3 0-3-2-5 0-8z"/>'],
+  telefono:['#e0f2fe','#0369a1','<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>'],
+  ropa:['#fce7f3','#be185d','<path d="M8 3l4 2 4-2 4 4-3 3v11H7V10L4 7z"/>'],
+  colegio:['#ede9fe','#6d28d9','<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>'],
+  medico:['#fee2e2','#b91c1c','<path d="M12 5v14M5 12h14"/>'],
+  ocio:['#fae8ff','#a21caf','<path d="M4 8a2 2 0 0 0 0 4v4h16v-4a2 2 0 0 0 0-4V4H4z"/>'],
+  transporte:['#e0e7ff','#4338ca','<rect x="5" y="3" width="14" height="14" rx="2"/><path d="M5 11h14M8 21l1-4M16 21l-1-4"/>'],
+  vehiculo:['#ffedd5','#c2410c','<path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16"/><path d="M3 21h13"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/>'],
+  otto:['#fef3c7','#b45309','<circle cx="12" cy="15" r="4"/><circle cx="6" cy="9" r="2"/><circle cx="18" cy="9" r="2"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/>'],
+  otro:['#e8ecf4','#475569','<rect x="4" y="7" width="16" height="13" rx="2"/><path d="M4 11h16M9 4h6"/>'],
+  ingreso:['#dcfce7','#15803d','<path d="M12 5v14M5 12l7 7 7-7"/>'],
+  tienda:['#fef3c7','#b45309','<path d="M3 10l2-6h14l2 6"/><path d="M4 10v10h16V10"/><path d="M10 20v-6h4v6"/>'],
+  reparacion:['#e0f2fe','#0369a1','<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-2.5z"/>'],
+  seguro:['#ede9fe','#6d28d9','<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'],
+  impuesto:['#e8ecf4','#334155','<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'],
+  comunidad:['#e8ecf4','#334155','<path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6"/>']
+};
+const ico=(k,sq)=>{const [bg,st,p]=ICO[k]||ICO.otro;return `<span class="fin-ico${sq?' sq':''}" style="background:${bg}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${st}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg></span>`;};
+const movIcon=m=>tienda3(m)!==null?'tienda':m.imp>0?'ingreso':catFromTag(m);
+const DONUT=['#5eead4','#ffffff','#f59e0b','#f472b6','#94a3b8'];
+const capi=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const diaLargo=f=>{const d=new Date(f+'T12:00:00'),o={weekday:'long',day:'numeric',month:'long'};if(f.slice(0,4)!==String(new Date().getFullYear()))o.year='numeric';return capi(d.toLocaleDateString('es-ES',o));};
+function donutSvg(parts,total,label){
+  let cum=0;const segs=parts.map((p,i)=>{const pct=total?p.v/total*100:0,s=`<circle cx="21" cy="21" r="15.9155" fill="none" stroke="${DONUT[i]}" stroke-width="6" stroke-dasharray="${pct.toFixed(2)} ${(100-pct).toFixed(2)}" stroke-dashoffset="${(25-cum).toFixed(2)}"/>`;cum+=pct;return s;}).join('');
+  return `<svg width="128" height="128" viewBox="0 0 42 42" role="img" aria-label="Reparto del gasto: ${esc(parts.map(p=>p.k+' '+eur(p.v)).join(', '))}" style="flex-shrink:0">
+    <circle cx="21" cy="21" r="15.9155" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>${segs}
+    <text x="21" y="20.5" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="5.6" fill="#ffffff">${esc(Math.round(total).toLocaleString('es-ES'))} €</text>
+    <text x="21" y="26" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="3.2" fill="#ffffff" opacity="0.8">${esc(label)}</text></svg>`;
+}
+
 function bResumen(P){
-  const v=F.cls.filter(m=>!m.excl&&inYear(m));
-  const ing=v.filter(m=>m.imp>0).reduce((a,m)=>a+m.imp,0),gas=v.filter(m=>m.imp<0).reduce((a,m)=>a+m.imp,0);
-  const ms=[...new Set(v.map(m=>m.fecha.slice(0,7)))].sort().reverse();
-  const top=new Map();v.filter(m=>m.imp<0).forEach(m=>{const k=m.etiqueta.split(SEP)[0];top.set(k,(top.get(k)||0)-m.imp);});
-  const arr=[...top].sort((a,b)=>b[1]-a[1]).slice(0,10),mx=arr.length?arr[0][1]:1;
+  const ms=[...new Set(F.cls.map(m=>m.fecha.slice(0,7)))].sort();
+  if(!F.bmes||!ms.includes(F.bmes))F.bmes=ms[ms.length-1];
+  const i=ms.indexOf(F.bmes),v=F.cls.filter(m=>!m.excl&&m.fecha.startsWith(F.bmes));
+  const ing=v.filter(m=>m.imp>0).reduce((a,m)=>a+m.imp,0),gas=-v.filter(m=>m.imp<0).reduce((a,m)=>a+m.imp,0);
+  const g=new Map();v.filter(m=>m.imp<0).forEach(m=>{const k=m.etiqueta.split(SEP)[0];g.set(k,(g.get(k)||0)-m.imp);});
+  let parts=[...g].sort((a,b)=>b[1]-a[1]).map(([k,x])=>({k,v:x}));
+  if(parts.length>5){const rest=parts.slice(4).reduce((a,p)=>a+p.v,0);parts=parts.slice(0,4).concat([{k:'Resto',v:rest}]);}
+  const com=new Map();v.filter(m=>m.imp<0&&['Tarjeta','Recibo','Pago Bizum'].includes(m.tipo)).forEach(m=>com.set(m.comercio,(com.get(m.comercio)||0)-m.imp));
+  const top=[...com].sort((a,b)=>b[1]-a[1]).slice(0,5),mx=top.length?top[0][1]:1;
+  let porPasar='…';
+  if(F.gastos){const R=analizar();porPasar=String(R.nuevos.length+R.dud.length);}
+  else loadGastos().then(()=>{if(F.bt==='resumen'&&$('screen-banco').classList.contains('active'))renderB();}).catch(()=>{});
   const fs=F.cls.map(m=>m.fecha).sort(),li=(F.data.cfg||{}).lastImport;
-  P.innerHTML=`<div class="fin-row">${yearSel('fin-year')}<span class="fin-mut" style="font-size:12px">${F.cls.length} movimientos · ${fdate(fs[0])} → ${fdate(fs[fs.length-1])}${li?' · última importación '+new Date(li).toLocaleDateString('es-ES'):''}</span></div>
-  <div class="fin-kpis">
-    <div class="fin-kpi"><small>Ingresos</small><b class="fin-pos">${eur(ing)}</b></div>
-    <div class="fin-kpi"><small>Gastos</small><b class="fin-neg">${eur(gas)}</b></div>
-    <div class="fin-kpi"><small>Neto</small><b class="${cls(ing+gas)}">${eur(ing+gas)}</b></div>
-    <div class="fin-kpi"><small>Gasto medio/mes</small><b class="fin-neg">${eur(gas/(ms.length||1))}</b></div></div>
-  <div class="fin-card"><h3>Por mes</h3><div class="fin-wrap"><table class="fin-tbl"><tr><th>Mes</th><th class="n">Ingresos</th><th class="n">Gastos</th><th class="n">Neto</th></tr>
-  ${ms.map(ym=>{const x=v.filter(m=>m.fecha.startsWith(ym)),i=x.filter(m=>m.imp>0).reduce((a,m)=>a+m.imp,0),g=x.filter(m=>m.imp<0).reduce((a,m)=>a+m.imp,0);
-    return `<tr><td>${ymLabel(ym)}</td><td class="n fin-pos">${eur(i)}</td><td class="n fin-neg">${eur(g)}</td><td class="n ${cls(i+g)}">${eur(i+g)}</td></tr>`;}).join('')}</table></div></div>
-  <div class="fin-card"><h3>En qué se va</h3>${arr.map(([k,t])=>`<div style="margin-bottom:8px;cursor:pointer" data-gotag="${esc(k)}"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${esc(k)}</span><b>${eur(t)}</b></div><div style="height:6px;background:var(--accent);opacity:.7;border-radius:3px;width:${Math.max(2,t/mx*100)}%"></div></div>`).join('')}</div>`;
+  P.innerHTML=`<div class="fin-hero">
+    <div class="fin-hnav"><button data-b="mesPrev" aria-label="Mes anterior" ${i<=0?'disabled':''}>‹</button><span>${capi(ymNombre(F.bmes).toLowerCase())}</span><button data-b="mesNext" aria-label="Mes siguiente" ${i>=ms.length-1?'disabled':''}>›</button></div>
+    ${gas>0?`<div class="fin-donut">${donutSvg(parts,gas,'gastado')}<div class="fin-legend">${parts.map((p,j)=>`<div><span><span style="color:${DONUT[j]}">●</span> ${esc(p.k)}</span><b>${eur(p.v).replace(',00','')}</b></div>`).join('')}</div></div>`
+      :'<div style="padding:20px 0;text-align:center;opacity:.8">Sin gastos este mes</div>'}
+  </div>
+  <div class="fin-two"><div><small>Entra este mes</small><b class="fin-pos">${eur(ing)}</b></div>
+    <button data-b="irConc"><small>Por pasar a Gastos</small><b style="color:#c2410c">${porPasar}</b></button></div>
+  ${top.length?`<div class="fin-card"><h3>Dónde más gastas</h3>${top.map(([k,x])=>`<div style="margin-bottom:10px;font-size:14px"><div style="display:flex;justify-content:space-between;gap:8px"><span>${esc(k)}</span><b style="font-variant-numeric:tabular-nums">${eur(x)}</b></div><div class="fin-bar" style="width:${Math.max(3,x/mx*100)}%"></div></div>`).join('')}</div>`:''}
+  <p class="fin-mut" style="font-size:12px;margin:4px 2px 12px">${F.cls.length} movimientos cargados, del ${fdate(fs[0])} al ${fdate(fs[fs.length-1])}${li?'. Última importación: '+new Date(li).toLocaleDateString('es-ES'):''}.</p>`;
 }
 
 function todasEtiquetas(){const s=new Set();F.cls.forEach(m=>{let p='';m.etiqueta.split(SEP).forEach(x=>{p=p?p+SEP+x:x;s.add(p);});});return [...s].sort((a,b)=>a.localeCompare(b,'es'));}
@@ -3915,22 +4013,28 @@ function filtrar(){
 }
 function bMovs(P){
   const f=F.filt,L=filtrar();
-  const ing=L.filter(m=>m.imp>0).reduce((a,m)=>a+m.imp,0),gas=L.filter(m=>m.imp<0).reduce((a,m)=>a+m.imp,0);
+  const tot=L.reduce((a,m)=>a+m.imp,0);
   const ms=[...new Set(L.map(m=>m.fecha.slice(0,7)))].sort().reverse();
-  P.innerHTML=`<div class="fin-row"><input class="fin-in" id="fin-q" placeholder="Buscar (digi, aljarafesa, seguros…)" value="${esc(f.q)}" style="flex:1;min-width:180px"></div>
-  <div class="fin-row"><select class="fin-in" id="fin-tag" style="max-width:100%"><option value="">Todas las etiquetas</option>${todasEtiquetas().map(t=>`<option ${t===f.tag?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
-  <div class="fin-row"><label>Desde <input type="date" class="fin-in" id="fin-d" value="${f.d}"></label><label>Hasta <input type="date" class="fin-in" id="fin-h" value="${f.h}"></label>
+  const byDay=new Map();L.forEach(m=>byDay.set(m.fecha,(byDay.get(m.fecha)||0)+m.imp));
+  let list='',cur=null;
+  L.slice(0,F.shown).forEach(m=>{
+    if(m.fecha!==cur){if(cur)list+='</div>';cur=m.fecha;list+=`<div class="fin-day"><span>${diaLargo(m.fecha)}</span><b>${eur(byDay.get(m.fecha))}</b></div><div class="fin-group">`;}
+    const meses=m.meses&&(m.meses.length>1||m.meses[0]!==m.fecha.slice(0,7))?' · cubre '+m.meses.map(ymLabel).join(', '):'';
+    list+=`<div class="fin-row2">${ico(movIcon(m))}<div class="fi-main"><div class="fi-desc" title="${esc(m.desc+(m.com?' · '+m.com:''))}">${esc(m.comercio)}</div>
+      <span class="fin-tag ${m.fuente==='ing'?'ing':''} ${m.fuente==='manual'?'man':''}" data-retag="${m.key}" title="Cambiar etiqueta">${esc(m.etiqueta)}</span>${meses?`<span class="fin-mut" style="font-size:11px">${esc(meses)}</span>`:''}</div>
+      <div class="fi-imp ${m.imp>0?'fin-pos':''}">${eur(m.imp)}</div></div>`;
+  });
+  if(cur)list+='</div>';
+  P.innerHTML=`<div class="fin-row"><input class="fin-in" id="fin-q" placeholder="Buscar: digi, aljarafesa, seguros…" value="${esc(f.q)}" style="flex:1;min-width:180px"></div>
+  <details class="fin-card" ${f.tag||f.d||f.h||f.s||f.x?'open':''}><summary style="cursor:pointer;font-weight:700;font-size:13px">Filtros${f.tag?' · '+esc(f.tag):''}</summary>
+   <div class="fin-row" style="margin-top:10px"><select class="fin-in" id="fin-tag" style="max-width:100%"><option value="">Todas las etiquetas</option>${todasEtiquetas().map(t=>`<option ${t===f.tag?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
+   <div class="fin-row"><label>Desde <input type="date" class="fin-in" id="fin-d" value="${f.d}"></label><label>Hasta <input type="date" class="fin-in" id="fin-h" value="${f.h}"></label>
     <select class="fin-in" id="fin-s"><option value="">Todos</option><option value="gasto" ${f.s==='gasto'?'selected':''}>Gastos</option><option value="ingreso" ${f.s==='ingreso'?'selected':''}>Ingresos</option></select>
-    <label><input type="checkbox" id="fin-x" ${f.x?'checked':''}> Traspasos</label>
-    <button class="fin-btn sm" data-b="limpiar">Limpiar</button><button class="fin-btn sm" data-b="excel">📊 Excel</button></div>
-  <div class="fin-kpis"><div class="fin-kpi"><small>Movimientos</small><b>${L.length}</b></div><div class="fin-kpi"><small>Total</small><b class="${cls(ing+gas)}">${eur(ing+gas)}</b></div>
-    <div class="fin-kpi"><small>Media/mes</small><b class="${cls(ing+gas)}">${eur((ing+gas)/(ms.length||1))}</b></div></div>
-  <details class="fin-card"><summary style="cursor:pointer;font-weight:700;font-size:13px">Desglose por mes</summary><table class="fin-tbl" style="margin-top:6px">${ms.map(ym=>{const t=L.filter(m=>m.fecha.startsWith(ym)).reduce((a,m)=>a+m.imp,0);return `<tr><td>${ymLabel(ym)}</td><td class="n ${cls(t)}">${eur(t)}</td></tr>`;}).join('')}</table></details>
-  <div class="fin-card"><ul class="fin-list">${L.slice(0,F.shown).map(m=>`<li class="fin-item"><div class="fi-main"><div class="fi-desc">${esc(m.desc)}${m.com?` <span class="fin-mut">· ${esc(m.com)}</span>`:''}</div>
-    <div class="fi-sub">${fdate(m.fecha)}${m.meses&&(m.meses.length>1||m.meses[0]!==m.fecha.slice(0,7))?' · cubre '+m.meses.map(ymLabel).join(', '):''}</div>
-    <span class="fin-tag ${m.fuente==='ing'?'ing':''} ${m.fuente==='manual'?'man':''}" data-retag="${m.key}">${esc(m.etiqueta)}</span></div>
-    <div class="fi-imp ${cls(m.imp)}">${eur(m.imp)}</div></li>`).join('')||'<li class="fin-mut">Sin resultados</li>'}</ul>
-    ${L.length>F.shown?`<button class="fin-btn sm" data-b="mas">Mostrar más (${L.length-F.shown})</button>`:''}</div>`;
+    <label><input type="checkbox" id="fin-x" ${f.x?'checked':''}> Traspasos</label></div>
+   <div class="fin-row" style="margin:0"><button class="fin-btn sm" data-b="limpiar">Quitar filtros</button><button class="fin-btn sm" data-b="excel">Exportar a Excel</button></div></details>
+  <div class="fin-two"><div><small>${L.length} movimientos</small><b class="${cls(tot)}">${eur(tot)}</b></div><div><small>Media al mes</small><b class="${cls(tot)}">${eur(tot/(ms.length||1))}</b></div></div>
+  ${list||'<div class="fin-card fin-mut">Sin resultados con estos filtros.</div>'}
+  ${L.length>F.shown?`<div style="margin:12px 0"><button class="fin-btn" data-b="mas">Mostrar más (${L.length-F.shown})</button></div>`:''}`;
 }
 function exportExcel(){
   const L=filtrar().map(m=>({Fecha:fdate(m.fecha),Descripción:m.desc,Comentario:m.com,Comercio:m.comercio,Tipo:m.tipo,Etiqueta:m.etiqueta,'Categoría banco':m.cat,'Subcategoría banco':m.sub,Importe:m.imp}));
@@ -4100,6 +4204,8 @@ $('fin-bpane').addEventListener('click',e=>{
     if(a==='recargarG'){F.gastos=null;renderB();}
     if(a==='selTodo'||a==='selNada')document.querySelectorAll('#fin-nuevos .fin-chk').forEach(c=>c.checked=a==='selTodo');
     if(a==='crear')crearGastos();
+    if(a==='mesPrev'||a==='mesNext'){const ms=[...new Set(F.cls.map(m=>m.fecha.slice(0,7)))].sort(),i=ms.indexOf(F.bmes)+(a==='mesNext'?1:-1);if(ms[i]){F.bmes=ms[i];renderB();}}
+    if(a==='irConc'){F.bt='conc';document.querySelectorAll('#fin-btabs .fin-tab').forEach(b=>b.classList.toggle('on',b.dataset.bt==='conc'));renderB();}
     if(a==='enlazar'&&F.lastR){const u={};F.lastR.auto.forEach(([m,g])=>u['conc/'+m.key]={g,a:1});fref().update(u).then(()=>showToast('✅ '+F.lastR.auto.length+' enlazados')).catch(e=>showToast('Error: '+e.message));}
     if(a==='reiniciar'){const c=F.data.conc||{},u={};Object.entries(c).forEach(([k,v])=>{if(v&&!v.n)u['conc/'+k]=null;});
       const n=Object.keys(u).length;if(!n){showToast('No hay enlaces que deshacer');return;}
@@ -4192,63 +4298,119 @@ function repercutir(){
     return Object.assign({},c,{recs,pagos,pendiente:sum('pendiente'),nPend:recs.filter(r=>r.estado==='pendiente').length});
   });
 }
+// ---------- gastos del local ----------
+const GL_TIPOS={reparacion:'Reparación',seguro:'Seguro',impuesto:'Impuesto o tasa',comunidad:'Comunidad',otro:'Otro'};
+function glTipoDeEtiqueta(e){const n=norm(e);if(/SEGURO/.test(n))return 'seguro';if(/IMPUESTO|IBI|BASURA|AYUNTAMIENTO/.test(n))return 'impuesto';if(/COMUNIDAD/.test(n))return 'comunidad';if(/REPARA|ARREGLO|MANTENIMIENTO/.test(n))return 'reparacion';return 'otro';}
+function esGastoLocal(m){const p=m.etiqueta.split(SEP);if(m.imp>=0)return false;if(p[0]==='Tienda'&&p[1]==='Gastos')return true;return p.includes('Local')&&m.etiqueta!=='Suministros › Agua › Local';}
+function gastosLocal(year){
+  const banco=F.cls.filter(m=>m.fecha.startsWith(year)&&esGastoLocal(m)).map(m=>({fecha:m.fecha,concepto:m.comercio,tipo:glTipoDeEtiqueta(m.etiqueta),imp:-m.imp,src:'banco',det:m.etiqueta}));
+  const man=Object.entries(((F.data.tienda||{}).gastosLocal)||{}).filter(([,x])=>x&&String(x.fecha||'').startsWith(year))
+    .map(([id,x])=>({id,fecha:x.fecha,concepto:x.concepto,tipo:x.tipo||'otro',imp:+x.imp||0,nota:x.nota||'',src:'manual',pend:!!x.pend}));
+  return banco.concat(man).sort((a,b)=>a.fecha<b.fecha?1:-1);
+}
+function dotAlq(ym,ini,now,paid,rep){
+  if(ym<ini)return null;if(ym>now)return 'fut';
+  const o=(rep['alq_'+ym]||{}).e;
+  if(o==='olga')return 'olga';if(o==='no')return 'no';if(o==='pendiente')return 'pend';
+  return (paid[ym]>0||o==='cobrado')?'ok':'pend';
+}
+function dotRec(rs,ym,now){
+  if(!rs.length)return ym>now?'fut':null;
+  if(rs.some(r=>r.estado==='pendiente'))return 'pend';
+  if(rs.every(r=>r.estado==='olga'))return 'olga';
+  if(rs.every(r=>r.estado==='no'))return 'no';
+  return 'ok';
+}
+function estadoTienda(){
+  const c=contrato(),rep=(F.data.tienda||{}).rep||{},R=repercutir(),paid=alquiler(),tot=totalesC(c).total,now=ymNow(),ini=c.inicio||c.repDesde||'2024-07';
+  const alqPend=[];for(let ym=ini;ym<=now;ym=ymNext(ym))if(dotAlq(ym,ini,now,paid,rep)==='pend')alqPend.push(ym);
+  return {c,rep,R,paid,tot,now,ini,alqPend,deuda:r2(R.reduce((a,x)=>a+x.pendiente,0)+alqPend.length*tot)};
+}
+const ESTADO_TXT={ok:'cobrado',pend:'pendiente',olga:'pagado a Olga',no:'no aplica',fut:'todavía no'};
 function renderT(){
   const P=$('fin-tpane');if(!P)return;
-  const bt=document.querySelector('#fin-ttabs [data-tt="bog"]');if(bt)bt.textContent=inquilina();
   if(!F.loaded){P.innerHTML=F.err?'':'<div class="empty-state">Cargando…</div>';return;}
   if(F.tt!=='contrato'&&!contratoOk(contrato())){P.innerHTML=`<div class="fin-card"><h3>Primero, el contrato</h3><p style="font-size:13px;color:var(--text2);margin-bottom:10px">Rellena una vez los datos de la factura (emisora, inquilina, renta e impuestos) y a partir de ahí la factura se crea sola el día 1.</p><button class="fin-btn pri" data-t="irContrato">Rellenar contrato</button></div>`;return;}
-  ({fact:tFacturas,bog:tBog,contrato:tContrato})[F.tt](P);
+  (F.tt==='contrato'?tContrato:tMain)(P);
 }
-function tFacturas(P){
-  const fs=Object.values((F.data.tienda||{}).facturas||{}).sort((a,b)=>a.ym<b.ym?1:-1),paid=alquiler(),rep=(F.data.tienda||{}).rep||{};
-  const tot=totalesC(contrato());
-  P.innerHTML=`<div class="fin-row"><span class="fin-mut" style="font-size:12px">La factura de cada mes se crea sola el día 1 (desde ${ymLabel(contrato().facturasDesde||ymNow())}). Total mensual: <b>${eur(tot.total)}</b></span>
-   <button class="fin-btn sm" data-t="otraFact" style="margin-left:auto">+ Otro mes</button></div>
-  <div class="fin-card"><ul class="fin-list">${fs.map(f=>{const st=estadoFactura(f,paid,rep),t=totalesC(f);
-    return `<li class="fin-item"><div class="fi-main"><div class="fi-desc">Factura ${esc(f.num)} · ${esc(ymNombre(f.ym).toLowerCase())}</div>
-    <div class="fi-sub"><span class="fin-chip ${st}">${st}</span>${f.enviada?' · enviada '+new Date(f.enviada).toLocaleDateString('es-ES'):''}</div>
-    <div class="fin-row" style="margin:6px 0 0"><button class="fin-btn sm" data-t="ver" data-ym="${f.ym}">📄 Ver</button><button class="fin-btn sm ok" data-t="wa" data-ym="${f.ym}">📲 WhatsApp</button>
-     <select class="fin-in fin-est" data-ym="${f.ym}" style="font-size:12px;padding:5px"><option value="">Estado auto</option>${['emitida','enviada','cobrada'].map(s=>`<option value="${s}" ${f.estadoManual===s?'selected':''}>Marcar ${s}</option>`).join('')}</select>
-     <button class="fin-btn sm" data-t="borrar" data-ym="${f.ym}">✕</button></div></div>
-    <div class="fi-imp">${eur(t.total)}</div></li>`;}).join('')||'<li class="fin-mut" style="font-size:13px">Aún no hay facturas. La primera se creará el día 1.</li>'}</ul></div>`;
-}
-function tBog(P){
-  const rep=(F.data.tienda||{}).rep||{},R=repercutir(),paid=alquiler(),c=contrato(),tot=totalesC(c).total,now=ymNow();
-  const ini=c.inicio||c.repDesde||'2024-07';
-  const alqPend=[];for(let ym=ini;ym<=now;ym=ymNext(ym)){const o=(rep['alq_'+ym]||{}).e;if(!(paid[ym]>0)&&!o)alqPend.push(ym);if(o==='pendiente')alqPend.push(ym);}
-  const deuda=r2(R.reduce((a,x)=>a+x.pendiente,0)+alqPend.length*tot);
-  const ys=new Set();for(let ym=ini;ym<=now;ym=ymNext(ym))ys.add(ym.slice(0,4));R.forEach(x=>x.recs.forEach(r=>ys.add(r.ym.slice(0,4))));
-  const n2=v=>v.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const grid=[...ys].sort().reverse().map(y=>{
-    let h=`<div class="lab h">${y}</div>`+MESES_C.map(n=>`<div class="h">${n}</div>`).join('');
-    h+='<div class="lab">Alquiler</div>';
-    for(let i=1;i<=12;i++){const ym=y+'-'+String(i).padStart(2,'0'),o=(rep['alq_'+ym]||{}).e,p=paid[ym];
-      if(ym<ini||ym>now){h+=`<div class="fin-mut">${p?n2(p):'—'}</div>`;continue;}
-      const st=o==='olga'?'olga':o==='no'?'no':o==='pendiente'?'pend':(p>0||o==='cobrado')?'ok':'pend';
-      h+=`<div class="${st}" data-alq="${ym}" style="cursor:pointer" title="Toca para cambiar">${p?n2(p):st==='pend'?'pend.':st==='olga'?'Olga':st==='no'?'—':'✓'}</div>`;}
-    R.forEach(x=>{h+=`<div class="lab">${x.k}</div>`;
-      for(let i=1;i<=12;i++){const ym=y+'-'+String(i).padStart(2,'0'),rs=x.recs.filter(r=>r.ym===ym);
-        const pv=F.cls.filter(m=>tienda3(m)===x.sub&&m.imp>0&&(m.meses||[]).includes(ym)).reduce((a,m)=>a+m.imp/m.meses.length,0);
-        if(rs.length){const v=rs.reduce((a,r)=>a+r.imp,0),st=rs.some(r=>r.estado==='pendiente')?'pend':rs.every(r=>r.estado==='olga')?'olga':rs.every(r=>r.estado==='no')?'no':'ok';
-          h+=`<div class="${st}" title="${esc(rs.map(r=>fdate(r.fecha)+' '+eur(r.imp)+' · '+r.estado+(r.pago?' (pago '+fdate(r.pago.fecha)+' '+eur(r.pago.imp)+')':'')).join('\n'))}">${n2(v)}</div>`;}
-        else if(pv)h+=`<div class="ok solo" title="Pago sin recibo en estos extractos">${n2(pv)}*</div>`;else h+='<div class="fin-mut">—</div>';}});
-    return `<div class="fin-grid">${h}</div>`;}).join('');
+function tMain(P){
+  const S=estadoTienda(),{c,rep,R,paid,tot,now,ini}=S,inq=inquilina();
+  const y0=+ini.slice(0,4),y1=+now.slice(0,4);if(!F.tyear)F.tyear=String(y1);
+  const Y=F.tyear,yi=+Y;
+  // puntos por mes
+  let dots=`<span></span>`+['E','F','M','A','M','J','J','A','S','O','N','D'].map(l=>`<span class="m">${l}</span>`).join('');
+  const fila=(lab,fn)=>{dots+=`<span class="l">${lab}</span>`;for(let i=1;i<=12;i++){const ym=Y+'-'+String(i).padStart(2,'0'),st=fn(ym);
+    dots+=st?`<button class="fin-dot ${st}" data-t="mes" data-ym="${ym}" aria-label="${lab} ${ymNombre(ym).toLowerCase()}: ${ESTADO_TXT[st]}" ${st==='fut'?'tabindex="-1"':''}></button>`:'<span></span>';}};
+  fila('Alquiler',ym=>dotAlq(ym,ini,now,paid,rep));
+  R.forEach(x=>fila(x.k,ym=>dotRec(x.recs.filter(r=>r.ym===ym),ym,now)));
+  // gastos del local
+  const G=gastosLocal(Y),gTot=r2(G.reduce((a,g)=>a+g.imp,0));
+  const cobrado=r2(Object.entries(paid).filter(([ym])=>ym.startsWith(Y)).reduce((a,[,v])=>a+v,0));
+  // facturas
+  const fs=Object.values((F.data.tienda||{}).facturas||{}).sort((a,b)=>a.ym<b.ym?1:-1);
   const filas=[];R.forEach(x=>x.recs.forEach(r=>filas.push({x,r})));filas.sort((a,b)=>a.r.fecha<b.r.fecha?1:-1);
-  const fe=F.repFiltro||'pendiente';
-  P.innerHTML=`<div class="fin-kpis">
-   <div class="fin-kpi"><small>Alquiler pendiente (${alqPend.length} meses)</small><b class="${alqPend.length?'fin-warn':'fin-pos'}">${eur(alqPend.length*tot)}</b></div>
-   ${R.map(x=>`<div class="fin-kpi"><small>${x.k} pendiente (${x.nPend})</small><b class="${x.pendiente?'fin-warn':'fin-pos'}">${eur(x.pendiente)}</b></div>`).join('')}
-   <div class="fin-kpi"><small>Total que debe</small><b class="${deuda?'fin-warn':'fin-pos'}">${eur(deuda)}</b></div></div>
-  <div class="fin-card"><h3>Mes a mes</h3><p class="fin-mut" style="font-size:12px;margin-bottom:6px">Internet y Agua muestran el recibo que pagas tú: <span class="fin-chip cobrada">cobrado</span> <span class="fin-chip enviada">a Olga</span> <span class="fin-chip" style="background:rgba(217,119,6,.2);color:#d97706">pendiente</span>. En Alquiler toca un mes para marcarlo. <b>*</b> = pago sin recibo en el banco.</p>
-   <div class="fin-wrap">${grid}</div></div>
-  <div class="fin-card"><h3>Recibos repercutidos</h3>
-   <div class="fin-row"><select class="fin-in" id="fin-repf"><option value="">Todos</option>${['pendiente','cobrado','olga','no'].map(s=>`<option value="${s}" ${fe===s?'selected':''}>${{pendiente:'Pendientes',cobrado:'Cobrados',olga:'Pagados a Olga',no:'No repercutir'}[s]}</option>`).join('')}</select>
-    <label>Repercutir desde <input type="month" class="fin-in" id="fin-repdesde" value="${c.repDesde||'2024-07'}"></label><button class="fin-btn sm" data-t="recManual">+ Recibo de otra cuenta</button></div>
-   <ul class="fin-list">${filas.filter(f=>!fe||f.r.estado===fe).map(({x,r})=>{const sel=v=>(r.auto?'':(rep[r.id]||{}).e)===v?'selected':'';
-     return `<li class="fin-item"><div class="fi-main"><div class="fi-desc">${x.k} · ${esc(r.com)}</div><div class="fi-sub">Recibo ${fdate(r.fecha)}${r.pago?' · cobrado con pago del '+fdate(r.pago.fecha)+' ('+eur(r.pago.imp)+')':''}</div>
-      <div class="fin-row" style="margin:6px 0 0"><select class="fin-in" data-repe="${r.id}" style="font-size:12px;padding:5px"><option value="" ${sel('')}>Auto (${r.auto?r.estado:'…'})</option><option value="cobrado" ${sel('cobrado')}>Cobrado</option><option value="olga" ${sel('olga')}>Pagado a Olga</option><option value="pendiente" ${sel('pendiente')}>Pendiente</option><option value="no" ${sel('no')}>No repercutir</option></select>
-      <label>Periodo <input type="month" class="fin-in" data-repym="${r.id}" value="${r.ym}" style="font-size:12px;padding:4px"></label>${r.manual?`<button class="fin-btn sm" data-t="delMan" data-id="${r.mid}">✕</button>`:''}</div></div>
-      <div class="fi-imp ${r.estado==='pendiente'?'fin-warn':''}">${eur(r.imp)}</div></li>`;}).join('')||'<li class="fin-mut" style="font-size:13px">Nada con este filtro.</li>'}</ul></div>`;
+  const fe=F.repFiltro??'pendiente';
+  P.innerHTML=`<div class="fin-hero">
+    <div class="sm">${esc(inq)} te debe</div>
+    <div class="big">${eur(S.deuda)}</div>
+    <div class="fin-mini3"><div><small>Alquiler</small><b>${eur(S.alqPend.length*tot)}</b></div>${R.map(x=>`<div><small>${x.k}</small><b>${eur(x.pendiente)}</b></div>`).join('')}</div>
+    ${S.deuda>0?'<button class="fin-hbtn" data-t="resumenPdf">Crear resumen para enviarle</button>':''}
+  </div>
+  <div class="fin-card">
+    <div class="fin-cardh"><h3>${Y} mes a mes</h3><div class="fin-ynav"><button data-t="yPrev" aria-label="Año anterior" ${yi<=y0?'disabled':''}>‹</button><button data-t="yNext" aria-label="Año siguiente" ${yi>=y1?'disabled':''}>›</button></div></div>
+    <div class="fin-dots">${dots}</div>
+    <div class="fin-ley"><span><span style="color:#16a34a">●</span> cobrado</span><span><span style="color:#f59e0b">●</span> pendiente</span><span><span style="color:#2f6fd6">●</span> pagado a Olga</span><span>Toca un punto para ver o cambiar</span></div>
+  </div>
+  <div class="fin-card">
+    <div class="fin-cardh"><h3>Gastos del local ${Y}</h3><button class="fin-btn sm pri" data-t="glNuevo">Añadir gasto</button></div>
+    ${G.length?G.map(g=>`<div class="fin-row2" ${g.src==='manual'?`data-t="glEdit" data-id="${g.id}" style="cursor:pointer"`:''}>${ico(g.tipo,1)}<div class="fi-main"><div class="fi-desc">${esc(g.concepto)}</div><div class="fi-sub">${fdate(g.fecha)} · ${GL_TIPOS[g.tipo]||'Otro'} · ${g.src==='banco'?'desde el banco':'añadido a mano'}${g.pend?' · pendiente de pagar':''}</div></div><div class="fi-imp">${g.imp?eur(g.imp):'<span class="fin-mut">sin importe</span>'}</div></div>`).join('')
+      :'<p class="fin-mut" style="font-size:13px">Nada este año. Añade a mano reparaciones como el toldo; los recibos con etiqueta del local (por ejemplo Seguros › Local) salen solos.</p>'}
+    <div class="fin-rend"><span>Alquiler cobrado</span><b>${eur(cobrado)}</b></div>
+    <div class="fin-rend" style="margin-top:6px"><span>Gastos del local</span><b>−${eur(gTot)}</b></div>
+    <div class="fin-rend" style="margin-top:6px;background:#172554;color:#fff"><span>Rendimiento ${Y}</span><b style="color:#5eead4">${eur(cobrado-gTot)}</b></div>
+  </div>
+  <div class="fin-card">
+    <div class="fin-cardh"><h3>Facturas</h3><button class="fin-btn sm" data-t="otraFact">Otro mes</button></div>
+    ${fs.length?`<div class="fin-fscroll">${fs.map(f=>{const st=estadoFactura(f,paid,rep);return `<div class="fin-fcard" role="button" tabindex="0" data-t="factura" data-ym="${f.ym}"><div class="n">${esc(f.num)}</div><div class="st ${st}">${capi(st)}</div>
+      <button class="fin-btn sm ${st==='emitida'?'ok':''}" style="margin-top:8px;width:100%" data-t="${st==='emitida'?'wa':'ver'}" data-ym="${f.ym}">${st==='emitida'?'WhatsApp':'Ver PDF'}</button></div>`;}).join('')}</div>`
+      :`<p class="fin-mut" style="font-size:13px">La primera factura se crea sola el día 1 de ${ymNombre(c.facturasDesde||now).toLowerCase()}.</p>`}
+  </div>
+  <details class="fin-card" id="fin-recdet" ${F.recOpen?'open':''}><summary style="cursor:pointer;font-weight:700;font-size:14px">Recibos de internet y agua (${filas.filter(f=>f.r.estado==='pendiente').length} pendientes)</summary>
+   <div class="fin-row" style="margin-top:10px"><select class="fin-in" id="fin-repf"><option value="" ${fe===''?'selected':''}>Todos</option>${['pendiente','cobrado','olga','no'].map(s=>`<option value="${s}" ${fe===s?'selected':''}>${{pendiente:'Pendientes',cobrado:'Cobrados',olga:'Pagados a Olga',no:'No repercutir'}[s]}</option>`).join('')}</select>
+    <label>Repercutir desde <input type="month" class="fin-in" id="fin-repdesde" value="${c.repDesde||'2024-07'}"></label><button class="fin-btn sm" data-t="recManual">Recibo de otra cuenta</button></div>
+   ${filas.filter(f=>!fe||f.r.estado===fe).map(({x,r})=>recHtml(x,r,rep)).join('')||'<p class="fin-mut" style="font-size:13px">Nada con este filtro.</p>'}
+  </details>`;
+}
+function recHtml(x,r,rep){
+  const sel=v=>(r.auto?'':(rep[r.id]||{}).e)===v?'selected':'';
+  return `<div class="fin-row2" style="align-items:flex-start">${ico(x.k==='Internet'?'telefono':'agua')}<div class="fi-main"><div class="fi-desc">${x.k} · ${esc(r.com)}</div><div class="fi-sub">Recibo del ${fdate(r.fecha)}${r.pago?' · cobrado con su pago del '+fdate(r.pago.fecha)+' ('+eur(r.pago.imp)+')':''}</div>
+    <div class="fin-row" style="margin:6px 0 0"><select class="fin-in" data-repe="${r.id}" aria-label="Estado" style="font-size:12px;padding:5px"><option value="" ${sel('')}>Automático (${r.auto?ESTADO_TXT[{cobrado:'ok',pendiente:'pend',olga:'olga',no:'no'}[r.estado]]:'…'})</option><option value="cobrado" ${sel('cobrado')}>Cobrado</option><option value="olga" ${sel('olga')}>Pagado a Olga</option><option value="pendiente" ${sel('pendiente')}>Pendiente</option><option value="no" ${sel('no')}>No repercutir</option></select>
+    <label>Periodo <input type="month" class="fin-in" data-repym="${r.id}" value="${r.ym}" style="font-size:12px;padding:4px"></label>${r.manual?`<button class="fin-btn sm" data-t="delMan" data-id="${r.mid}">Borrar</button>`:''}</div></div>
+    <div class="fi-imp ${r.estado==='pendiente'?'fin-warn':''}">${eur(r.imp)}</div></div>`;
+}
+function abrirMes(ym){
+  F.modalYm=ym;const S=estadoTienda(),{rep,R,paid,tot,ini,now}=S,st=dotAlq(ym,ini,now,paid,rep);
+  let h=`<div class="fin-card" style="margin-bottom:10px"><div class="fin-cardh"><h3>Alquiler</h3><b>${paid[ym]?eur(paid[ym]):st==='pend'?'<span class="fin-warn">pendiente '+eur(tot)+'</span>':ESTADO_TXT[st]||'—'}</b></div>
+    <div class="fin-row" style="margin:0">${[['','Automático'],['cobrado','Cobrado'],['olga','Pagado a Olga'],['pendiente','Pendiente'],['no','No aplica']].map(([v,l])=>`<button class="fin-btn sm ${((rep['alq_'+ym]||{}).e||'')===v?'pri':''}" data-alqset="${ym}|${v}">${l}</button>`).join('')}</div></div>`;
+  R.forEach(x=>{const rs=x.recs.filter(r=>r.ym===ym);h+=`<div class="fin-card" style="margin-bottom:10px"><h3>${x.k}</h3>${rs.length?rs.map(r=>recHtml(x,r,rep)).join(''):'<p class="fin-mut" style="font-size:13px">Sin recibo este mes.</p>'}</div>`;});
+  modal(capi(ymNombre(ym).toLowerCase()),h+'<button class="btn-sec" data-fin="cerrar">Cerrar</button>');
+}
+function abrirFactura(ym){
+  const f=((F.data.tienda||{}).facturas||{})[ym];if(!f)return;
+  const st=estadoFactura(f,alquiler(),(F.data.tienda||{}).rep||{});
+  modal('Factura '+f.num,`<p style="font-size:14px;color:var(--text2);margin-bottom:12px">${capi(ymNombre(ym).toLowerCase())} · ${eur(totalesC(f).total)} · <b>${st}</b>${f.enviada?' · enviada el '+new Date(f.enviada).toLocaleDateString('es-ES'):''}</p>
+   <div style="display:grid;gap:8px"><button class="btn-primary" data-t="wa" data-ym="${ym}">Enviar por WhatsApp</button><button class="btn-sec" style="margin:0" data-t="ver" data-ym="${ym}">Ver PDF</button>
+   <label style="font-size:13px;color:var(--text2)">Estado <select class="fin-in fin-est" data-ym="${ym}" style="width:100%;margin-top:4px"><option value="">Automático (${st})</option>${['emitida','enviada','cobrada'].map(s=>`<option value="${s}" ${f.estadoManual===s?'selected':''}>${capi(s)}</option>`).join('')}</select></label>
+   <button class="btn-sec" style="margin:0;color:#b91c1c" data-t="borrar" data-ym="${ym}">Borrar factura</button><button class="btn-sec" style="margin:0" data-fin="cerrar">Cerrar</button></div>`);
+}
+function abrirGastoLocal(id){
+  const x=id?(((F.data.tienda||{}).gastosLocal)||{})[id]||{}:{},hoy=new Date().toISOString().slice(0,10);
+  modal(id?'Gasto del local':'Añadir gasto del local',`<div class="fg"><label for="gl-c">Concepto</label><input class="fin-in" id="gl-c" style="width:100%" value="${esc(x.concepto||'')}" placeholder="Cambio de toldo"></div>
+   <div class="fg"><label for="gl-t">Tipo</label><select class="fin-in" id="gl-t" style="width:100%">${Object.entries(GL_TIPOS).map(([k,l])=>`<option value="${k}" ${(x.tipo||'reparacion')===k?'selected':''}>${l}</option>`).join('')}</select></div>
+   <div class="fin-row"><label>Fecha <input class="fin-in" type="date" id="gl-f" value="${esc(x.fecha||hoy)}"></label><label>Importe € <input class="fin-in" type="number" step="0.01" id="gl-i" value="${x.imp??''}" style="width:110px"></label></div>
+   <label style="display:flex;gap:8px;align-items:center;font-size:13px;margin-bottom:12px"><input type="checkbox" id="gl-p" ${x.pend?'checked':''} style="width:auto"> Presupuesto, todavía sin pagar</label>
+   <div class="fg"><label for="gl-n">Nota</label><input class="fin-in" id="gl-n" style="width:100%" value="${esc(x.nota||'')}" placeholder="Empresa, nº de factura…"></div>
+   <button class="btn-primary" data-t="glSave" data-id="${id||''}">Guardar</button>${id?`<button class="btn-sec" style="color:#b91c1c" data-t="glDel" data-id="${id}">Borrar</button>`:''}<button class="btn-sec" data-fin="cerrar">Cancelar</button>`);
 }
 function tContrato(P){
   const c=contrato(),e=c.emisor||{},r=c.receptor||{},t=totalesC(c);
@@ -4321,22 +4483,70 @@ async function enviarWA(ym){
     }
   }catch(e){showToast('Error: '+e.message);}
 }
-// ---------- eventos Tienda ----------
-$('fin-tpane').addEventListener('click',async e=>{
-  const x=e.target.closest('[data-t],[data-alq]');if(!x)return;
-  if(x.dataset.alq){const ym=x.dataset.alq;modal('Alquiler '+ymNombre(ym).toLowerCase(),`<div style="display:grid;gap:8px">${[['','Automático (según el banco)'],['cobrado','Cobrado'],['olga','Pagado a Olga'],['pendiente','Pendiente'],['no','No aplica']].map(([v,l])=>`<button class="btn-sec" data-alqset="${ym}|${v}" style="margin:0">${l}</button>`).join('')}</div>`);return;}
+// ---------- resumen de lo pendiente (PDF) ----------
+function pdfResumen(){
+  const S=estadoTienda(),{c,R,tot}=S,{jsPDF}=window.jspdf,d=new jsPDF({unit:'mm',format:'a4'});
+  const rows=[];
+  S.alqPend.forEach(ym=>rows.push([fdate(ym+'-01'),ymLabel(ym),'Alquiler del local',tot]));
+  R.forEach(x=>x.recs.filter(r=>r.estado==='pendiente').forEach(r=>rows.push([fdate(r.fecha),ymLabel(r.ym),x.k==='Internet'?'Internet (Digi)':'Agua (Aljarafesa)',r.imp])));
+  rows.sort((a,b)=>{const k=s=>s.slice(6)+s.slice(3,5)+s.slice(0,2);return k(a[0])<k(b[0])?-1:1;});
+  const nom=((c.receptor||{}).nombre)||'';
+  d.setFont('helvetica','bold');d.setFontSize(16);d.text('Gastos del local pendientes',18,22);
+  d.setFont('helvetica','normal');d.setFontSize(10);d.text('Para: '+nom+' · Fecha: '+new Date().toLocaleDateString('es-ES'),18,29);
+  let y=40;d.setFillColor(23,37,84);d.rect(18,y-5,174,8,'F');d.setTextColor(255,255,255);d.setFont('helvetica','bold');
+  d.text('Fecha recibo',20,y);d.text('Periodo',52,y);d.text('Concepto',80,y);d.text('Importe',190,y,{align:'right'});
+  d.setTextColor(26,26,46);d.setFont('helvetica','normal');y+=8;
+  rows.forEach((r,i)=>{if(y>270){d.addPage();y=20;}if(i%2){d.setFillColor(242,243,248);d.rect(18,y-5,174,7,'F');}
+    d.text(r[0],20,y);d.text(r[1],52,y);d.text(r[2],80,y);d.text(eur(r[3]),190,y,{align:'right'});y+=7;});
+  const sum=k=>r2(rows.filter(r=>r[2].startsWith(k)).reduce((a,r)=>a+r[3],0)),total=r2(rows.reduce((a,r)=>a+r[3],0));
+  y+=3;d.setDrawColor(23,37,84);d.line(18,y-4,192,y-4);
+  [['Alquiler',sum('Alquiler')],['Internet',sum('Internet')],['Agua',sum('Agua')]].filter(x=>x[1]).forEach(([k,v])=>{d.text('Total '+k.toLowerCase(),120,y);d.text(eur(v),190,y,{align:'right'});y+=6;});
+  d.setFont('helvetica','bold');d.setFontSize(12);d.text('TOTAL PENDIENTE',120,y+2);d.text(eur(total),190,y+2,{align:'right'});
+  return {blob:d.output('blob'),total};
+}
+async function compartir(blob,name,txt){
+  const file=new File([blob],name,{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],text:txt});return 'share';}catch(e){if(e&&e.name==='AbortError')return 'abort';throw e;}
+  }
+  descargar(blob,name);
+  let tel=String((contrato().receptor||{}).tel||'').replace(/\D/g,'');if(tel.length===9)tel='34'+tel;
+  window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(txt),'_blank');
+  return 'web';
+}
+async function enviarResumen(){
+  try{await loadJsPDF();const {blob,total}=pdfResumen(),nom=inquilina();
+    const r=await compartir(blob,'Pendiente_local_'+new Date().toISOString().slice(0,10)+'.pdf',`Hola ${nom}, te paso el resumen de lo pendiente del local. Total: ${eur(total)}.`);
+    if(r==='web')setTimeout(()=>showToast('PDF descargado: adjúntalo en el chat de WhatsApp',4000),500);
+  }catch(e){showToast('Error: '+e.message);}
+}
+// ---------- eventos Tienda (pantalla y ventana) ----------
+async function tClick(e){
+  const x=e.target.closest('[data-t]');if(!x)return;
   const a=x.dataset.t,ym=x.dataset.ym;
   if(a==='irContrato'){F.tt='contrato';document.querySelectorAll('#fin-ttabs .fin-tab').forEach(b=>b.classList.toggle('on',b.dataset.tt==='contrato'));renderT();}
-  if(a==='ver')verFactura(ym);
-  if(a==='wa')enviarWA(ym);
-  if(a==='borrar'&&confirm('¿Borrar la factura '+ym+'? No se volverá a crear sola.')){await fref().update({['tienda/facturas/'+ym]:null,['tienda/borradas/'+ym]:true});}
-  if(a==='otraFact'){const v=prompt('Mes de la factura (AAAA-MM), por ejemplo '+ymNow(),ymNow());if(!v)return;if(!/^\d{4}-\d\d$/.test(v)){showToast('Formato AAAA-MM');return;}
+  if(a==='yPrev'||a==='yNext'){F.tyear=String(+F.tyear+(a==='yNext'?1:-1));renderT();}
+  if(a==='mes')abrirMes(ym);
+  if(a==='factura')abrirFactura(ym);
+  if(a==='ver'){e.stopPropagation();verFactura(ym);}
+  if(a==='wa'){e.stopPropagation();enviarWA(ym);}
+  if(a==='resumenPdf')enviarResumen();
+  if(a==='borrar'&&confirm('¿Borrar la factura '+ym+'? No se volverá a crear sola.')){await fref().update({['tienda/facturas/'+ym]:null,['tienda/borradas/'+ym]:true});cerrarModal();}
+  if(a==='otraFact'){const v=prompt('Mes de la factura (AAAA-MM), por ejemplo '+ymNow(),ymNow());if(!v)return;if(!/^\d{4}-\d\d$/.test(v)){showToast('Escribe el mes como AAAA-MM');return;}
     if(((F.data.tienda||{}).facturas||{})[v]&&!confirm('Ya existe. ¿Rehacerla con los datos actuales del contrato?'))return;
     await fref().update({['tienda/facturas/'+v]:nuevaFactura(contrato(),v),['tienda/borradas/'+v]:null});}
-  if(a==='recManual'){modal('Recibo de otra cuenta',`<div class="fg"><label>Concepto</label><select class="fin-in" id="rm-k" style="width:100%">${REPER.map(c=>`<option>${c.k}</option>`).join('')}</select></div>
-    <div class="fg"><label>Fecha del recibo</label><input class="fin-in" type="date" id="rm-f" style="width:100%"></div><div class="fg"><label>Importe €</label><input class="fin-in" type="number" step="0.01" id="rm-i" style="width:100%"></div>
-    <div class="fg"><label>Nota</label><input class="fin-in" id="rm-n" placeholder="p. ej. Caja Rural" style="width:100%"></div><button class="btn-primary" data-fin="rmSave">Guardar</button><button class="btn-sec" data-fin="cerrar">Cancelar</button>`);}
-  if(a==='delMan'&&confirm('¿Borrar este recibo manual?'))fref('tienda/recManual/'+x.dataset.id).remove();
+  if(a==='recManual'){modal('Recibo de otra cuenta',`<div class="fg"><label for="rm-k">Concepto</label><select class="fin-in" id="rm-k" style="width:100%">${REPER.map(c=>`<option>${c.k}</option>`).join('')}</select></div>
+    <div class="fg"><label for="rm-f">Fecha del recibo</label><input class="fin-in" type="date" id="rm-f" style="width:100%"></div><div class="fg"><label for="rm-i">Importe €</label><input class="fin-in" type="number" step="0.01" id="rm-i" style="width:100%"></div>
+    <div class="fg"><label for="rm-n">Nota</label><input class="fin-in" id="rm-n" placeholder="p. ej. Caja Rural" style="width:100%"></div><button class="btn-primary" data-fin="rmSave">Guardar</button><button class="btn-sec" data-fin="cerrar">Cancelar</button>`);}
+  if(a==='delMan'&&confirm('¿Borrar este recibo añadido a mano?')){await fref('tienda/recManual/'+x.dataset.id).remove();if(F.modalYm&&$('modal-fin').classList.contains('show'))abrirMes(F.modalYm);}
+  if(a==='glNuevo')abrirGastoLocal('');
+  if(a==='glEdit')abrirGastoLocal(x.dataset.id);
+  if(a==='glSave'){const c=($('gl-c').value||'').trim(),f=$('gl-f').value,i=$('gl-i').value===''?null:r2(parseFloat($('gl-i').value));
+    if(!c||!f){showToast('Pon concepto y fecha');return;}
+    const id=x.dataset.id||('gl'+Date.now());
+    await fref('tienda/gastosLocal/'+id).set({concepto:c,tipo:$('gl-t').value,fecha:f,imp:i,pend:$('gl-p').checked||null,nota:($('gl-n').value||'').trim()||null});
+    cerrarModal();showToast('✅ Gasto del local guardado');}
+  if(a==='glDel'&&confirm('¿Borrar este gasto del local?')){await fref('tienda/gastosLocal/'+x.dataset.id).remove();cerrarModal();}
   if(a==='guardarContrato'){
     const g=id=>($(id).value||'').trim(),num=id=>$(id).value===''?null:+$(id).value;
     const c={emisor:{nombre:g('c-en'),nif:g('c-ei'),dir:g('c-ed'),cp:g('c-ec'),email:g('c-ee'),tel:g('c-et')},receptor:{nombre:g('c-rn'),nif:g('c-ri'),dir:g('c-rd'),cp:g('c-rc'),tel:g('c-rt')},
@@ -4344,29 +4554,35 @@ $('fin-tpane').addEventListener('click',async e=>{
     if(!contratoOk(c)){showToast('Faltan nombre de emisora, inquilina o neto');return;}
     await fref('tienda/contrato').set(c);showToast('✅ Contrato guardado');window.scrollTo(0,0);const sb=document.querySelector('#screen-tienda .screen-body');if(sb)sb.scrollTop=0;
   }
-});
+}
+function tChange(e){
+  const t=e.target;
+  if(t.id==='fin-repf'){F.repFiltro=t.value;renderT();return;}
+  if(t.id==='fin-repdesde'&&t.value){fref('tienda/contrato/repDesde').set(t.value);return;}
+  const reMes=()=>{if(F.modalYm&&$('modal-fin').classList.contains('show')&&t.closest('#modal-fin'))abrirMes(F.modalYm);};
+  if(t.dataset.repe!==undefined){fref('tienda/rep/'+t.dataset.repe+'/e').set(t.value||null).then(reMes);return;}
+  if(t.dataset.repym!==undefined&&t.value){fref('tienda/rep/'+t.dataset.repym+'/ym').set(t.value).then(reMes);return;}
+  if(t.classList.contains('fin-est')){fref('tienda/facturas/'+t.dataset.ym+'/estadoManual').set(t.value||null);return;}
+}
+$('fin-tpane').addEventListener('click',tClick);
+$('fin-tpane').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.fin-fcard')){e.preventDefault();abrirFactura(e.target.dataset.ym);}});
+$('fin-tpane').addEventListener('change',tChange);
+$('fin-tpane').addEventListener('toggle',e=>{if(e.target.id==='fin-recdet')F.recOpen=e.target.open;},true);
 $('fin-tpane').addEventListener('input',e=>{
   if(/^c-/.test(e.target.id)){const st=$('c-est');if(st){st.style.background='rgba(217,119,6,.15)';st.style.color='#d97706';st.textContent='✏️ Cambios sin guardar: pulsa "Guardar contrato" al final';}}
   if(!/^c-(neto|iva|irpf)$/.test(e.target.id))return;
   const c={neto:+$('c-neto').value||0,iva:+$('c-iva').value||0,irpf:+$('c-irpf').value||0},tt=totalesC(c),el=$('c-total');
   if(el)el.innerHTML=`Neto ${eur(tt.neto)} + IVA ${eur(tt.iva)} − IRPF ${eur(tt.irpf)} = <b>${eur(tt.total)}</b>`;
 });
-$('fin-tpane').addEventListener('change',e=>{
-  const t=e.target;
-  if(t.id==='fin-repf'){F.repFiltro=t.value;renderT();return;}
-  if(t.id==='fin-repdesde'&&t.value){fref('tienda/contrato/repDesde').set(t.value);return;}
-  if(t.dataset.repe!==undefined){fref('tienda/rep/'+t.dataset.repe+'/e').set(t.value||null);return;}
-  if(t.dataset.repym!==undefined&&t.value){fref('tienda/rep/'+t.dataset.repym+'/ym').set(t.value);return;}
-  if(t.classList.contains('fin-est')){fref('tienda/facturas/'+t.dataset.ym+'/estadoManual').set(t.value||null);return;}
-});
+$('modal-fin').addEventListener('click',e=>{if(e.target.closest('#modal-fin-body [data-t]'))tClick(e);});
+$('modal-fin').addEventListener('change',e=>{if(e.target.closest('#modal-fin-body'))tChange(e);});
 $('modal-fin').addEventListener('click',async e=>{
   const x=e.target.closest('[data-alqset],[data-fin="rmSave"]');if(!x)return;
-  if(x.dataset.alqset){const [ym,v]=x.dataset.alqset.split('|');await fref('tienda/rep/alq_'+ym+'/e').set(v||null);cerrarModal();return;}
+  if(x.dataset.alqset){const [ym,v]=x.dataset.alqset.split('|');await fref('tienda/rep/alq_'+ym+'/e').set(v||null);abrirMes(ym);return;}
   const k=$('rm-k').value,f=$('rm-f').value,i=parseFloat($('rm-i').value);
   if(!f||!(i>0)){showToast('Pon fecha e importe');return;}
   await fref('tienda/recManual/r'+Date.now()).set({k,fecha:f,imp:r2(i),nota:($('rm-n').value||'').trim()});cerrarModal();
 });
-
 // ---------- enganche con la app (sin tocar el código existente) ----------
 const _cargarHome=cargarHome;
 cargarHome=async function(){await _cargarHome.apply(this,arguments);finInit();};
