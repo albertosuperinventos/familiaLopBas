@@ -4253,9 +4253,9 @@ function tContrato(P){
   <div class="fin-card"><h3>Factura</h3>
    <div class="fg"><textarea class="fin-in" id="c-con" rows="3" style="width:100%" placeholder="Importe del alquiler situado en …, según contrato de arrendamiento suscrito.">${esc(c.concepto||'')}</textarea></div>
    <div class="fin-row"><label>Neto € <input class="fin-in" id="c-neto" type="number" step="0.01" value="${c.neto??''}" style="width:90px"></label><label>IVA % <input class="fin-in" id="c-iva" type="number" step="0.01" value="${c.iva??21}" style="width:70px"></label><label>IRPF % <input class="fin-in" id="c-irpf" type="number" step="0.01" value="${c.irpf??19}" style="width:70px"></label></div>
-   <div class="fin-mut" style="font-size:12px;margin-bottom:8px">Neto ${eur(t.neto)} + IVA ${eur(t.iva)} − IRPF ${eur(t.irpf)} = <b>${eur(t.total)}</b></div>
+   <div class="fin-mut" id="c-total" style="font-size:13px;margin-bottom:8px">Neto ${eur(t.neto)} + IVA ${eur(t.iva)} − IRPF ${eur(t.irpf)} = <b>${eur(t.total)}</b></div>
    <div class="fin-row"><label>Inicio del alquiler <input class="fin-in" id="c-ini" type="month" value="${c.inicio||'2024-08'}"></label><label>Crear facturas desde <input class="fin-in" id="c-fd" type="month" value="${c.facturasDesde||'2026-12'}"></label></div>
-   <p class="fin-mut" style="font-size:12px;margin-bottom:10px">Los cambios solo afectan a las facturas nuevas; las ya creadas guardan sus datos.</p>
+   <p class="fin-mut" style="font-size:12px;margin-bottom:10px"><b>Crear facturas desde</b>: primer mes que la app facturará sola (cada día 1). Las anteriores ya las tienes hechas fuera, así que no se repiten; si necesitas alguna, en Facturas → "+ Otro mes". Los cambios del contrato solo afectan a las facturas nuevas.</p>
    <button class="btn-primary" data-t="guardarContrato">Guardar contrato</button></div>`;
 }
 // ---------- PDF ----------
@@ -4334,6 +4334,11 @@ $('fin-tpane').addEventListener('click',async e=>{
     await fref('tienda/contrato').set(c);showToast('✅ Contrato guardado');F.tt='fact';document.querySelectorAll('#fin-ttabs .fin-tab').forEach(b=>b.classList.toggle('on',b.dataset.tt==='fact'));
   }
 });
+$('fin-tpane').addEventListener('input',e=>{
+  if(!/^c-(neto|iva|irpf)$/.test(e.target.id))return;
+  const c={neto:+$('c-neto').value||0,iva:+$('c-iva').value||0,irpf:+$('c-irpf').value||0},tt=totalesC(c),el=$('c-total');
+  if(el)el.innerHTML=`Neto ${eur(tt.neto)} + IVA ${eur(tt.iva)} − IRPF ${eur(tt.irpf)} = <b>${eur(tt.total)}</b>`;
+});
 $('fin-tpane').addEventListener('change',e=>{
   const t=e.target;
   if(t.id==='fin-repf'){F.repFiltro=t.value;renderT();return;}
@@ -4341,8 +4346,6 @@ $('fin-tpane').addEventListener('change',e=>{
   if(t.dataset.repe!==undefined){fref('tienda/rep/'+t.dataset.repe+'/e').set(t.value||null);return;}
   if(t.dataset.repym!==undefined&&t.value){fref('tienda/rep/'+t.dataset.repym+'/ym').set(t.value);return;}
   if(t.classList.contains('fin-est')){fref('tienda/facturas/'+t.dataset.ym+'/estadoManual').set(t.value||null);return;}
-  if(/^c-(neto|iva|irpf)$/.test(t.id)){/* recalcula el total mostrado */const c=Object.assign({},contrato(),{neto:+$('c-neto').value,iva:+$('c-iva').value,irpf:+$('c-irpf').value});
-    const tt=totalesC(c),el=t.closest('.fin-card').querySelector('.fin-mut');if(el)el.innerHTML=`Neto ${eur(tt.neto)} + IVA ${eur(tt.iva)} − IRPF ${eur(tt.irpf)} = <b>${eur(tt.total)}</b>`;}
 });
 $('modal-fin').addEventListener('click',async e=>{
   const x=e.target.closest('[data-alqset],[data-fin="rmSave"]');if(!x)return;
