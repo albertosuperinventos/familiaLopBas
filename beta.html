@@ -3955,6 +3955,8 @@ function catFromTag(m){
   if(p0==='Combustible'||p0==='Vehículos'||e==='Seguros › Vehículos')return 'vehiculo';
   if(e.startsWith('Suministros › Luz'))return 'luz';if(e.startsWith('Suministros › Agua'))return 'agua';if(e.startsWith('Suministros › Gas'))return 'gas';
   if(p0==='Telefonía')return 'telefono';if(p0==='Extraescolares')return 'colegio';
+  const pn=norm(p0);if(/^OCIO/.test(pn))return 'ocio';if(/^(RESTAURANTE|CAFETERIA)/.test(pn))return 'restaurante';if(/^(SUPERMERCADO|ALIMENTACION|COMPRA)/.test(pn))return 'supermercado';
+  if(/^ROPA/.test(pn))return 'ropa';if(/^(COLEGIO|EDUCACION)/.test(pn))return 'colegio';if(/^(MEDICO|SALUD|FARMACIA)/.test(pn))return 'medico';if(/^TRANSPORTE/.test(pn))return 'transporte';if(/^(OTTO|MASCOTA)/.test(pn))return 'otto';
   if(/SUPERMERCADO/.test(s))return 'supermercado';if(/RESTAURANTE|CAFETERIA/.test(s))return 'restaurante';if(/ROPA/.test(s))return 'ropa';
   if(/DENTISTA|MEDICO|FARMACIA|OPTICA/.test(s))return 'medico';if(/MASCOTA|VETERINAR/.test(s))return 'otto';
   if(/GASOLINA|VEHICULO/.test(s))return 'vehiculo';if(/TRANSPORTE|PARKING|BILLETE|TAXI|PEAJE/.test(s))return 'transporte';
