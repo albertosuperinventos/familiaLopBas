@@ -415,7 +415,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .dsp-seg button.on{color:#fff}
 .dsp-seg .on.nev{background:#0e7490}.dsp-seg .on.desp{background:#4d7c0f}.dsp-seg .on.cong{background:#0369a1}.dsp-seg .on.no{background:#9ca3af}
 .dsp-tk-sub{font-size:12px;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.dsp-tk-sub select{border:none;background:var(--bg3);color:var(--text);border-radius:8px;padding:3px 6px;font-size:12px;font-family:inherit;max-width:230px}
+.dsp-tk-sub select{border:1.5px solid #4d7c0f;background:var(--card);color:var(--text);border-radius:8px;padding:5px 8px;font-size:13px;font-weight:700;font-family:inherit;max-width:250px}
+.dsp-tk-sub .lbl{font-weight:700;color:var(--text)}
 .dsp-tk-sub .ces{color:#4d7c0f;font-weight:700}
 .dsp-tk-nota{font-size:12px;color:var(--text2);padding:8px 0 0}
 
@@ -4922,7 +4923,7 @@ function pintarTicket(){
     const enC=r.d!=='no'&&D.cestaN&&D.cestaN.has(norm(r.nombre));
     return `<div class="dsp-tk-row"><div class="dsp-tk-top"><input value="${esc(r.nombre)}" data-tkn="${i}" aria-label="Nombre">
       <div class="dsp-seg">${Object.keys(LBL).map(k=>`<button class="${r.d===k?'on '+k:''}" data-tkd="${i}|${k}">${LBL[k]}</button>`).join('')}</div></div>
-      <div class="dsp-tk-sub">${r.precio?r.precio.toFixed(2).replace('.',',')+' € · ':''}${lugar||'No se guarda'}${enC?' <span class="ces">· sale de la Cesta</span>':''}</div></div>`;
+      <div class="dsp-tk-sub">${r.precio?r.precio.toFixed(2).replace('.',',')+' € · ':''}${lugar?'<span class="lbl">'+(r.d==='cong'?'Cajón':'Balda')+':</span> '+lugar:'No se guarda'}${enC?' <span class="ces">· sale de la Cesta</span>':''}</div></div>`;
   }).join('');
   const n={nev:0,desp:0,cong:0};t.rows.forEach(r=>{if(n[r.d]!=null)n[r.d]++;});
   const partes=[n.nev&&'Nevera '+n.nev,n.desp&&'Despensa '+n.desp,n.cong&&'Congelador '+n.cong].filter(Boolean);
