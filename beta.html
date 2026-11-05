@@ -3996,16 +3996,19 @@ function analizar(){
 }
 async function bConc(P){
   if(!F.gastos){P.innerHTML='<div class="empty-state">Cargando gastos…</div>';try{await loadGastos();}catch(e){P.innerHTML='<div class="fin-card">Error cargando gastos: '+esc(e.message)+'</div>';return;}if(F.bt==='conc')renderB();return;}
-  const R=analizar();
-  if(R.auto.length){const u={};R.auto.forEach(([m,g])=>u['conc/'+m.key]={g,a:1});fref().update(u).catch(e=>showToast('Error: '+e.message));
-    P.innerHTML='<div class="empty-state">Enlazando '+R.auto.length+' movimientos con sus tickets…</div>';return;}
+  const R=analizar();F.lastR=R;
   const vhOpts=sel=>`<option value="">— sin asignar —</option>`+Object.entries(F.vh||{}).map(([id,v])=>`<option value="${id}" ${id===sel?'selected':''}>${esc(vhNom(v)||'Vehículo')}</option>`).join('');
   const pref=F.data.vhPref||{};
   const nEnl=Object.values(F.data.conc||{}).filter(c=>c&&c.g).length;
   const totN=R.nuevos.reduce((a,m)=>a-m.imp,0);
-  P.innerHTML=`<div class="fin-row"><label>Conciliar desde <input type="month" class="fin-in" id="fin-concdesde" value="${concDesde()}"></label><button class="fin-btn sm" data-b="recargarG">↻ Recargar gastos</button></div>
-  <div class="fin-kpis"><div class="fin-kpi"><small>✅ Enlazados</small><b>${nEnl}</b></div><div class="fin-kpi"><small>❓ Dudosos</small><b class="${R.dud.length?'fin-warn':''}">${R.dud.length}</b></div>
+  const gNom=id=>{const g=(F.gastos||{})[id]||{};return fdate(g.fecha)+' '+(g.nota||CATS[g.categoria]||'');};
+  P.innerHTML=`<div class="fin-row"><label>Conciliar desde <input type="month" class="fin-in" id="fin-concdesde" value="${concDesde()}"></label><button class="fin-btn sm" data-b="recargarG">↻ Recargar gastos</button>${nEnl?'<button class="fin-btn sm" data-b="reiniciar">↺ Deshacer enlaces</button>':''}</div>
+  <p class="fin-mut" style="font-size:12px;margin-bottom:8px">Nada se guarda hasta que pulses un botón verde. Empieza por un mes reciente.</p>
+  <div class="fin-kpis"><div class="fin-kpi"><small>✅ Ya enlazados</small><b>${nEnl}</b></div><div class="fin-kpi"><small>🔗 Coinciden con ticket</small><b>${R.auto.length}</b></div><div class="fin-kpi"><small>❓ Dudosos</small><b class="${R.dud.length?'fin-warn':''}">${R.dud.length}</b></div>
    <div class="fin-kpi"><small>➕ Sin ticket</small><b class="${R.nuevos.length?'fin-warn':''}">${R.nuevos.length}</b></div><div class="fin-kpi"><small>🧾 Tickets sin banco</small><b>${R.sinMov.length}</b></div></div>
+  ${R.auto.length?`<div class="fin-card"><h3>🔗 Coinciden con un ticket (${R.auto.length})</h3><p class="fin-mut" style="font-size:12px;margin-bottom:8px">Mismo importe y fecha cercana. Enlazarlos no crea gastos: solo marca que ya están en Gastos.</p>
+   <button class="fin-btn ok" data-b="enlazar">Enlazar los ${R.auto.length}</button>
+   <details style="margin-top:8px"><summary style="cursor:pointer;font-size:13px;font-weight:700">Ver la lista</summary><ul class="fin-list">${R.auto.map(([m,g])=>`<li class="fin-item"><div class="fi-main"><div class="fi-desc">${fdate(m.fecha)} · ${esc(m.comercio)}</div><div class="fi-sub">↔ ticket ${esc(gNom(g))}</div></div><div class="fi-imp fin-neg">${eur(m.imp)}</div></li>`).join('')}</ul></details></div>`:''}
   ${R.dud.length?`<div class="fin-card"><h3>❓ ¿Es el mismo gasto?</h3><ul class="fin-list">${R.dud.map(([m,c])=>`<li class="fin-item"><div class="fi-main"><div class="fi-desc">${fdate(m.fecha)} · ${esc(m.comercio)} · <b>${eur(-m.imp)}</b></div>
     <div class="fin-row" style="margin:6px 0 0">${c.map(([id,g])=>`<button class="fin-btn sm" data-link="${m.key}|${id}">Es: ${fdate(g.fecha)} ${esc(g.nota||CATS[g.categoria]||'')}</button>`).join('')}
     <button class="fin-btn sm" data-nomatch="${m.key}">Ninguno</button><button class="fin-btn sm" data-ign="${m.key}">Ignorar</button></div></div></li>`).join('')}</ul></div>`:''}
@@ -4095,6 +4098,10 @@ $('fin-bpane').addEventListener('click',e=>{
     if(a==='recargarG'){F.gastos=null;renderB();}
     if(a==='selTodo'||a==='selNada')document.querySelectorAll('#fin-nuevos .fin-chk').forEach(c=>c.checked=a==='selTodo');
     if(a==='crear')crearGastos();
+    if(a==='enlazar'&&F.lastR){const u={};F.lastR.auto.forEach(([m,g])=>u['conc/'+m.key]={g,a:1});fref().update(u).then(()=>showToast('✅ '+F.lastR.auto.length+' enlazados')).catch(e=>showToast('Error: '+e.message));}
+    if(a==='reiniciar'){const c=F.data.conc||{},u={};Object.entries(c).forEach(([k,v])=>{if(v&&!v.n)u['conc/'+k]=null;});
+      const n=Object.keys(u).length;if(!n){showToast('No hay enlaces que deshacer');return;}
+      if(confirm('¿Deshacer '+n+' enlaces e "ignorados"? Los gastos creados desde el banco no se tocan.'))fref().update(u).then(()=>showToast('↺ Enlaces deshechos'));}
     if(a==='rAdd'){const R=userRules();R.unshift({p:'',e:''});saveRules(R);}
     if(a==='rExp'){const blob=new Blob([JSON.stringify({reglas:userRules()},null,2)],{type:'application/json'});const l=document.createElement('a');l.href=URL.createObjectURL(blob);l.download='reglas_banco.json';l.click();}
     if(a==='rImp')$('fin-rfile').click();
