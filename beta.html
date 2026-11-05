@@ -4243,15 +4243,17 @@ function tBog(P){
 }
 function tContrato(P){
   const c=contrato(),e=c.emisor||{},r=c.receptor||{},t=totalesC(c);
-  const inp=(id,v,ph,type)=>`<input class="fin-in" style="width:100%" id="${id}" value="${esc(v||'')}" placeholder="${esc(ph||'')}" ${type?'type="'+type+'"':''}>`;
-  P.innerHTML=`<div class="fin-card"><h3>Emisora (quien factura)</h3>
+  const inp=(id,v,ph,type)=>`<label for="${id}" style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px">${esc(ph)}</label><input class="fin-in fin-cin" style="width:100%" id="${id}" value="${esc(v||'')}" ${type?'type="'+type+'"':''}>`;
+  const est=c.guardado?`<div id="c-est" class="fin-card" style="background:rgba(22,163,74,.12);color:#16a34a;font-weight:700;font-size:13px">✅ Contrato guardado el ${new Date(c.guardado).toLocaleString('es-ES',{dateStyle:'short',timeStyle:'short'})}</div>`
+    :`<div id="c-est" class="fin-card" style="background:rgba(217,119,6,.15);color:#d97706;font-weight:700;font-size:13px">⚠️ Contrato todavía sin guardar</div>`;
+  P.innerHTML=est+`<div class="fin-card"><h3>Emisora (quien factura)</h3>
    <div class="fg">${inp('c-en',e.nombre,'Nombre completo')}</div><div class="fg">${inp('c-ei',e.nif,'NIF')}</div><div class="fg">${inp('c-ed',e.dir,'Dirección')}</div>
    <div class="fg">${inp('c-ec',e.cp,'CP y localidad')}</div><div class="fg">${inp('c-ee',e.email,'Email')}</div><div class="fg">${inp('c-et',e.tel,'Teléfono')}</div></div>
   <div class="fin-card"><h3>Inquilina</h3>
    <div class="fg">${inp('c-rn',r.nombre,'Nombre completo')}</div><div class="fg">${inp('c-ri',r.nif,'NIF/NIE')}</div><div class="fg">${inp('c-rd',r.dir,'Dirección')}</div>
    <div class="fg">${inp('c-rc',r.cp,'CP y localidad')}</div><div class="fg">${inp('c-rt',r.tel,'Móvil para WhatsApp (ej. 612345678)','tel')}</div></div>
   <div class="fin-card"><h3>Factura</h3>
-   <div class="fg"><textarea class="fin-in" id="c-con" rows="3" style="width:100%" placeholder="Importe del alquiler situado en …, según contrato de arrendamiento suscrito.">${esc(c.concepto||'')}</textarea></div>
+   <div class="fg"><label for="c-con" style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px">Concepto (ej.: Importe del alquiler situado en …, según contrato de arrendamiento suscrito.)</label><textarea class="fin-in fin-cin" id="c-con" rows="3" style="width:100%">${esc(c.concepto||'')}</textarea></div>
    <div class="fin-row"><label>Neto € <input class="fin-in" id="c-neto" type="number" step="0.01" value="${c.neto??''}" style="width:90px"></label><label>IVA % <input class="fin-in" id="c-iva" type="number" step="0.01" value="${c.iva??21}" style="width:70px"></label><label>IRPF % <input class="fin-in" id="c-irpf" type="number" step="0.01" value="${c.irpf??19}" style="width:70px"></label></div>
    <div class="fin-mut" id="c-total" style="font-size:13px;margin-bottom:8px">Neto ${eur(t.neto)} + IVA ${eur(t.iva)} − IRPF ${eur(t.irpf)} = <b>${eur(t.total)}</b></div>
    <div class="fin-row"><label>Inicio del alquiler <input class="fin-in" id="c-ini" type="month" value="${c.inicio||'2024-08'}"></label><label>Crear facturas desde <input class="fin-in" id="c-fd" type="month" value="${c.facturasDesde||'2026-12'}"></label></div>
@@ -4329,12 +4331,13 @@ $('fin-tpane').addEventListener('click',async e=>{
   if(a==='guardarContrato'){
     const g=id=>($(id).value||'').trim(),num=id=>$(id).value===''?null:+$(id).value;
     const c={emisor:{nombre:g('c-en'),nif:g('c-ei'),dir:g('c-ed'),cp:g('c-ec'),email:g('c-ee'),tel:g('c-et')},receptor:{nombre:g('c-rn'),nif:g('c-ri'),dir:g('c-rd'),cp:g('c-rc'),tel:g('c-rt')},
-      concepto:g('c-con'),neto:num('c-neto'),iva:num('c-iva'),irpf:num('c-irpf'),inicio:g('c-ini'),facturasDesde:g('c-fd'),repDesde:contrato().repDesde||'2024-07'};
+      concepto:g('c-con'),neto:num('c-neto'),iva:num('c-iva'),irpf:num('c-irpf'),inicio:g('c-ini'),facturasDesde:g('c-fd'),repDesde:contrato().repDesde||'2024-07',guardado:Date.now()};
     if(!contratoOk(c)){showToast('Faltan nombre de emisora, inquilina o neto');return;}
-    await fref('tienda/contrato').set(c);showToast('✅ Contrato guardado');F.tt='fact';document.querySelectorAll('#fin-ttabs .fin-tab').forEach(b=>b.classList.toggle('on',b.dataset.tt==='fact'));
+    await fref('tienda/contrato').set(c);showToast('✅ Contrato guardado');window.scrollTo(0,0);const sb=document.querySelector('#screen-tienda .screen-body');if(sb)sb.scrollTop=0;
   }
 });
 $('fin-tpane').addEventListener('input',e=>{
+  if(/^c-/.test(e.target.id)){const st=$('c-est');if(st){st.style.background='rgba(217,119,6,.15)';st.style.color='#d97706';st.textContent='✏️ Cambios sin guardar: pulsa "Guardar contrato" al final';}}
   if(!/^c-(neto|iva|irpf)$/.test(e.target.id))return;
   const c={neto:+$('c-neto').value||0,iva:+$('c-iva').value||0,irpf:+$('c-irpf').value||0},tt=totalesC(c),el=$('c-total');
   if(el)el.innerHTML=`Neto ${eur(tt.neto)} + IVA ${eur(tt.iva)} − IRPF ${eur(tt.irpf)} = <b>${eur(tt.total)}</b>`;
