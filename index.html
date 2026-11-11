@@ -362,6 +362,64 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .fin-mov:focus-visible{outline:2px solid #5eead4;outline-offset:2px;border-radius:8px}
 .fin-mdet{margin:0 0 10px 50px;padding:10px 12px;background:var(--bg3);border-radius:10px;font-size:13px;line-height:1.6;cursor:default}
 
+/* ===== DESPENSA ===== */
+.dsp-chips{display:flex;gap:6px;padding:12px 16px 4px;overflow-x:auto}
+.dsp-chip{padding:8px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--card);color:var(--text);font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer;font-family:inherit}
+.dsp-chip.sel{background:#4d7c0f;border-color:#4d7c0f;color:#fff}
+.dsp-mueble{margin:10px 16px 0;background:#f4ede1;border:6px solid #c9a46c;border-radius:12px;overflow:hidden}
+.dsp-mueble.z-nevera{background:#ecf6f8;border-color:#9cc7d1}
+.dsp-mueble.z-limpieza{background:#eef2fb;border-color:#a9b7d6}
+[data-theme="dark"] .dsp-mueble{background:#2b2a26}
+[data-theme="dark"] .dsp-mueble.z-nevera{background:#22303a}
+[data-theme="dark"] .dsp-mueble.z-limpieza{background:#262b3b}
+.dsp-balda{padding:9px 10px 8px;border-bottom:6px solid #c9a46c;cursor:pointer}
+.z-nevera .dsp-balda{border-color:#9cc7d1}.z-limpieza .dsp-balda{border-color:#a9b7d6}
+.dsp-balda:last-child{border-bottom:none}
+.dsp-balda.sel{background:rgba(101,163,13,.16)}
+.dsp-bt{font-size:11px;font-weight:700;color:#7c5a2a;margin-bottom:6px}
+.z-nevera .dsp-bt{color:#155e75}.z-limpieza .dsp-bt{color:#3b4a75}
+[data-theme="dark"] .dsp-bt{color:#d6c3a1}
+.dsp-balda.sel .dsp-bt{color:#3f6212}
+[data-theme="dark"] .dsp-balda.sel .dsp-bt{color:#a3e635}
+.dsp-pills{display:flex;gap:6px;flex-wrap:wrap;min-height:26px}
+.dsp-pill{background:var(--card);color:var(--text);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.dsp-pill.cero{background:#fee2e2;color:#991b1b}
+.dsp-vacia{font-size:12px;color:var(--text3);padding:5px 0}
+.dsp-sec{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 6px;font-size:13px;font-weight:700;color:var(--text2)}
+.dsp-link{background:none;border:none;color:#4d7c0f;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+.dsp-list{margin:0 16px;background:var(--card);border-radius:16px;padding:2px 14px;box-shadow:var(--shadow)}
+.dsp-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.dsp-row:last-child{border-bottom:none}
+.dsp-rn{flex:1;min-width:0;cursor:pointer}
+.dsp-rn .n{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dsp-rn .s{font-size:12px;color:var(--text2);margin-top:1px}
+.dsp-rn .cero{color:#4d7c0f;font-weight:700}
+.dsp-step{display:flex;align-items:center;gap:6px}
+.dsp-step button{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg3);color:var(--text);font-size:19px;cursor:pointer;line-height:1}
+.dsp-step b{min-width:20px;text-align:center}
+.dsp-empty{margin:0 16px;padding:18px;text-align:center;color:var(--text2);font-size:13px;background:var(--card);border-radius:16px}
+#dsp-snack{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(20px);width:min(420px,calc(100% - 32px));background:#1a1a2e;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:10001;box-sizing:border-box}
+#dsp-snack.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#dsp-snack span{flex:1}
+#dsp-snack button{background:none;border:none;color:#a3e635;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+#modal-dsp-ticket{z-index:10000}
+#modal-dsp-ticket .modal-sheet{max-height:92vh;display:flex;flex-direction:column}
+.dsp-tk-head{font-size:13px;color:var(--text2);margin:-6px 0 8px}
+#dsp-tk-list{overflow-y:auto;flex:1;min-height:0;margin:0 -4px;padding:0 4px}
+.dsp-tk-row{padding:9px 0;border-bottom:1px solid var(--border)}
+.dsp-tk-top{display:flex;align-items:center;gap:8px}
+.dsp-tk-top input{flex:1;min-width:0;border:none;background:transparent;font-weight:700;font-size:14px;color:var(--text);padding:4px 0;font-family:inherit;border-bottom:1px dashed transparent}
+.dsp-tk-top input:focus{outline:none;border-bottom-color:var(--border2)}
+.dsp-seg{display:flex;background:var(--bg3);border-radius:10px;padding:2px;flex-shrink:0}
+.dsp-seg button{border:none;background:none;padding:6px 7px;border-radius:8px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:inherit}
+.dsp-seg button.on{color:#fff}
+.dsp-seg .on.nev{background:#0e7490}.dsp-seg .on.desp{background:#4d7c0f}.dsp-seg .on.cong{background:#0369a1}.dsp-seg .on.no{background:#9ca3af}
+.dsp-tk-sub{font-size:12px;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.dsp-tk-sub select{border:1.5px solid #4d7c0f;background:var(--card);color:var(--text);border-radius:8px;padding:5px 8px;font-size:13px;font-weight:700;font-family:inherit;max-width:250px}
+.dsp-tk-sub .lbl{font-weight:700;color:var(--text)}
+.dsp-tk-sub .ces{color:#4d7c0f;font-weight:700}
+.dsp-tk-nota{font-size:12px;color:var(--text2);padding:8px 0 0}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -501,6 +559,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div class="mc-grad"></div>
         <div><div class="module-icon">🧊</div><div class="module-name">Congelador</div><div class="module-badge">Familia</div></div>
         <div class="module-count" id="badge-congelador" style="display:none;background:#ef4444">0</div>
+      </div>
+      <div class="module-card" id="card-despensa" style="--mc:#4d7c0f" onclick="abrirDespensa()">
+        <div class="mc-grad"></div>
+        <div><div class="module-icon">🥫</div><div class="module-name">Despensa</div><div class="module-badge">Familia</div></div>
       </div>
       <div class="module-card" style="--mc:#8b5cf6" onclick="abrirPersonal()">
         <div class="mc-grad"></div>
@@ -1401,6 +1463,56 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div id="modal-fin-body"></div>
   </div>
 </div>
+
+<!-- DESPENSA -->
+<div class="screen" id="screen-despensa">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <span class="screen-title">🥫 Despensa</span>
+    <button onclick="abrirModalDespensa()" style="margin-left:auto;padding:8px 14px;background:#4d7c0f;border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer">+ Añadir</button>
+  </div>
+  <div class="input-bar">
+    <input type="text" id="dsp-buscar" placeholder="🔍 Buscar: leche, atún…" style="flex:1">
+  </div>
+  <div class="screen-body" id="dsp-body" style="padding-bottom:90px"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Inicio</div>
+    <div class="nav-item" onclick="abrirCesta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cesta</div>
+    <div class="nav-item" onclick="abrirCongelador()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5L4.9 17.5"/></svg>Congelador</div>
+    <div class="nav-item" onclick="abrirGastos()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos</div>
+  </div>
+</div>
+
+<!-- MODAL DESPENSA -->
+<div class="modal-overlay" id="modal-despensa">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="dsp-mt">Añadir a la despensa</div>
+    <input type="hidden" id="dsp-id">
+    <div class="fg"><label>Producto</label><input type="text" id="dsp-nombre" placeholder="Atún, leche, lejía…" autocomplete="off"></div>
+    <div class="fr">
+      <div class="fg" style="max-width:110px"><label>Cantidad</label><input type="number" id="dsp-cant" value="1" min="0" step="1"></div>
+      <div class="fg"><label>Dónde</label><select id="dsp-lugar"></select></div>
+    </div>
+    <button class="btn-primary" id="dsp-guardar">Guardar</button>
+    <button class="btn-sec" id="dsp-borrar" style="display:none;color:#dc2626">🗑️ Quitar de la despensa</button>
+    <button class="btn-sec" onclick="T('modal-despensa').classList.remove('show')">Cancelar</button>
+  </div>
+</div>
+
+<!-- HOJA DEL TICKET -->
+<div class="modal-overlay" id="modal-dsp-ticket">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">¿Dónde va cada producto?</div>
+    <div class="dsp-tk-head" id="dsp-tk-sub"></div>
+    <div id="dsp-tk-list"></div>
+    <div class="dsp-tk-nota">La app recuerda lo que elijas: la próxima vez ya viene marcado.</div>
+    <button class="btn-primary" id="dsp-tk-ok" style="margin-top:10px">Guardar</button>
+    <button class="btn-sec" id="dsp-tk-no">Solo guardar el gasto</button>
+  </div>
+</div>
+<div id="dsp-snack"></div>
 
 <script>
 firebase.initializeApp({
@@ -4628,6 +4740,281 @@ const _logout=window.doLogout;
 window.doLogout=async function(){if(F.ref){F.ref.off();F.ref=null;}Object.assign(F,{fid:null,uid:null,padreOk:false,loaded:false,data:{},cls:[],gastos:null,vh:null,err:null});
   ['card-banco','card-tienda'].forEach(id=>{const c=$(id);if(c)c.classList.add('fin-hidden');});return _logout.apply(this,arguments);};
 window.__fin={F,classify,parseSheetRows,mergeSets,movKey,repercutir,analizar,catFromTag,effectiveRules,recompute,pdfFactura,totalesC,DEFAULT_RULES};
+})();
+
+</script>
+<script>
+// ===== DESPENSA (estanterías D1 + hoja del ticket D3) =====
+(function(){
+const D={l:null,lc:null,items:{},cfg:null,mem:{},zona:'armario',balda:null,undo:null,ticket:null,pend:{}};
+const ZONAS={nevera:'Nevera',armario:'Armario',limpieza:'Limpieza'};
+const BALDAS_DEF={
+  nevera:['Lácteos y huevos','Fiambre y queso','Fruta y verdura'],
+  armario:['Pasta y arroz','Conservas y legumbres','Desayuno y dulces','Aceite, salsas y especias'],
+  limpieza:['Cocina y ropa','Baño e higiene']
+};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+const memKey=s=>norm(s).replace(/ /g,'_').slice(0,60)||'x';
+const base=()=>'familias/'+familiaData.id;
+const autor=()=>currentUser.displayName||currentUser.email.split('@')[0];
+const titulo=s=>{s=String(s||'').trim();if(s&&s===s.toUpperCase())s=s.split(' ').map(w=>/\d/.test(w)?w:w.charAt(0)+w.slice(1).toLowerCase()).join(' ');return s.charAt(0).toUpperCase()+s.slice(1);};
+function baldas(z){const c=D.cfg&&D.cfg[z];return Array.isArray(c)&&c.length?c:BALDAS_DEF[z];}
+
+// ---------- suscripción ----------
+function suscribir(){
+  if(D.l||!familiaData)return;
+  D.l=db.ref(base()+'/despensa').on('value',s=>{D.items=s.val()||{};limpiarCeros();render();});
+  D.lc=db.ref(base()+'/despensaCfg').on('value',s=>{const v=s.val()||{};D.cfg=v.baldas||null;D.mem=v.mem||{};render();});
+}
+window.abrirDespensa=()=>{showScreen('despensa');suscribir();render();};
+const _lo=window.doLogout;
+window.doLogout=async function(){if(D.l){db.ref(base()+'/despensa').off();db.ref(base()+'/despensaCfg').off();}D.l=D.lc=null;D.items={};D.cfg=null;D.mem={};return _lo.apply(this,arguments);};
+
+// ---------- pantalla ----------
+function render(){
+  const sc=T('dsp-body');if(!sc||!T('screen-despensa').classList.contains('active'))return;
+  const all=Object.entries(D.items).filter(([id,it])=>(Number(it.cantidad)||0)>0||D.pend[id]);
+  const q=norm((T('dsp-buscar')||{}).value);
+  const chips=Object.keys(ZONAS).map(z=>{const n=all.filter(([,it])=>it.zona===z).length;
+    return `<button class="dsp-chip${D.zona===z?' sel':''}" data-dz="${z}">${ZONAS[z]} · ${n}</button>`;}).join('');
+  let h=`<div class="dsp-chips">${chips}</div>`;
+  if(q){
+    const its=all.filter(([,it])=>norm(it.nombre).includes(q));
+    h+=`<div class="dsp-sec">Resultados (${its.length})</div>`+lista(its,true);
+    sc.innerHTML=h;return;
+  }
+  const bs=baldas(D.zona);
+  if(D.balda==null||D.balda>=bs.length)D.balda=0;
+  h+=`<div class="dsp-mueble z-${D.zona}">`+bs.map((b,i)=>{
+    const its=all.filter(([,it])=>it.zona===D.zona&&(Number(it.balda)||0)===i).sort((a,b)=>a[1].nombre.localeCompare(b[1].nombre,'es'));
+    const pills=its.map(([id,it])=>{const c=Number(it.cantidad)||0;
+      return `<span class="dsp-pill${c<=0?' cero':''}" data-dedit="${id}">${esc(it.nombre)} ×${c}</span>`;}).join('')||'<span class="dsp-vacia">Vacía</span>';
+    return `<div class="dsp-balda${i===D.balda?' sel':''}" data-db="${i}"><div class="dsp-bt">${esc(b)}</div><div class="dsp-pills">${pills}</div></div>`;
+  }).join('')+`</div>`;
+  h+=`<div class="dsp-sec"><span>${esc(bs[D.balda])}</span><button class="dsp-link" data-dbaldas="1">Editar baldas</button></div>`;
+  const sel=all.filter(([,it])=>it.zona===D.zona&&(Number(it.balda)||0)===D.balda).sort((a,b)=>a[1].nombre.localeCompare(b[1].nombre,'es'));
+  h+=sel.length?lista(sel,false):`<div class="dsp-empty">No hay nada en esta balda. Pulsa <b>Añadir</b> o escanea un ticket en Gastos.</div>`;
+  sc.innerHTML=h;
+}
+function lista(its,pos){
+  return `<div class="dsp-list">`+its.map(([id,it])=>{
+    const c=Number(it.cantidad)||0;
+    const sub=c<=0?`<span class="cero">Acabado · en la Cesta</span>`:
+      (pos?esc(ZONAS[it.zona]+' · '+(baldas(it.zona)[Number(it.balda)||0]||'')):(it.tienda?esc(titulo(it.tienda))+' · ':'')+(it.fecha?it.fecha.split('-').reverse().slice(0,2).join('/'):''));
+    return `<div class="dsp-row"><div class="dsp-rn" data-dedit="${id}"><div class="n">${esc(it.nombre)}</div><div class="s">${sub}</div></div>
+      <div class="dsp-step"><button data-dmenos="${id}" aria-label="Gastar uno">−</button><b>${c}</b><button data-dmas="${id}" aria-label="Añadir uno">+</button></div></div>`;
+  }).join('')+`</div>`;
+}
+
+// ---------- cantidades y Cesta ----------
+async function enCesta(nombre){
+  const c=await dbG(base()+'/cesta')||{};const n=norm(nombre);
+  return Object.entries(c).find(([,x])=>x&&!x.tachado&&norm(x.nombre)===n);
+}
+async function cambiar(id,d){
+  const it=D.items[id];if(!it)return;
+  const c=Math.max(0,(Number(it.cantidad)||0)+d);
+  if(c===(Number(it.cantidad)||0))return;
+  try{
+    if(c===0&&d<0){
+      const copia=Object.assign({},it);delete copia.agotado;
+      D.pend[id]=1;
+      await db.ref(base()+'/despensa/'+id).update({cantidad:0,agotado:Date.now()});
+      // recuerda su balda para el próximo ticket
+      await db.ref(base()+'/despensaCfg/mem/'+memKey(it.nombre)).set({d:it.zona==='nevera'?'nev':'desp',z:it.zona,b:Number(it.balda)||0});
+      let cid=null;
+      if(!(await enCesta(it.nombre))){cid='item_'+Date.now();
+        await db.ref(base()+'/cesta/'+cid).set({nombre:it.nombre,cantidad:'',autor:autor(),tachado:false,ts:Date.now(),origen:'despensa'});}
+      const t=setTimeout(()=>{delete D.pend[id];quitarSiCero(id);},5000);
+      snack(cid?esc(it.nombre)+' añadido a la Cesta':esc(it.nombre)+' ya estaba en la Cesta',async()=>{
+        clearTimeout(t);delete D.pend[id];
+        await db.ref(base()+'/despensa/'+id).set(Object.assign(copia,{cantidad:1}));if(cid)await db.ref(base()+'/cesta/'+cid).remove();});
+    }else await db.ref(base()+'/despensa/'+id).update({cantidad:c,agotado:null});
+  }catch(e){showToast('Error: '+e.message);}
+}
+async function quitarSiCero(id){
+  try{const c=await dbG(base()+'/despensa/'+id+'/cantidad');
+    if(c!=null&&(Number(c)||0)<=0)await db.ref(base()+'/despensa/'+id).remove();}catch(e){}
+}
+// agotados que quedaron a 0 (app cerrada antes de 5 s, u otro móvil): se limpian
+function limpiarCeros(){
+  const ahora=Date.now();
+  Object.entries(D.items).forEach(([id,it])=>{
+    if(D.pend[id]||(Number(it.cantidad)||0)>0)return;
+    if(!it.agotado||ahora-it.agotado>15000)quitarSiCero(id);
+  });
+}
+function snack(html,undo){
+  const s=T('dsp-snack');clearTimeout(D.st);D.undo=undo;
+  s.innerHTML=`<span>${html}</span>`+(undo?`<button id="dsp-undo">Deshacer</button>`:'');s.classList.add('show');
+  D.st=setTimeout(()=>{s.classList.remove('show');D.undo=null;},5000);
+}
+
+// ---------- modal añadir / editar ----------
+function optsLugar(z,b){
+  return Object.keys(ZONAS).map(k=>`<optgroup label="${ZONAS[k]}">`+baldas(k).map((x,i)=>`<option value="${k}|${i}"${k===z&&i===b?' selected':''}>${esc(ZONAS[k]+' · '+x)}</option>`).join('')+`</optgroup>`).join('');
+}
+function abrirModal(id){
+  const it=id?D.items[id]:null;
+  T('dsp-mt').textContent=it?'Editar producto':'Añadir a la despensa';
+  T('dsp-id').value=id||'';
+  T('dsp-nombre').value=it?it.nombre:'';
+  T('dsp-cant').value=it?(Number(it.cantidad)||0):1;
+  T('dsp-lugar').innerHTML=optsLugar(it?it.zona:D.zona,it?(Number(it.balda)||0):D.balda||0);
+  T('dsp-borrar').style.display=it?'block':'none';
+  T('modal-despensa').classList.add('show');
+}
+window.abrirModalDespensa=()=>abrirModal(null);
+async function guardarModal(){
+  const nombre=titulo(T('dsp-nombre').value);if(!nombre)return showToast('Escribe el producto');
+  const cantidad=Math.max(0,parseInt(T('dsp-cant').value,10)||0);
+  const [zona,b]=T('dsp-lugar').value.split('|');const balda=Number(b)||0;
+  const id=T('dsp-id').value;
+  try{
+    if(id)await db.ref(base()+'/despensa/'+id).update({nombre,cantidad,zona,balda});
+    else{
+      const ex=Object.entries(D.items).find(([,x])=>norm(x.nombre)===norm(nombre));
+      if(ex)await db.ref(base()+'/despensa/'+ex[0]).update({cantidad:(Number(ex[1].cantidad)||0)+cantidad,zona,balda});
+      else await db.ref(base()+'/despensa/dp_'+Date.now()).set({nombre,cantidad,zona,balda,fecha:hoy(),autor:autor(),ts:Date.now()});
+    }
+    await db.ref(base()+'/despensaCfg/mem/'+memKey(nombre)).set({d:zona==='nevera'?'nev':'desp',z:zona,b:balda});
+    T('modal-despensa').classList.remove('show');D.zona=zona;D.balda=balda;render();
+    showToast(id?'✅ Actualizado':'✅ Guardado en '+ZONAS[zona]);
+  }catch(e){showToast('Error: '+e.message);}
+}
+async function borrarModal(){
+  const id=T('dsp-id').value;if(!id||!confirm('¿Quitar este producto de la despensa?'))return;
+  try{await db.ref(base()+'/despensa/'+id).remove();T('modal-despensa').classList.remove('show');showToast('🗑️ Quitado');}catch(e){showToast('Error: '+e.message);}
+}
+async function editarBaldas(){
+  const v=prompt('Baldas de '+ZONAS[D.zona]+' (de arriba abajo, separadas por comas):',baldas(D.zona).join(', '));
+  if(v==null)return;const arr=v.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!arr.length)return showToast('Pon al menos una balda');
+  const fuera=Object.values(D.items).filter(it=>it.zona===D.zona&&(Number(it.balda)||0)>=arr.length).length;
+  if(fuera&&!confirm(fuera+' producto(s) están en baldas que desaparecen; pasarán a la última. ¿Seguir?'))return;
+  const up={};up['despensaCfg/baldas/'+D.zona]=arr;
+  Object.entries(D.items).forEach(([id,it])=>{if(it.zona===D.zona&&(Number(it.balda)||0)>=arr.length)up['despensa/'+id+'/balda']=arr.length-1;});
+  try{await db.ref(base()).update(up);}catch(e){showToast('Error: '+e.message);}
+}
+
+// ---------- hoja del ticket ----------
+const RX={
+  cong:/congelad|helado|varitas|surimi|cubitos|hielo|nugget|pizza fresca no/,
+  limp:/lejia|deterg|suaviz|friega|lavavaj|limpia|papel hig|higienic|servillet|rollo coc|gel |champu|desodor|pasta dent|cepillo|esponja|bolsa basura|bolsas basura|estropajo|amoniaco|insectic|compresa|panal|toallit/,
+  nev:/leche|yogur|queso|jamon|pavo|chorizo|salchich|huevo|mantequ|nata|natill|flan|pollo|carne|ternera|cerdo|lomo|filete|picada|pescado|merluza|salmon|atun fresco|gamba|fresa|fruta|platano|manzana|naranja|tomate |lechuga|zanahoria|pimiento|cebolla|patata|verdura|zumo|kefir|tofu|hummus|bacon|fiambre|mozzarella|ensalada/,
+  no:/^producto$|bolsa$|^bolsa |barra|baguette|pan de pueblo|chapata|cafe solo|propina|descuento|cupon|envase/
+};
+function sugerir(nombre){
+  const m=D.mem[memKey(nombre)];if(m)return {d:m.d,z:m.z||(m.d==='nev'?'nevera':'armario'),b:Number(m.b)||0,cj:m.cj||'izq|1'};
+  const n=' '+norm(nombre)+' ';
+  if(RX.no.test(norm(nombre)))return {d:'no',z:'armario',b:0};
+  if(RX.cong.test(n))return {d:'cong',cj:'izq|1'};
+  if(RX.limp.test(n))return {d:'desp',z:'limpieza',b:0};
+  if(RX.nev.test(n))return {d:'nev',z:'nevera',b:0};
+  return {d:'desp',z:'armario',b:0};
+}
+function cgCajonSug(nombre){
+  try{const p=Object.values(cgItems||{}).find(x=>norm(x.nombre)===norm(nombre));if(p)return p.puerta+'|'+p.cajon;}catch(e){}
+  return null;
+}
+async function abrirTicket(productos,tienda,fecha){
+  if(!familiaData)return;suscribir();
+  if(!D.cfg&&!Object.keys(D.mem).length){const v=await dbG(base()+'/despensaCfg')||{};D.cfg=v.baldas||null;D.mem=v.mem||{};}
+  const rows=productos.filter(p=>p&&p.nombre).map(p=>{const nombre=titulo(p.nombre);const s=sugerir(nombre);
+    return {nombre,precio:Number(p.precio)||0,d:s.d,z:s.z||'armario',b:s.b||0,cj:cgCajonSug(nombre)||s.cj||'izq|1'};});
+  if(!rows.length)return;
+  D.ticket={rows,tienda:titulo(tienda||''),fecha:fecha||hoy()};
+  pintarTicket();T('modal-dsp-ticket').classList.add('show');
+}
+function pintarTicket(){
+  const t=D.ticket;if(!t)return;
+  const tot=t.rows.reduce((a,r)=>a+r.precio,0);
+  T('dsp-tk-sub').textContent=[t.tienda||'Ticket',t.fecha.split('-').reverse().join('/'),t.rows.length+' productos',tot?tot.toFixed(2).replace('.',',')+' €':''].filter(Boolean).join(' · ');
+  const LBL={nev:'Nev.',desp:'Desp.',cong:'Cong.',no:'—'};
+  T('dsp-tk-list').innerHTML=t.rows.map((r,i)=>{
+    let lugar='';
+    if(r.d==='nev'||r.d==='desp'){const zs=r.d==='nev'?['nevera']:['armario','limpieza'];
+      lugar=`<select data-tkl="${i}">`+zs.map(z=>baldas(z).map((x,j)=>`<option value="${z}|${j}"${r.z===z&&r.b===j?' selected':''}>${esc((zs.length>1?ZONAS[z]+' · ':'')+x)}</option>`).join('')).join('')+`</select>`;}
+    else if(r.d==='cong'){lugar=`<select data-tkc="${i}">`+['izq','der'].map(p=>[1,2,3].map(c=>`<option value="${p}|${c}"${r.cj===p+'|'+c?' selected':''}>Congelador · ${p==='izq'?'Izquierda':'Derecha'} cajón ${c}</option>`).join('')).join('')+`</select>`;}
+    const enC=r.d!=='no'&&D.cestaN&&D.cestaN.has(norm(r.nombre));
+    return `<div class="dsp-tk-row"><div class="dsp-tk-top"><input value="${esc(r.nombre)}" data-tkn="${i}" aria-label="Nombre">
+      <div class="dsp-seg">${Object.keys(LBL).map(k=>`<button class="${r.d===k?'on '+k:''}" data-tkd="${i}|${k}">${LBL[k]}</button>`).join('')}</div></div>
+      <div class="dsp-tk-sub">${r.precio?r.precio.toFixed(2).replace('.',',')+' € · ':''}${lugar?'<span class="lbl">'+(r.d==='cong'?'Cajón':'Balda')+':</span> '+lugar:'No se guarda'}${enC?' <span class="ces">· sale de la Cesta</span>':''}</div></div>`;
+  }).join('');
+  const n={nev:0,desp:0,cong:0};t.rows.forEach(r=>{if(n[r.d]!=null)n[r.d]++;});
+  const partes=[n.nev&&'Nevera '+n.nev,n.desp&&'Despensa '+n.desp,n.cong&&'Congelador '+n.cong].filter(Boolean);
+  T('dsp-tk-ok').textContent=partes.length?'Guardar · '+partes.join(' · '):'Cerrar';
+}
+async function cargarCestaN(){try{const c=await dbG(base()+'/cesta')||{};D.cestaN=new Set(Object.values(c).filter(x=>x&&!x.tachado).map(x=>norm(x.nombre)));}catch(e){D.cestaN=new Set();}}
+async function guardarTicket(){
+  const t=D.ticket;if(!t)return;
+  const up={},ts=Date.now();let k=0;const nuevos={};
+  const cesta=await dbG(base()+'/cesta')||{};
+  for(const r of t.rows){
+    const nombre=titulo(r.nombre);if(!nombre)continue;const mk=memKey(nombre);
+    if(r.d==='no'){up['despensaCfg/mem/'+mk]={d:'no'};continue;}
+    if(r.d==='cong'){
+      const [puerta,cajon]=r.cj.split('|');
+      let cat='otros';try{const p=cgBuscarProducto(nombre);if(p)cat=p.categoria;}catch(e){}
+      up['congelador/cg_'+(ts+k++)]={nombre,cantidad:1,unidad:'uds',categoria:cat,puerta,cajon:Number(cajon),fecha:t.fecha,autor:autor(),ts};
+      up['despensaCfg/mem/'+mk]={d:'cong',cj:r.cj};
+    }else{
+      const zona=r.d==='nev'?'nevera':(r.z==='limpieza'?'limpieza':'armario');const balda=r.d==='nev'&&r.z!=='nevera'?0:r.b;
+      const nn=norm(nombre);
+      const ex=Object.entries(D.items).find(([,x])=>norm(x.nombre)===nn);
+      if(ex){const prev=(nuevos[ex[0]]!=null?nuevos[ex[0]]:Number(ex[1].cantidad)||0)+1;nuevos[ex[0]]=prev;
+        up['despensa/'+ex[0]+'/cantidad']=prev;up['despensa/'+ex[0]+'/agotado']=null;up['despensa/'+ex[0]+'/fecha']=t.fecha;if(t.tienda)up['despensa/'+ex[0]+'/tienda']=t.tienda;}
+      else{const id='dp_'+(ts+k++);const dup=Object.keys(up).find(p=>p.startsWith('despensa/dp_')&&!p.includes('/cantidad')&&up[p].nombre&&norm(up[p].nombre)===nn);
+        if(dup)up[dup].cantidad++;else up['despensa/'+id]={nombre,cantidad:1,zona,balda,fecha:t.fecha,tienda:t.tienda||'',autor:autor(),ts};}
+      up['despensaCfg/mem/'+mk]={d:r.d,z:zona,b:balda};
+    }
+    Object.entries(cesta).forEach(([cid,x])=>{if(x&&!x.tachado&&norm(x.nombre)===norm(nombre))up['cesta/'+cid+'/tachado']=true;});
+  }
+  try{await db.ref(base()).update(up);T('modal-dsp-ticket').classList.remove('show');
+    const n=t.rows.filter(r=>r.d!=='no').length;D.ticket=null;if(n)showToast('✅ '+n+' productos guardados');}
+  catch(e){showToast('Error: '+e.message);}
+}
+// Engancha al análisis de tickets de Gastos sin tocar su código
+const _gp=guardarPreciosOCR;
+guardarPreciosOCR=async function(productos,establecimiento,fecha,categoria){
+  await _gp.apply(this,arguments);
+  try{
+    const ps=(productos||[]).filter(p=>p&&p.nombre&&norm(p.nombre)!==norm(establecimiento));
+    if(categoria==='supermercado'||(ps.length>=3&&!['vehiculo','restaurante','luz','agua','gas','telefono'].includes(categoria))){
+      if(ps.length){await cargarCestaN();await abrirTicket(ps,establecimiento,fecha);}
+    }
+  }catch(e){console.error('despensa ticket',e);}
+};
+window.dspProbarTicket=async(ps,t,f)=>{await cargarCestaN();return abrirTicket(ps,t,f);};
+
+// ---------- eventos ----------
+document.addEventListener('click',e=>{
+  const g=a=>e.target.closest('['+a+']');let el;
+  if(e.target.id==='dsp-undo'){const u=D.undo;D.undo=null;T('dsp-snack').classList.remove('show');if(u)u();return;}
+  if(!e.target.closest('#screen-despensa,#modal-despensa,#modal-dsp-ticket'))return;
+  if((el=g('data-dz'))){D.zona=el.dataset.dz;D.balda=0;const q=T('dsp-buscar');if(q)q.value='';render();}
+  else if((el=g('data-dmenos')))cambiar(el.dataset.dmenos,-1);
+  else if((el=g('data-dmas')))cambiar(el.dataset.dmas,1);
+  else if((el=g('data-dedit')))abrirModal(el.dataset.dedit);
+  else if((el=g('data-db'))){D.balda=Number(el.dataset.db);render();}
+  else if(g('data-dbaldas'))editarBaldas();
+  else if((el=g('data-tkd'))){const [i,k]=el.dataset.tkd.split('|');const r=D.ticket.rows[i];r.d=k;
+    if(k==='nev'){r.z='nevera';r.b=0;}else if(k==='desp'&&r.z==='nevera'){r.z='armario';r.b=0;}pintarTicket();}
+  else if(e.target.id==='dsp-guardar')guardarModal();
+  else if(e.target.id==='dsp-borrar')borrarModal();
+  else if(e.target.id==='dsp-tk-ok')guardarTicket();
+  else if(e.target.id==='dsp-tk-no'){T('modal-dsp-ticket').classList.remove('show');D.ticket=null;}
+});
+document.addEventListener('change',e=>{
+  const el=e.target;if(!D.ticket)return;
+  if(el.dataset.tkl!=null){const [z,b]=el.value.split('|');const r=D.ticket.rows[el.dataset.tkl];r.z=z;r.b=Number(b);}
+  else if(el.dataset.tkc!=null)D.ticket.rows[el.dataset.tkc].cj=el.value;
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='dsp-buscar')render();
+  else if(e.target.dataset&&e.target.dataset.tkn!=null&&D.ticket)D.ticket.rows[e.target.dataset.tkn].nombre=e.target.value;
+});
 })();
 
 </script>

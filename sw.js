@@ -1,4 +1,4 @@
-const CACHE = 'familialopbas-v6';
+const CACHE = 'familialopbas-v7';
 const ASSETS = ['.', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
