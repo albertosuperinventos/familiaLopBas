@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lumbar">
+<title>Ejercicios Lumbares</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--bg:#f4f7f6;--card:#fff;--ink:#16302b;--mut:#5f7470;--pri:#0f766e;--pri2:#14b8a6;--warn:#d97706;--line:#dfe8e6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);
+ padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+header{background:var(--pri);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1}
+header button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:8px;padding:8px 10px;font-size:14px}
+main{max-width:640px;margin:0 auto;padding:14px}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.levels button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px 4px;font-weight:600;color:var(--ink);font-size:15px}
+.levels button.on{border-color:var(--pri);background:#e6f6f4;color:var(--pri)}
+.levels small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:2px}
+.ex{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.ex:last-child{border-bottom:0}
+.ex img{width:64px;height:64px;object-fit:cover;border-radius:10px;background:#e8eeed;flex:none}
+.ex b{display:block;font-size:15px}
+.ex span{font-size:13px;color:var(--mut)}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;background:#eef2ff;color:#4338ca;margin-top:3px}
+.tag.mov{background:#fef3c7;color:#92400e}
+.big{width:100%;border:0;border-radius:12px;padding:15px;font-size:17px;font-weight:700;background:var(--pri);color:#fff}
+.big.sec{background:#e6f6f4;color:var(--pri)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+video{width:100%;border-radius:12px;background:#000;aspect-ratio:16/9;display:block}
+.progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0 12px}
+.progress i{display:block;height:100%;background:var(--pri2);width:0;transition:width .3s}
+.state{text-align:center;padding:6px 0}
+.phase{font-size:16px;font-weight:600;color:var(--mut);min-height:22px}
+.count{font-size:72px;font-weight:800;line-height:1.05;color:var(--pri);font-variant-numeric:tabular-nums}
+.count.rest{color:var(--warn)}
+.meta{display:flex;justify-content:center;gap:18px;font-size:15px;margin:4px 0 12px}
+.meta b{font-size:20px;display:block;text-align:center}
+.desc{font-size:15px;line-height:1.45;color:#2b4540}
+.ctrl{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
+.ctrl button{border:0;border-radius:12px;padding:14px 6px;font-size:15px;font-weight:600;background:#e6f6f4;color:var(--pri)}
+.ctrl button.main{background:var(--pri);color:#fff;font-size:17px}
+.hist li{padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;font-size:14px}
+.hist ul{list-style:none;margin:0;padding:0}
+.stats{display:flex;gap:10px;margin-bottom:10px}
+.stats div{flex:1;background:#e6f6f4;border-radius:12px;padding:10px;text-align:center}
+.stats b{display:block;font-size:24px;color:var(--pri)}
+.note{font-size:12px;color:var(--mut);line-height:1.4}
+.hidden{display:none}
+h2{font-size:17px;margin:0 0 8px}
+.done{text-align:center;padding:24px 10px}
+.done .ok{font-size:56px}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Ejercicios Lumbares</h1>
+  <button id="btnHist">Historial</button>
+</header>
+<main>
+
+<!-- INICIO -->
+<section id="vHome">
+  <div class="levels" id="levels"></div>
+  <div class="card"><div id="exList"></div></div>
+  <button class="big" id="btnStart">▶ Empezar sesión</button>
+  <p class="note" style="margin-top:14px">Programas y vídeos de la SERMEF (ejercicios.sermef.es), dolor lumbar. Los vídeos se cargan desde su web y necesitan conexión. Si un ejercicio aumenta el dolor o aparece dolor hacia la pierna u hormigueo, para y consúltalo con tu médico o fisio.</p>
+</section>
+
+<!-- SESIÓN -->
+<section id="vSession" class="hidden">
+  <div class="progress"><i id="bar"></i></div>
+  <div class="card">
+    <h2 id="sName"></h2>
+    <video id="vid" muted playsinline controls preload="auto"></video>
+    <div class="state">
+      <div class="phase" id="sPhase"></div>
+      <div class="count" id="sCount">–</div>
+    </div>
+    <div class="meta">
+      <div><b id="sSerie"></b>serie</div>
+      <div><b id="sRep"></b>repetición</div>
+    </div>
+    <p class="desc" id="sDesc"></p>
+  </div>
+  <div class="ctrl">
+    <button id="bPrev">⏮ Ant.</button>
+    <button id="bPlay" class="main">▶ Iniciar</button>
+    <button id="bNext">Sig. ⏭</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="big sec" id="bSkipRest">Saltar descanso</button>
+    <button class="big sec" id="bExit">Salir</button>
+  </div>
+</section>
+
+<!-- FIN -->
+<section id="vDone" class="hidden">
+  <div class="card done">
+    <div class="ok">✅</div>
+    <h2>¡Sesión completada!</h2>
+    <p id="doneTxt" class="note"></p>
+    <button class="big" id="bHome">Volver al inicio</button>
+  </div>
+</section>
+
+<!-- HISTORIAL -->
+<section id="vHist" class="hidden">
+  <div class="stats">
+    <div><b id="stTot">0</b>sesiones</div>
+    <div><b id="stWeek">0</b>últimos 7 días</div>
+    <div><b id="stStreak">0</b>días seguidos</div>
+  </div>
+  <div class="card hist"><ul id="histList"></ul></div>
+  <div class="row">
+    <button class="big sec" id="bHistBack">Volver</button>
+    <button class="big sec" id="bHistClear">Borrar historial</button>
+  </div>
+</section>
+
+</main>
+<script>
+const BASE='https://ejercicios.sermef.es/apirest/ejercicios/';
+const V=n=>BASE+'videos/'+encodeURIComponent(n)+'.mp4';
+const M=c=>BASE+'miniaturas/'+c+'A.png';
+// pasos: fases de cada repetición [texto, segundos]
+const EX={
+ lumbosacro:{n:'Estiramiento lumbosacro',t:'mov',v:'Estiramiento lumbosacro',m:'054',d:'Flexione caderas y rodillas con ayuda de las manos y doble el cuello hacia delante. Mantenga 20-30 segundos.',s:1,r:3,f:[['Mantén el estiramiento',25]]},
+ bascula:{n:'Báscula pélvica',t:'fza',v:'Bascula pelvica',m:'011',d:'Tome aire y suéltelo mientras aprieta los abdominales aplanando la parte inferior de la espalda. Mantenga 5 segundos.',s:3,r:10,f:[['Aprieta y mantén',5]]},
+ puente:{n:'Puente',t:'fza',v:'Puente',m:'091',d:'Tome aire y suéltelo al levantar el cuerpo del suelo, hasta que los muslos queden en línea con el tronco. Mantenga 5 segundos.',s:3,r:10,f:[['Arriba, mantén',5]]},
+ absSuelo:{n:'Abdominales manos suelo',t:'fza',v:'Abdominales manos suelo',m:'005',d:'Despegue la parte alta del cuerpo del suelo, de frente, llevando las manos en dirección a las rodillas. Mantenga 3 segundos.',s:1,r:10,f:[['Arriba, mantén',3]]},
+ gato:{n:'Gato camello',t:'mov',v:'Gato-camello',m:'077',d:'Lleve la cabeza hacia abajo arqueando la espalda hacia arriba. Mantenga 10 segundos. Lleve la cabeza hacia arriba arqueando la espalda hacia abajo. Mantenga 10 segundos.',lado:' (2 posturas)',s:1,r:3,f:[['Espalda arriba (gato)',10],['Espalda abajo (camello)',10]]},
+ brazoCuad:{n:'Elevación brazo cuadrupedia',t:'fza',v:'Elevacion brazo cuadrupedia',m:'021',d:'Con el tronco recto y el cuello alineado con el tronco tome aire y suéltelo mientras eleva el brazo. Mantenga 5 segundos. Repita con el otro brazo.',s:1,r:10,f:[['Brazo derecho',5],['Brazo izquierdo',5]]},
+ piernaCuad:{n:'Elevación pierna cuadrupedia',t:'fza',v:'Elevacion pierna cuadrupedia',m:'028',d:'Con el tronco recto y el cuello alineado con el tronco tome aire y suéltelo mientras eleva la pierna. Mantenga 5 segundos. Repita con la otra pierna.',s:1,r:10,f:[['Pierna derecha',5],['Pierna izquierda',5]]},
+ isquios:{n:'Estiramiento de isquiotibiales tumbado',t:'mov',v:'Estiramiento de isquiotibiales tumbado',m:'044',d:'Flexione la cadera sujetando el muslo con las manos y extienda la rodilla lo más que pueda hasta notar sensación de tirantez. Mantenga 20-30 segundos.',s:1,r:3,f:[['Pierna derecha',25],['Pierna izquierda',25]]},
+ absNuca:{n:'Abdominales manos nuca',t:'fza',v:'Abdominales manos nuca',m:'004',d:'Con las manos en la nuca despegue la parte alta del cuerpo del suelo, de frente, en dirección a las rodillas. Mantenga 3 segundos.',s:3,r:10,f:[['Arriba, mantén',3]]},
+ absCruz:{n:'Abdominales cruzados manos nuca',t:'fza',v:'Abdominales cruzados manos nuca',m:'002',d:'Con las manos en la nuca despegue la parte alta del cuerpo del suelo, llevando el codo hacia la rodilla opuesta. Mantenga 3 segundos. Repita hacia el otro lado.',s:3,r:10,f:[['Codo derecho a rodilla izquierda',3],['Codo izquierdo a rodilla derecha',3]]},
+ bpCuad:{n:'Elevación brazo-pierna cuadrupedia',t:'fza',v:'Elevacion brazo-pierna cuadrupedia',m:'022',d:'Con el tronco recto y el cuello alineado con el tronco tome aire y suéltelo mientras eleva el brazo de un lado y la pierna del lado contrario. Mantenga 5 segundos. Repita con el otro lado.',s:1,r:10,f:[['Brazo dcho. + pierna izda.',5],['Brazo izdo. + pierna dcha.',5]]},
+ puentePierna:{n:'Puente con elevación de la pierna',t:'fza',v:'Puente con elevación de la pierna',m:'092',d:'Tome aire y suéltelo al levantar el cuerpo del suelo, hasta que los muslos queden en línea con el tronco. Levante un pie del suelo hasta que la rodilla quede estirada. Mantenga 5 segundos. Repita con el otro lado.',s:1,r:10,f:[['Pierna derecha estirada',5],['Pierna izquierda estirada',5]]},
+ troncoTumb:{n:'Elevación tronco tumbado',t:'fza',v:'Elevacion tronco tumbado',m:'029',d:'Tome aire y suéltelo mientras despega el pecho del suelo con el cuello y el tronco alineados. Mantenga 5 segundos.',s:1,r:10,f:[['Pecho arriba, mantén',5]]},
+ bpTumb:{n:'Elevación brazo-pierna tumbado',t:'fza',v:'Elevacion brazo-pierna tumbado',m:'023',d:'Tome aire y suéltelo mientras eleva el brazo de un lado y la pierna del lado contrario sin doblarlos. Mantenga 5 segundos. Repita con el otro lado.',s:1,r:10,f:[['Brazo dcho. + pierna izda.',5],['Brazo izdo. + pierna dcha.',5]]}
+};
+const LEVELS={
+ m1:{n:'Medio I',ex:['lumbosacro','bascula','puente','absSuelo','gato','brazoCuad','piernaCuad']},
+ m2:{n:'Medio II',ex:['lumbosacro','isquios','puente','absNuca','absCruz','bpCuad']},
+ alto:{n:'Avanzado',ex:['lumbosacro','isquios','puentePierna','absNuca','absCruz','troncoTumb','bpTumb']}
+};
+const REST_REP=3, REST_SERIE=30, PREP=5;
+
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let level=store.get('lumbar_level','m1'); if(!LEVELS[level])level='m1';
+
+function show(v){['vHome','vSession','vDone','vHist'].forEach(x=>$(x).classList.toggle('hidden',x!==v));window.scrollTo(0,0)}
+function fmtSR(e){const lado=e.lado||(e.f.length>1?' (cada lado)':'');const hold=e.f[0][1];return (e.s>1?e.s+' series × ':'')+e.r+' rep.'+lado+' · '+hold+' s'}
+
+function renderHome(){
+ $('levels').innerHTML=Object.entries(LEVELS).map(([k,l])=>`<button data-k="${k}" class="${k===level?'on':''}">${l.n}<small>${l.ex.length} ejercicios</small></button>`).join('');
+ $('levels').querySelectorAll('button').forEach(b=>b.onclick=()=>{level=b.dataset.k;store.set('lumbar_level',level);renderHome()});
+ $('exList').innerHTML=LEVELS[level].ex.map((k,i)=>{const e=EX[k];return `<div class="ex"><img src="${M(e.m)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><div><b>${i+1}. ${e.n}</b><span>${fmtSR(e)}</span><br><span class="tag ${e.t==='mov'?'mov':''}">${e.t==='mov'?'Movilidad / estiramiento':'Fortalecimiento'}</span></div></div>`}).join('');
+ $('title').textContent='Lumbares · '+LEVELS[level].n;
+}
+
+/* ---------- Motor de sesión ---------- */
+let S=null, timer=null, actx=null;
+function beep(f=880,ms=150){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.value=.15;o.start();o.stop(actx.currentTime+ms/1000)}catch(e){}}
+function vibrate(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+// construye la cola de pasos de un ejercicio
+function steps(e){const q=[{type:'prep',txt:'Colócate en posición',sec:PREP}];
+ for(let s=1;s<=e.s;s++){for(let r=1;r<=e.r;r++){e.f.forEach(([t,sec],fi)=>{q.push({type:'work',txt:t,sec,s,r});if(fi<e.f.length-1)q.push({type:'rest',txt:'Relaja y cambia de lado',sec:REST_REP,s,r})});
+   if(r<e.r)q.push({type:'rest',txt:'Relaja',sec:REST_REP,s,r});}
+  if(s<e.s)q.push({type:'rest',txt:'Descanso entre series',sec:REST_SERIE,s,r:e.r,long:true});}
+ return q}
+
+function startSession(){S={ex:LEVELS[level].ex,i:0,q:[],k:0,left:0,run:false,start:Date.now(),done:[]};loadEx(0);show('vSession')}
+function loadEx(i){stop();S.i=i;S.started=false;const e=EX[S.ex[i]];S.q=steps(e);S.k=0;S.left=S.q[0].sec;
+ $('sName').textContent=(i+1)+'/'+S.ex.length+' · '+e.n;$('sDesc').textContent=e.d;
+ const vid=$('vid');vid.loop=false;vid.src=V(e.v);vid.poster=M(e.m);vid.currentTime=0;vid.play().catch(()=>{});
+ $('bar').style.width=(i/S.ex.length*100)+'%';paint();$('bPlay').textContent='▶ Empezar ejercicio'}
+// al acabar la explicación del vídeo: arranca solo si aún no se ha empezado
+$('vid').addEventListener('ended',()=>{const v=$('vid');v.loop=true;v.play().catch(()=>{});
+ if(S&&!S.started&&!$('vSession').classList.contains('hidden'))play()});
+function paint(){const st=S.q[S.k],e=EX[S.ex[S.i]];
+ if(!S.started){$('sPhase').textContent='Mira la explicación del vídeo';$('sCount').textContent='–';$('sCount').classList.add('rest');
+  $('sSerie').textContent='–/'+e.s;$('sRep').textContent='–/'+e.r;$('bSkipRest').style.visibility='hidden';return}
+ $('sPhase').textContent=st.txt;$('sCount').textContent=S.left;$('sCount').classList.toggle('rest',st.type!=='work');
+ $('sSerie').textContent=(st.s||1)+'/'+e.s;$('sRep').textContent=(st.r||0)+'/'+e.r;
+ $('bSkipRest').style.visibility=st.type==='work'?'hidden':'visible'}
+function tick(){S.left--;if(S.left<=3&&S.left>0)beep(660,90);
+ if(S.left<=0){advance();return}paint()}
+function advance(){S.k++;
+ if(S.k>=S.q.length){beep(1046,300);vibrate([200,100,200]);S.done.push(S.ex[S.i]);
+  if(S.i+1<S.ex.length){loadEx(S.i+1)}
+  else finish();return}
+ const st=S.q[S.k];S.left=st.sec;beep(st.type==='work'?988:520,st.type==='work'?250:150);vibrate(st.type==='work'?120:60);paint()}
+function play(){if(S.run)return;const first=!S.started;S.started=true;S.run=true;timer=setInterval(tick,1000);$('bPlay').textContent='⏸ Pausa';const v=$('vid');v.loop=true;v.play().catch(()=>{});if(first){beep(988,200);paint()}}
+function stop(){S&&(S.run=false);clearInterval(timer);timer=null;$('bPlay').textContent=S&&!S.started?'▶ Empezar ejercicio':'▶ Seguir'}
+function skipRest(){const st=S.q[S.k];if(st.type!=='work'){S.left=1;tick()}}
+function finish(){stop();const rec={d:new Date().toISOString(),lvl:LEVELS[level].n,min:Math.max(1,Math.round((Date.now()-S.start)/60000)),n:S.done.length,tot:S.ex.length};
+ const h=store.get('lumbar_hist',[]);h.unshift(rec);store.set('lumbar_hist',h);
+ $('doneTxt').textContent=`${rec.lvl} · ${rec.n}/${rec.tot} ejercicios · ${rec.min} min`;$('bar').style.width='100%';$('vid').pause();show('vDone')}
+
+$('btnStart').onclick=()=>{beep(0,1);startSession()};
+$('bPlay').onclick=()=>{S.run?stop():play()};
+$('bNext').onclick=()=>{S.done.push(S.ex[S.i]);if(S.i+1<S.ex.length)loadEx(S.i+1);else finish()};
+$('bPrev').onclick=()=>{loadEx(Math.max(0,S.i-1))};
+$('bSkipRest').onclick=skipRest;
+$('bExit').onclick=()=>{stop();$('vid').pause();if(S.done.length&&confirmExit())finish();else{show('vHome')}};
+function confirmExit(){return true}
+$('bHome').onclick=()=>{renderHome();show('vHome')};
+
+/* ---------- Historial ---------- */
+function dayKey(d){const x=new Date(d);return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate()}
+function renderHist(){const h=store.get('lumbar_hist',[]);
+ $('stTot').textContent=h.length;
+ $('stWeek').textContent=h.filter(r=>Date.now()-new Date(r.d)<7*864e5).length;
+ const days=new Set(h.map(r=>dayKey(r.d)));let st=0,c=new Date();if(!days.has(dayKey(c)))c.setDate(c.getDate()-1);
+ while(days.has(dayKey(c))){st++;c.setDate(c.getDate()-1)}$('stStreak').textContent=st;
+ $('histList').innerHTML=h.length?h.map(r=>{const d=new Date(r.d);return `<li><span>${d.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'})} ${d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</span><span>${r.lvl} · ${r.n}/${r.tot} · ${r.min} min</span></li>`}).join(''):'<li><span>Aún no hay sesiones</span></li>'}
+let armClear=false;
+$('btnHist').onclick=()=>{if(S&&S.run)stop();renderHist();show('vHist')};
+$('bHistBack').onclick=()=>{renderHome();show('vHome')};
+$('bHistClear').onclick=()=>{if(!armClear){armClear=true;$('bHistClear').textContent='¿Seguro? Pulsa otra vez';setTimeout(()=>{armClear=false;$('bHistClear').textContent='Borrar historial'},3000);return}
+ store.set('lumbar_hist',[]);armClear=false;$('bHistClear').textContent='Borrar historial';renderHist()};
+
+renderHome();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{})}
+</script>
+</body>
+</html>
