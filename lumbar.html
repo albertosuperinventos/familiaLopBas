@@ -134,7 +134,7 @@ const EX={
  bascula:{n:'Báscula pélvica',t:'fza',v:'Bascula pelvica',m:'011',d:'Tome aire y suéltelo mientras aprieta los abdominales aplanando la parte inferior de la espalda. Mantenga 5 segundos.',s:3,r:10,f:[['Aprieta y mantén',5]]},
  puente:{n:'Puente',t:'fza',v:'Puente',m:'091',d:'Tome aire y suéltelo al levantar el cuerpo del suelo, hasta que los muslos queden en línea con el tronco. Mantenga 5 segundos.',s:3,r:10,f:[['Arriba, mantén',5]]},
  absSuelo:{n:'Abdominales manos suelo',t:'fza',v:'Abdominales manos suelo',m:'005',d:'Despegue la parte alta del cuerpo del suelo, de frente, llevando las manos en dirección a las rodillas. Mantenga 3 segundos.',s:1,r:10,f:[['Arriba, mantén',3]]},
- gato:{n:'Gato camello',t:'mov',v:'Gato-camello',m:'077',d:'Lleve la cabeza hacia abajo arqueando la espalda hacia arriba. Mantenga 10 segundos. Lleve la cabeza hacia arriba arqueando la espalda hacia abajo. Mantenga 10 segundos.',s:1,r:3,f:[['Espalda arriba (gato)',10],['Espalda abajo (camello)',10]]},
+ gato:{n:'Gato camello',t:'mov',v:'Gato-camello',m:'077',d:'Lleve la cabeza hacia abajo arqueando la espalda hacia arriba. Mantenga 10 segundos. Lleve la cabeza hacia arriba arqueando la espalda hacia abajo. Mantenga 10 segundos.',lado:' (2 posturas)',s:1,r:3,f:[['Espalda arriba (gato)',10],['Espalda abajo (camello)',10]]},
  brazoCuad:{n:'Elevación brazo cuadrupedia',t:'fza',v:'Elevacion brazo cuadrupedia',m:'021',d:'Con el tronco recto y el cuello alineado con el tronco tome aire y suéltelo mientras eleva el brazo. Mantenga 5 segundos. Repita con el otro brazo.',s:1,r:10,f:[['Brazo derecho',5],['Brazo izquierdo',5]]},
  piernaCuad:{n:'Elevación pierna cuadrupedia',t:'fza',v:'Elevacion pierna cuadrupedia',m:'028',d:'Con el tronco recto y el cuello alineado con el tronco tome aire y suéltelo mientras eleva la pierna. Mantenga 5 segundos. Repita con la otra pierna.',s:1,r:10,f:[['Pierna derecha',5],['Pierna izquierda',5]]},
  isquios:{n:'Estiramiento de isquiotibiales tumbado',t:'mov',v:'Estiramiento de isquiotibiales tumbado',m:'044',d:'Flexione la cadera sujetando el muslo con las manos y extienda la rodilla lo más que pueda hasta notar sensación de tirantez. Mantenga 20-30 segundos.',s:1,r:3,f:[['Pierna derecha',25],['Pierna izquierda',25]]},
@@ -157,7 +157,7 @@ const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e)
 let level=store.get('lumbar_level','m1'); if(!LEVELS[level])level='m1';
 
 function show(v){['vHome','vSession','vDone','vHist'].forEach(x=>$(x).classList.toggle('hidden',x!==v));window.scrollTo(0,0)}
-function fmtSR(e){const lado=e.f.length>1?' (cada lado)':'';const hold=e.f[0][1];return (e.s>1?e.s+' series × ':'')+e.r+' rep.'+lado+' · '+hold+' s'}
+function fmtSR(e){const lado=e.lado||(e.f.length>1?' (cada lado)':'');const hold=e.f[0][1];return (e.s>1?e.s+' series × ':'')+e.r+' rep.'+lado+' · '+hold+' s'}
 
 function renderHome(){
  $('levels').innerHTML=Object.entries(LEVELS).map(([k,l])=>`<button data-k="${k}" class="${k===level?'on':''}">${l.n}<small>${l.ex.length} ejercicios</small></button>`).join('');
