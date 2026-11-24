@@ -2154,6 +2154,7 @@ function ubEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;
 function ubBase(){return 'familias/'+familiaData.id+'/ubicacion';}
 function ubEsPadre(){return familiaData&&familiaData.userRole!=='hijo';}
 const UB_COL=['#6c63ff','#ff6584','#0ea5e9','#22c55e','#f59e0b','#a855f7'];
+function ubMiembros(){return Object.keys(familiaData.miembros||{}).filter(uid=>UB.nombres[uid]);}
 function ubColor(uid){const ks=Object.keys(familiaData.miembros||{}).sort();const i=ks.indexOf(uid);return UB_COL[(i<0?0:i)%UB_COL.length];}
 function ubHace(ts){
   if(!ts)return 'sin datos';const m=Math.round((Date.now()-ts)/60000);
@@ -2172,8 +2173,8 @@ window.abrirLocalizacion=async()=>{
   ['hist','zonas'].forEach(t=>{const b=T('ub-tab-'+t);if(b)b.style.display=ubEsPadre()?'':'none';});
   try{await ubCargarLeaflet();}catch(e){showToast('❌ '+e.message);return;}
   for(const uid of Object.keys(familiaData.miembros||{})){
-    if(UB.nombres[uid])continue;
-    const u=await dbG('users/'+uid);UB.nombres[uid]=u?(u.name||u.email||'?').split(' ')[0]:'?';
+    if(uid in UB.nombres)continue;
+    const u=await dbG('users/'+uid);UB.nombres[uid]=u&&(u.name||u.email)?(u.name||u.email).split(' ')[0]:'';
   }
   if(!UB.map){
     UB.map=L.map('ub-map',{zoomControl:true,attributionControl:true}).setView([37.37,-6.07],12);
@@ -2226,7 +2227,7 @@ function ubPintarZonas(){
 function ubLista(){
   const el=T('ub-lista');if(!el)return;
   if(UB.tab==='mapa'){
-    const uids=Object.keys(familiaData.miembros||{});
+    const uids=ubMiembros();
     el.innerHTML=uids.map(uid=>{
       const it=UB.actual[uid];const viejo=!it||Date.now()-it.ts>3*3600e3;
       return `<div class="cg-item" style="cursor:pointer" onclick="ubCentrar('${uid}')">
@@ -2251,7 +2252,7 @@ function ubDiaStr(off){const d=new Date();d.setDate(d.getDate()-off);return d.ge
 function ubPrepararHist(){
   const sm=T('ub-hist-miembro'),sd=T('ub-hist-dia');
   const prevM=sm.value,prevD=sd.value;
-  sm.innerHTML=Object.keys(familiaData.miembros||{}).map(uid=>`<option value="${uid}">${ubEsc(UB.nombres[uid]||'?')}</option>`).join('');
+  sm.innerHTML=ubMiembros().map(uid=>`<option value="${uid}">${ubEsc(UB.nombres[uid]||'?')}</option>`).join('');
   sd.innerHTML=Array.from({length:15},(_,i)=>{const s=ubDiaStr(i);const t=i===0?'Hoy':i===1?'Ayer':new Date(s+'T12:00').toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});return `<option value="${s}">${t}</option>`;}).join('');
   if(prevM)sm.value=prevM;if(prevD)sd.value=prevD;
   ubPintarHist();
