@@ -527,7 +527,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       </div>
       <div class="module-card" style="--mc:#6c63ff" onclick="abrirLocalizacion()">
         <div class="mc-grad"></div>
-        <div><div class="module-icon">📍</div><div class="module-name">Localización</div><div class="module-badge">Familia</div></div>
+        <div><div class="module-icon">📍</div><div class="module-name">Ubicación</div><div class="module-badge">Familia</div></div>
       </div>
       <div class="module-card" style="--mc:#ff6584" onclick="abrirGastos()">
         <div class="mc-grad"></div>
@@ -1218,6 +1218,45 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 </div>
 
+<!-- UBICACIÓN FAMILIAR -->
+<div class="screen" id="screen-ubicacion">
+  <div class="screen-header">
+    <button class="back-btn" onclick="ubSalir()">←</button>
+    <span class="screen-title">📍 Ubicación</span>
+  </div>
+  <div style="display:flex;gap:6px;padding:10px 16px;overflow-x:auto">
+    <button class="chip active" id="ub-tab-mapa" onclick="ubTab('mapa')">🗺️ Mapa</button>
+    <button class="chip" id="ub-tab-hist" onclick="ubTab('hist')">🕓 Recorridos</button>
+    <button class="chip" id="ub-tab-zonas" onclick="ubTab('zonas')">📌 Zonas</button>
+  </div>
+  <div class="screen-body">
+    <div id="ub-hist-bar" style="display:none;padding:0 16px 8px;gap:8px" class="fr">
+      <select id="ub-hist-miembro" onchange="ubPintarHist()"></select>
+      <select id="ub-hist-dia" onchange="ubPintarHist()"></select>
+    </div>
+    <div id="ub-zona-aviso" style="display:none;margin:0 16px 8px;padding:10px 12px;border-radius:12px;background:rgba(108,99,255,.12);color:var(--text);font-size:13px;font-weight:600">👆 Toca en el mapa donde quieres la zona</div>
+    <div id="ub-map" style="isolation:isolate;position:relative;z-index:0;height:52vh;margin:0 16px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--bg3)"></div>
+    <div id="ub-lista" style="padding-top:12px"></div>
+  </div>
+</div>
+
+<!-- MODAL ZONA -->
+<div class="modal-overlay" id="modal-ub-zona">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="ub-zona-titulo">Nueva zona</div>
+    <input type="hidden" id="ub-zona-id"><input type="hidden" id="ub-zona-lat"><input type="hidden" id="ub-zona-lng">
+    <div class="fg"><label>Nombre</label><input type="text" id="ub-zona-nombre" list="ub-zona-sug" placeholder="Casa, Intplus…" autocomplete="off">
+      <datalist id="ub-zona-sug"><option value="Casa"><option value="Intplus"><option value="Camino Viejo"><option value="Mascareta"><option value="Universidad (Pedagogía)"><option value="CTA Correos Sevilla"></datalist></div>
+    <div class="fg"><label>Radio</label>
+      <select id="ub-zona-radio" onchange="ubPreviewRadio()"><option value="100">100 m</option><option value="150" selected>150 m</option><option value="250">250 m</option><option value="400">400 m</option><option value="600">600 m</option></select>
+    </div>
+    <button class="btn-primary" onclick="ubGuardarZona()">Guardar zona</button>
+    <button class="btn-sec" id="ub-zona-borrar" onclick="ubBorrarZona()" style="display:none;color:#dc2626">🗑️ Borrar zona</button>
+    <button class="btn-sec" onclick="ubCerrarZona()">Cancelar</button>
+  </div>
+</div>
+
 <!-- CONGELADOR -->
 <div class="screen" id="screen-congelador">
   <div class="screen-header">
@@ -1574,7 +1613,7 @@ window.doGoogleLogin=async()=>{
   try{const c=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const s=await dbG('users/'+c.user.uid);if(!s)await dbS('users/'+c.user.uid,{name:c.user.displayName||'Usuario',email:c.user.email,role:'padre',familiaId:null});}
   catch(err){hideLoading();if(err.code!=='auth/popup-closed-by-user')showError('login-error',err.message);}
 };
-window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=lVhCache=null;lCongelador=lCgProd=null;cgItems={};cgProductos={};cgSel=null;vhCache={};gastosUlt=null;vhUlt=null;};
+window.doLogout=async()=>{await auth.signOut();familiaData=null;lCesta=lTareas=lGastos=lMedicos=lVehiculos=lOtto=lVhCache=null;lCongelador=lCgProd=null;cgItems={};if(UB.refBase){db.ref(UB.refBase+'/actual').off('value',UB.lAct);db.ref(UB.refBase+'/zonas').off('value',UB.lZon);}UB.refBase=null;UB.lAct=UB.lZon=null;clearInterval(UB.timer);UB.actual={};UB.zonas={};UB.nombres={};cgProductos={};cgSel=null;vhCache={};gastosUlt=null;vhUlt=null;};
 window.crearFamilia=async()=>{
   if(!currentUser)return showToast('Sin sesión');showLoading();
   try{
@@ -2100,36 +2139,173 @@ window.filtrarTareas=f=>{
   renderTareas(tareasData);
 };
 
-// ===== LOCALIZACIÓN CON GPS REAL =====
-window.abrirLocalizacion = () => {
-  if (!navigator.geolocation) {
-    showToast('❌ Tu navegador no soporta geolocalización');
-    return;
+// ── UBICACIÓN FAMILIAR (OwnTracks → Raspberry → Firebase) ──
+const UB={map:null,leaf:null,tab:'mapa',actual:{},zonas:{},nombres:{},marcas:{},capaZonas:null,capaHist:null,lAct:null,lZon:null,modoZona:false,tmpCirc:null,timer:null};
+function ubCargarLeaflet(){
+  if(UB.leaf)return UB.leaf;
+  UB.leaf=new Promise((res,rej)=>{
+    const c=document.createElement('link');c.rel='stylesheet';c.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';document.head.appendChild(c);
+    const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
+    s.onload=res;s.onerror=()=>{UB.leaf=null;rej(new Error('No se pudo cargar el mapa'));};document.head.appendChild(s);
+  });
+  return UB.leaf;
+}
+function ubEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function ubBase(){return 'familias/'+familiaData.id+'/ubicacion';}
+function ubEsPadre(){return familiaData&&familiaData.userRole!=='hijo';}
+const UB_COL=['#6c63ff','#ff6584','#0ea5e9','#22c55e','#f59e0b','#a855f7'];
+function ubColor(uid){const ks=Object.keys(familiaData.miembros||{}).sort();const i=ks.indexOf(uid);return UB_COL[(i<0?0:i)%UB_COL.length];}
+function ubHace(ts){
+  if(!ts)return 'sin datos';const m=Math.round((Date.now()-ts)/60000);
+  if(m<1)return 'ahora';if(m<60)return 'hace '+m+' min';const h=Math.floor(m/60);
+  if(h<24)return 'hace '+h+' h';return new Date(ts).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function ubBat(it){if(it.bat==null)return '';const ic=it.bs===2||it.bs===3?'🔌':(it.bat<=20?'🪫':'🔋');return ic+' '+it.bat+'%';}
+function ubIcono(uid){
+  const n=(UB.nombres[uid]||'?').trim();const ini=n.charAt(0).toUpperCase();
+  return L.divIcon({className:'',iconSize:[36,36],iconAnchor:[18,18],
+    html:`<div style="width:36px;height:36px;border-radius:50%;background:${ubColor(uid)};color:#fff;font:800 16px Nunito,sans-serif;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">${ubEsc(ini)}</div>`});
+}
+window.abrirLocalizacion=async()=>{
+  if(!familiaData)return;
+  showScreen('ubicacion');
+  ['hist','zonas'].forEach(t=>{const b=T('ub-tab-'+t);if(b)b.style.display=ubEsPadre()?'':'none';});
+  try{await ubCargarLeaflet();}catch(e){showToast('❌ '+e.message);return;}
+  for(const uid of Object.keys(familiaData.miembros||{})){
+    if(UB.nombres[uid])continue;
+    const u=await dbG('users/'+uid);UB.nombres[uid]=u?(u.name||u.email||'?').split(' ')[0]:'?';
   }
-  showToast('📍 Obteniendo tu ubicación...');
-  showLoading();
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
-      hideLoading();
-      showToast('✅ Mostrando tu ubicación real');
-    },
-    (error) => {
-      hideLoading();
-      let mensaje = '';
-      switch(error.code) {
-        case 1: mensaje = '❌ Permiso denegado. Activa ubicación en ajustes'; break;
-        case 2: mensaje = '❌ Ubicación no disponible'; break;
-        case 3: mensaje = '❌ Tiempo de espera agotado'; break;
-        default: mensaje = '❌ Error: ' + error.message;
-      }
-      showToast(mensaje);
-      if (confirm('¿Abrir Maps manualmente?')) window.open('https://www.google.com/maps', '_blank');
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  );
+  if(!UB.map){
+    UB.map=L.map('ub-map',{zoomControl:true,attributionControl:true}).setView([37.37,-6.07],12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(UB.map);
+    UB.capaZonas=L.layerGroup().addTo(UB.map);UB.capaHist=L.layerGroup().addTo(UB.map);
+    UB.map.on('click',ubClickMapa);
+  }
+  setTimeout(()=>UB.map.invalidateSize(),150);
+  if(!UB.lAct){
+    UB.refBase=ubBase();
+    UB.lAct=db.ref(ubBase()+'/actual').on('value',s=>{UB.actual=s.val()||{};ubPintar();});
+    UB.lZon=db.ref(ubBase()+'/zonas').on('value',s=>{UB.zonas=s.val()||{};ubPintarZonas();if(UB.tab==='zonas')ubLista();});
+    UB._centrado=false;
+  }
+  clearInterval(UB.timer);UB.timer=setInterval(()=>{if(UB.tab==='mapa')ubLista();},60000);
+  ubTab(UB.tab);
+};
+window.ubSalir=()=>{clearInterval(UB.timer);ubCancelarModoZona();showScreen('home');};
+window.ubTab=t=>{
+  if(t!=='mapa'&&!ubEsPadre())t='mapa';
+  UB.tab=t;['mapa','hist','zonas'].forEach(x=>{const b=T('ub-tab-'+x);if(b)b.classList.toggle('active',x===t);});
+  T('ub-hist-bar').style.display=t==='hist'?'grid':'none';
+  ubCancelarModoZona();
+  if(!UB.map)return;
+  UB.capaHist.clearLayers();
+  Object.values(UB.marcas).forEach(m=>{t==='hist'?UB.map.removeLayer(m):m.addTo(UB.map);});
+  if(t==='hist')ubPrepararHist();else ubLista();
+};
+function ubPintar(){
+  if(!UB.map)return;
+  for(const uid of Object.keys(UB.marcas)){if(!UB.actual[uid]){UB.map.removeLayer(UB.marcas[uid]);delete UB.marcas[uid];}}
+  const pts=[];
+  for(const [uid,it] of Object.entries(UB.actual)){
+    if(it.lat==null)continue;pts.push([it.lat,it.lng]);
+    const pop=`<b>${ubEsc(UB.nombres[uid]||'?')}</b><br>${it.zona?'📌 '+ubEsc(it.zona):'Fuera de zonas'}<br>${ubBat(it)} · ${ubHace(it.ts)}`;
+    if(UB.marcas[uid]){UB.marcas[uid].setLatLng([it.lat,it.lng]).setPopupContent(pop);}
+    else{UB.marcas[uid]=L.marker([it.lat,it.lng],{icon:ubIcono(uid)}).bindPopup(pop);if(UB.tab!=='hist')UB.marcas[uid].addTo(UB.map);}
+  }
+  if(!UB._centrado&&pts.length){UB._centrado=true;pts.length===1?UB.map.setView(pts[0],15):UB.map.fitBounds(pts,{padding:[40,40],maxZoom:15});}
+  if(UB.tab==='mapa')ubLista();
+}
+function ubPintarZonas(){
+  if(!UB.capaZonas)return;UB.capaZonas.clearLayers();
+  for(const [zid,z] of Object.entries(UB.zonas)){
+    const c=L.circle([z.lat,z.lng],{radius:z.radio||150,color:'#6c63ff',weight:2,fillOpacity:.12}).addTo(UB.capaZonas);
+    c.bindTooltip(z.nombre,{permanent:false});
+    c.on('click',e=>{if(UB.tab==='zonas'&&!UB.modoZona){L.DomEvent.stopPropagation(e);ubAbrirZona(zid);}});
+  }
+}
+function ubLista(){
+  const el=T('ub-lista');if(!el)return;
+  if(UB.tab==='mapa'){
+    const uids=Object.keys(familiaData.miembros||{});
+    el.innerHTML=uids.map(uid=>{
+      const it=UB.actual[uid];const viejo=!it||Date.now()-it.ts>3*3600e3;
+      return `<div class="cg-item" style="cursor:pointer" onclick="ubCentrar('${uid}')">
+        <div class="cg-ic" style="background:${ubColor(uid)};color:#fff;font-weight:800">${ubEsc((UB.nombres[uid]||'?').charAt(0).toUpperCase())}</div>
+        <div style="flex:1;min-width:0"><div style="font-weight:600">${ubEsc(UB.nombres[uid]||'?')}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${it?(it.zona?'📌 '+ubEsc(it.zona):'Fuera de zonas')+' · '+ubHace(it.ts):'Sin OwnTracks configurado'}</div></div>
+        <span style="font-size:12px;font-weight:700;color:${it&&it.bat!=null&&it.bat<=20?'#dc2626':'var(--text2)'}">${it?ubBat(it):''}</span>
+        ${it&&viejo?'<span class="cg-age a">sin señal</span>':''}
+      </div>`;}).join('');
+  }else if(UB.tab==='zonas'){
+    const zs=Object.entries(UB.zonas).sort((a,b)=>a[1].nombre.localeCompare(b[1].nombre,'es'));
+    el.innerHTML=`<div style="padding:0 16px 10px"><button class="btn-primary" onclick="ubModoZona()">+ Nueva zona</button></div>`+
+      (zs.length?zs.map(([zid,z])=>`<div class="cg-item" style="cursor:pointer" onclick="ubAbrirZona('${zid}')">
+        <div class="cg-ic">📌</div><div style="flex:1"><div style="font-weight:600">${ubEsc(z.nombre)}</div>
+        <div style="font-size:12px;color:var(--text3)">Radio ${z.radio} m</div></div><span style="color:var(--text3)">✏️</span></div>`).join('')
+      :'<div class="empty-state"><div class="ei">📌</div><p>Aún no hay zonas</p><small>Crea Casa, Intplus, Camino Viejo…</small></div>');
+  }
+}
+window.ubCentrar=uid=>{const it=UB.actual[uid];if(!it)return showToast('Sin ubicación todavía');UB.map.setView([it.lat,it.lng],16);UB.marcas[uid]&&UB.marcas[uid].openPopup();window.scrollTo({top:0,behavior:'smooth'});};
+// ── Recorridos ──
+function ubDiaStr(off){const d=new Date();d.setDate(d.getDate()-off);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function ubPrepararHist(){
+  const sm=T('ub-hist-miembro'),sd=T('ub-hist-dia');
+  const prevM=sm.value,prevD=sd.value;
+  sm.innerHTML=Object.keys(familiaData.miembros||{}).map(uid=>`<option value="${uid}">${ubEsc(UB.nombres[uid]||'?')}</option>`).join('');
+  sd.innerHTML=Array.from({length:15},(_,i)=>{const s=ubDiaStr(i);const t=i===0?'Hoy':i===1?'Ayer':new Date(s+'T12:00').toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});return `<option value="${s}">${t}</option>`;}).join('');
+  if(prevM)sm.value=prevM;if(prevD)sd.value=prevD;
+  ubPintarHist();
+}
+window.ubPintarHist=async()=>{
+  const uid=T('ub-hist-miembro').value,dia=T('ub-hist-dia').value,el=T('ub-lista');
+  UB.capaHist.clearLayers();if(!uid||!dia)return;
+  el.innerHTML='<div class="cg-sec">Cargando…</div>';
+  const v=await dbG(ubBase()+'/historial/'+uid+'/'+dia)||{};
+  const pts=Object.values(v).filter(p=>p&&p.lat!=null).sort((a,b)=>a.ts-b.ts);
+  if(!pts.length){el.innerHTML='<div class="empty-state"><div class="ei">🕓</div><p>Sin recorrido ese día</p></div>';return;}
+  const ll=pts.map(p=>[p.lat,p.lng]);
+  L.polyline(ll,{color:ubColor(uid),weight:4,opacity:.85}).addTo(UB.capaHist);
+  L.circleMarker(ll[0],{radius:7,color:'#16a34a',fillOpacity:1}).bindTooltip('Inicio '+new Date(pts[0].ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})).addTo(UB.capaHist);
+  L.circleMarker(ll.at(-1),{radius:7,color:'#dc2626',fillOpacity:1}).bindTooltip('Último '+new Date(pts.at(-1).ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})).addTo(UB.capaHist);
+  UB.map.fitBounds(ll,{padding:[30,30],maxZoom:16});
+  const ev=Object.values(await dbG(ubBase()+'/eventos')||{}).filter(e=>e.uid===uid&&e.dia===dia).sort((a,b)=>a.ts-b.ts);
+  el.innerHTML=`<div class="cg-sec">${pts.length} posiciones · ${ev.length} entradas/salidas</div>`+ev.map(e=>`<div class="cg-item"><div class="cg-ic">${e.tipo==='entra'?'🟢':'🔴'}</div>
+    <div style="flex:1"><div style="font-weight:600">${e.tipo==='entra'?'Llega a':'Sale de'} ${ubEsc(e.zona)}</div></div>
+    <span style="font-size:12px;color:var(--text2);font-weight:700">${new Date(e.ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
+};
+// ── Zonas ──
+window.ubModoZona=()=>{UB.modoZona=true;T('ub-zona-aviso').style.display='block';window.scrollTo({top:0,behavior:'smooth'});};
+function ubCancelarModoZona(){UB.modoZona=false;const a=T('ub-zona-aviso');if(a)a.style.display='none';if(UB.tmpCirc&&UB.map){UB.map.removeLayer(UB.tmpCirc);UB.tmpCirc=null;}}
+function ubClickMapa(e){
+  if(!UB.modoZona)return;UB.modoZona=false;T('ub-zona-aviso').style.display='none';
+  T('ub-zona-id').value='';T('ub-zona-lat').value=e.latlng.lat.toFixed(6);T('ub-zona-lng').value=e.latlng.lng.toFixed(6);
+  T('ub-zona-nombre').value='';T('ub-zona-radio').value='150';T('ub-zona-titulo').textContent='Nueva zona';T('ub-zona-borrar').style.display='none';
+  ubPreviewRadio();T('modal-ub-zona').classList.add('show');
+}
+window.ubPreviewRadio=()=>{
+  const lat=parseFloat(T('ub-zona-lat').value),lng=parseFloat(T('ub-zona-lng').value),r=parseInt(T('ub-zona-radio').value);
+  if(isNaN(lat))return;if(UB.tmpCirc)UB.map.removeLayer(UB.tmpCirc);
+  UB.tmpCirc=L.circle([lat,lng],{radius:r,color:'#f59e0b',weight:2,dashArray:'6',fillOpacity:.15}).addTo(UB.map);
+};
+window.ubAbrirZona=zid=>{
+  const z=UB.zonas[zid];if(!z)return;
+  T('ub-zona-id').value=zid;T('ub-zona-lat').value=z.lat;T('ub-zona-lng').value=z.lng;
+  T('ub-zona-nombre').value=z.nombre;T('ub-zona-radio').value=String(z.radio||150);
+  T('ub-zona-titulo').textContent='Editar zona';T('ub-zona-borrar').style.display='block';
+  UB.map.setView([z.lat,z.lng],16);ubPreviewRadio();T('modal-ub-zona').classList.add('show');
+};
+window.ubCerrarZona=()=>{T('modal-ub-zona').classList.remove('show');ubCancelarModoZona();};
+window.ubGuardarZona=async()=>{
+  const nombre=T('ub-zona-nombre').value.trim();if(!nombre)return showToast('Pon un nombre a la zona');
+  const datos={nombre,lat:parseFloat(T('ub-zona-lat').value),lng:parseFloat(T('ub-zona-lng').value),radio:parseInt(T('ub-zona-radio').value)};
+  const zid=T('ub-zona-id').value||('z_'+Date.now());
+  try{await db.ref(ubBase()+'/zonas/'+zid).set(datos);ubCerrarZona();showToast('📌 Zona guardada');}
+  catch(err){showToast('Error: '+err.message);}
+};
+window.ubBorrarZona=async()=>{
+  const zid=T('ub-zona-id').value;if(!zid||!confirm('¿Borrar esta zona?'))return;
+  try{await db.ref(ubBase()+'/zonas/'+zid).remove();ubCerrarZona();showToast('🗑️ Zona borrada');}
+  catch(err){showToast('Error: '+err.message);}
 };
 
 // ===== GASTOS (código original) =====
